@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:port_karo/generated/assets.dart';
@@ -8,9 +9,63 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/home/widgets/category_Grid.dart';
 import 'package:port_karo/view/home/widgets/pick_up_location.dart';
 import 'package:port_karo/view/home/widgets/see_what_new.dart';
+import 'package:port_karo/view_model/port_banner_view_model.dart';
+import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final PageController _pageController = PageController(initialPage: 0);
+  int _currentPage = 0;
+  Timer? _timer;
+
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 🔹 Banner API call after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final portBannerVm = Provider.of<PortBannerViewModel>(context, listen: false);
+      portBannerVm.portBannerApi();
+    });
+
+    // 🔹 Auto slide every 3 seconds
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      final bannerVm = Provider.of<PortBannerViewModel>(context, listen: false);
+      final bannerLength = bannerVm.portBannerModel?.data?.length ?? 0;
+
+      if (bannerLength > 0) {
+        if (_currentPage < bannerLength - 1) {
+          _currentPage++;
+        } else {
+          _currentPage = 0;
+        }
+
+        if (_pageController.hasClients) {
+          _pageController.animateToPage(
+            _currentPage,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+    });
+  }
+
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   Future<bool> _onWillPop(BuildContext context) async {
     return (await showDialog(
@@ -56,6 +111,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final banner = Provider.of<PortBannerViewModel>(context);
     return Container(
       color: Colors.white,
       child: SingleChildScrollView(
@@ -65,10 +121,11 @@ class HomePage extends StatelessWidget {
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
+                // 🔹 Banner with Auto Slide
                 Container(
-                  height: screenHeight * 0.25, 
+                  height: screenHeight * 0.25,
                   width: screenWidth,
-                  decoration:  BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: PortColor.blue,
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(30),
@@ -76,19 +133,17 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                   child: PageView.builder(
-                    itemCount: 3, // number of banners
+                    controller: _pageController,
+                    itemCount: banner.portBannerModel?.data?.length,
                     itemBuilder: (context, index) {
+                      final portBanner = banner.portBannerModel?.data?[index];
                       return ClipRRect(
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(30),
                           bottomRight: Radius.circular(30),
                         ),
-                        child: Image.asset(
-                          [
-                            Assets.assetsPortpro,
-                            Assets.assetsPortpro,
-                            Assets.assetsPortpro,
-                          ][index],
+                        child: Image.network(
+                          portBanner?.imageUrl??"",
                           fit: BoxFit.cover,
                           width: screenWidth,
                         ),
@@ -162,6 +217,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
 
+            // Rest of your code remains same
             SizedBox(height: screenHeight * 0.04),
             const CategoryGrid(),
             Container(
@@ -200,7 +256,11 @@ class HomePage extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextConst(title: 'Explore Courier Reward',color: PortColor.white,fontFamily: AppFonts.kanitReg,),
+                            TextConst(
+                              title: 'Explore Courier Reward',
+                              color: PortColor.white,
+                              fontFamily: AppFonts.kanitReg,
+                            ),
                             TextConst(
                               title: 'Earn 4 coins for every 100 spent',
                               color: PortColor.grayLight,

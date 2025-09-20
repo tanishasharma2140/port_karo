@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
+import 'package:port_karo/res/app_fonts.dart';
+import 'package:port_karo/res/constant_color.dart';
+import 'package:port_karo/view_model/on_boarding_view_model.dart';
+import 'package:provider/provider.dart';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
@@ -12,27 +16,38 @@ class _IntroPageState extends State<IntroPage> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> onboardingData = [
-    {
-      "image": Assets.assetsPortpro,
-      "title": "Pickup & drop anywhere",
-      "desc": "Choose your pickup & drop location from within the area which you require"
-    },
-    {
-      "image": Assets.assetsPortpro,
-      "title": "Fast & Secure",
-      "desc": "Get your packages delivered quickly and safely at your doorstep."
-    },
-    {
-      "image": Assets.assetsPortpro,
-      "title": "24/7 Support",
-      "desc": "We are here to help you anytime, anywhere with our service."
-    },
-  ];
+  // final List<Map<String, String>> onboardingData = [
+  //   {
+  //     "image": Assets.assetsPortpro,
+  //     "title": "Pickup & drop anywhere",
+  //     "desc": "Choose your pickup & drop location from within the area which you require"
+  //   },
+  //   {
+  //     "image": Assets.assetsPortpro,
+  //     "title": "Fast & Secure",
+  //     "desc": "Get your packages delivered quickly and safely at your doorstep."
+  //   },
+  //   {
+  //     "image": Assets.assetsPortpro,
+  //     "title": "24/7 Support",
+  //     "desc": "We are here to help you anytime, anywhere with our service."
+  //   },
+  // ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final onBoardingVm = Provider.of<OnBoardingViewModel>(context, listen: false);
+      onBoardingVm.onBoardingApi();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final onBoarding = Provider.of<OnBoardingViewModel>(context);
     return Scaffold(
+      backgroundColor: PortColor.bg,
       body: Column(
         children: [
           Expanded(
@@ -43,31 +58,35 @@ class _IntroPageState extends State<IntroPage> {
                   _currentPage = index;
                 });
               },
-              itemCount: onboardingData.length,
+              itemCount: onBoarding.onBoardingModel?.data?.length,
               itemBuilder: (context, index) {
+                final portOnBoarding = onBoarding.onBoardingModel?.data?[index];
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      onboardingData[index]["image"]!,
+                    Image.network(
+                      portOnBoarding?.imageUrl??"",
                       height: 250,
                     ),
                     const SizedBox(height: 30),
                     Text(
-                      onboardingData[index]["title"]!,
-                      style: const TextStyle(
-                          fontSize: 20,
+                      textAlign: TextAlign.center,
+                      portOnBoarding?.heading??"",
+                      style:  TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          fontFamily: AppFonts.kanitReg,
                           color: Colors.black),
                     ),
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Text(
-                        onboardingData[index]["desc"]!,
+                        portOnBoarding?.subHeading??"",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style:  TextStyle(
+                          fontSize: 11,
+                          fontFamily: AppFonts.poppinsReg,
                           color: Colors.grey,
                         ),
                       ),
@@ -80,7 +99,7 @@ class _IntroPageState extends State<IntroPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              onboardingData.length,
+              onBoarding.onBoardingModel?.data?.length ?? 0,
                   (index) => Container(
                 margin: const EdgeInsets.all(4),
                 width: _currentPage == index ? 16 : 8,

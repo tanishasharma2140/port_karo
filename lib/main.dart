@@ -14,7 +14,9 @@ import 'package:port_karo/view_model/address_delete_view_model.dart';
 import 'package:port_karo/view_model/address_show_view_model.dart';
 import 'package:port_karo/view_model/help_and_support_view_model.dart';
 import 'package:port_karo/view_model/login_view_model.dart';
+import 'package:port_karo/view_model/on_boarding_view_model.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
+import 'package:port_karo/view_model/port_banner_view_model.dart';
 import 'package:port_karo/view_model/privacy_policy_view_model.dart';
 import 'package:port_karo/view_model/profile_update_view_model.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
@@ -102,6 +104,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> UserHistoryViewModel()),
           ChangeNotifierProvider(create: (context)=> AddWalletViewModel()),
           ChangeNotifierProvider(create: (context)=> WalletHistoryViewModel()),
+          ChangeNotifierProvider(create: (context)=> PortBannerViewModel()),
+          ChangeNotifierProvider(create: (context)=> OnBoardingViewModel()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

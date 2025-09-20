@@ -92,7 +92,7 @@ class _AllIndiaPickUpState extends State<AllIndiaPickUp> {
               const Center(child: CupertinoActivityIndicator())
             else
               Expanded(
-                child: Material( // ✅ Wrap with Material
+                child: Material(
                   child: ListView.builder(
                     itemCount: searchResults.length,
                     itemBuilder: (context, index) {

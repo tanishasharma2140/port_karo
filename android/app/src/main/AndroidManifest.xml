@@ -29,7 +29,9 @@
     <application
         android:label="port_karo"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/NormalTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI"/>
