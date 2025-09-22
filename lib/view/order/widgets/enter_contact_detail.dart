@@ -17,10 +17,11 @@ class EnterContactDetail extends StatefulWidget {
   final String selectedLocation;
   final LatLng selectedLatLng;
 
-  const EnterContactDetail(
-      {super.key,
-      required this.selectedLocation,
-      required this.selectedLatLng});
+  const EnterContactDetail({
+    super.key,
+    required this.selectedLocation,
+    required this.selectedLatLng,
+  });
 
   @override
   State<EnterContactDetail> createState() => _EnterContactDetailState();
@@ -37,6 +38,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
 
   static const LatLng defaultPosition = LatLng(26.8467, 80.9462);
   LatLng selectedLatLng = defaultPosition;
+  int selectedIndex = -1;
 
   @override
   void initState() {
@@ -70,7 +72,8 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   snippet: selectedLocation,
                 ),
                 icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueRed),
+                  BitmapDescriptor.hueRed,
+                ),
               ),
             },
             onMapCreated: (controller) {
@@ -99,10 +102,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                     ),
                   ],
                 ),
-                child: Icon(
-                  Icons.arrow_back,
-                  size: screenHeight * 0.025,
-                ),
+                child: Icon(Icons.arrow_back, size: screenHeight * 0.025),
               ),
             ),
           ),
@@ -185,8 +185,10 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   height: screenHeight * 0.055,
                   cursorHeight: screenHeight * 0.023,
                   labelText: "Receiver's Name",
-                  suffixIcon: const Icon(Icons.perm_contact_cal_outlined,
-                      color: PortColor.blue),
+                  suffixIcon: const Icon(
+                    Icons.perm_contact_cal_outlined,
+                    color: PortColor.blue,
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
                 CustomTextField(
@@ -204,7 +206,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                       isContactDetailsSelected = !isContactDetailsSelected;
                       if (isContactDetailsSelected) {
                         mobileController.text = profileViewModel
-                            .profileModel!.data!.phone
+                            .profileModel!
+                            .data!
+                            .phone
                             .toString();
                       } else {
                         mobileController.clear();
@@ -218,16 +222,20 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                         width: screenWidth * 0.056,
                         decoration: BoxDecoration(
                           border: Border.all(
-                              color: PortColor.blue,
-                              width: screenWidth * 0.004),
+                            color: PortColor.blue,
+                            width: screenWidth * 0.004,
+                          ),
                           borderRadius: BorderRadius.circular(4),
                           color: isContactDetailsSelected
                               ? PortColor.blue
                               : Colors.transparent,
                         ),
                         child: isContactDetailsSelected
-                            ? Icon(Icons.check,
-                                color: Colors.white, size: screenHeight * 0.02)
+                            ? Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: screenHeight * 0.02,
+                              )
                             : null,
                       ),
                       SizedBox(width: screenWidth * 0.028),
@@ -260,9 +268,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    buildSaveOption("Home", Icons.home_filled),
-                    buildSaveOption("Shop", null, Assets.assetsShop),
-                    buildSaveOption("Other", Icons.favorite),
+                    buildSaveOption("Home", Icons.home_filled, null, 0),
+                    buildSaveOption("Shop", null, 'assets/shop.png', 1),
+                    buildSaveOption("Other", Icons.favorite, null, 2),
                   ],
                 ),
               ],
@@ -302,7 +310,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   SizedBox(
                     width: screenWidth * 0.7,
                     child: TextConst(
-                        title: selectedLocation, color: PortColor.black),
+                      title: selectedLocation,
+                      color: PortColor.black,
+                    ),
                   ),
                 ],
               ),
@@ -340,7 +350,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -358,47 +368,84 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-                width: screenWidth * 0.5,
-                child: TextConst(
-                    title: selectedLocation, color: PortColor.black,fontFamily: AppFonts.poppinsReg,size: 12,)),
+              width: screenWidth * 0.5,
+              child: TextConst(
+                title: selectedLocation,
+                color: PortColor.black,
+                fontFamily: AppFonts.poppinsReg,
+                size: 12,
+              ),
+            ),
             SizedBox(height: screenHeight * 0.004),
           ],
         ),
         const Spacer(),
-        Container(
-          height: screenHeight * 0.038,
-          width: screenWidth * 0.14,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: PortColor.gray),
-          ),
-          child: Center(
-            child: TextConst(title: "Change", color: PortColor.blue,size: 12,),
+        GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            height: screenHeight * 0.038,
+            width: screenWidth * 0.14,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: PortColor.gray),
+            ),
+            child: Center(
+              child: TextConst(
+                title: "Change",
+                color: PortColor.blue,
+                size: 12,
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget buildSaveOption(String label, IconData? icon, [String? asset]) {
-    return Container(
-      width: screenWidth * 0.25,
-      height: screenHeight * 0.036,
-      decoration: BoxDecoration(
-        border: Border.all(color: PortColor.gray),
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (icon != null)
-            Icon(icon, color: PortColor.black, size: screenHeight * 0.02),
-          if (asset != null)
-            Image(image: AssetImage(asset), height: screenHeight * 0.03),
-          SizedBox(width: screenWidth * 0.01),
-          TextConst(title: label, color: PortColor.black),
-        ],
+  Widget buildSaveOption(String label, IconData? icon, String? asset, int index) {
+    bool isSelected = index == selectedIndex;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+        });
+      },
+      child: Container(
+        width: 90,
+        height: 30,
+        decoration: BoxDecoration(
+          color: isSelected ? PortColor.blue : Colors.transparent,
+          border: Border.all(color: PortColor.gray),
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : PortColor.black,
+                size: 20,
+              ),
+            if (asset != null)
+              Image(
+                image: AssetImage(asset),
+                height: 20,
+                color: isSelected ? Colors.white : null, // Optional: color overlay
+              ),
+            SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : PortColor.black,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -440,9 +487,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               };
               orderViewModel.setLocationData(data);
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SelectVehicles()));
+                context,
+                MaterialPageRoute(builder: (context) => const SelectVehicles()),
+              );
             }
           },
           child: Container(

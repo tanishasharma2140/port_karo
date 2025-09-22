@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/account/widgets/address/save_pickup_address.dart';
@@ -177,13 +178,19 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                                 title:
                                                     saveAddress?.addressType ??
                                                         "",
-                                                color: PortColor.black),
+                                                color: PortColor.black,
+                                            fontFamily: AppFonts.kanitReg,
+                                              size: 14,
+                                            ),
                                             Row(
                                               children: [
                                                 TextConst(
                                                     title:
                                                         saveAddress?.name ?? "",
-                                                    color: PortColor.gray),
+                                                    color: PortColor.gray,
+                                                fontFamily: AppFonts.poppinsReg,
+                                                  size: 12,
+                                                ),
                                                 SizedBox(
                                                   width: screenWidth * 0.01,
                                                 ),
@@ -191,7 +198,11 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                                     title: saveAddress?.contactNo
                                                             .toString() ??
                                                         "",
-                                                    color: PortColor.gray),
+                                                    color: PortColor.gray,
+                                                  fontFamily: AppFonts.poppinsReg,
+                                                  size: 12,
+
+                                                ),
                                               ],
                                             ),
                                           ],
@@ -202,20 +213,28 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                       thickness: screenWidth * 0.001,
                                     ),
                                     TextConst(
-                                        title: saveAddress?.houseArea ?? "",
-                                        color: PortColor.gray),
+                                        title: saveAddress?.houseArea ?? "mfnwe",
+                                        color: PortColor.gray,
+                                    fontFamily: AppFonts.poppinsReg,
+                                      size: 12,
+                                    ),
                                     SizedBox(
                                       height: screenHeight * 0.01,
                                     ),
                                     TextConst(
                                         title: saveAddress?.address ?? "",
-                                        color: PortColor.gray),
+                                        color: PortColor.gray,
+                                      fontFamily: AppFonts.poppinsReg,
+                                      size: 12,
+                                    ),
                                     SizedBox(
                                       height: screenHeight * 0.01,
                                     ),
                                     TextConst(
                                       title: " Pin code: ${saveAddress?.pincode.toString() ?? ""} ",
                                       color: PortColor.gray,
+                                      fontFamily: AppFonts.poppinsReg,
+                                      size: 12,
                                     ),
 
                                     SizedBox(height: screenHeight * 0.01),
@@ -323,7 +342,7 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
               ),
               GestureDetector(
                 onTap: (){
-                  addressDeleteViewModel.deleteAddressApi(userid: "", addressId: addressId, context: context);
+                  addressDeleteViewModel.deleteAddressApi( addressId: addressId, context: context);
                   Navigator.pop(context);
                 },
                 child: Container(

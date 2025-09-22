@@ -16,8 +16,8 @@ class Services{
       }
       if (value == null || value == '') {
         await Future.delayed(const Duration(seconds: 3));
-        // Navigator.pushNamed(context, RoutesName.login);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>IntroPage()));
+        Navigator.pushNamed(context, RoutesName.login);
+        // Navigator.push(context, MaterialPageRoute(builder: (context)=>IntroPage()));
       } else {
         final profileViewModel = Provider.of<ProfileViewModel>(context, listen: false);
         profileViewModel.profileApi(context);

@@ -21,19 +21,23 @@ class WalletHistoryViewModel with ChangeNotifier {
   }
   Future<void> walletHistoryApi() async {
     setLoading(true);
-    UserViewModel userViewModel = UserViewModel();
-    String? userId = await userViewModel.getUser();
-    _walletHistoryRepo.walletHistoryApi(userId).then((value){
-      print('value:$value');
+    try {
+      UserViewModel userViewModel = UserViewModel();
+      String? userId = await userViewModel.getUser();
+
+      final value = await _walletHistoryRepo.walletHistoryApi(userId);
+
       if (value.success == true) {
         setModelData(value);
       }
-    }).onError((error, stackTrace) {
-      setLoading(false);
+    } catch (e) {
       if (kDebugMode) {
-        print('error: $error');
+        print('error: $e');
       }
-    });
+    } finally {
+      setLoading(false); // 👈 hamesha chalega (success or error)
+    }
   }
+
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view_model/wallet_history_view_model.dart';
@@ -70,7 +71,7 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
       onTap: () => _addAmount(amount),
       child: Container(
         height: 40, // fixed height for button
-        width: 140, // fixed width for button
+        width: 50, // fixed width for button
         decoration: BoxDecoration(
           color: PortColor.blue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(15),
@@ -78,6 +79,7 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
         child: Center(
           child: TextConst(
             title: label,
+            fontFamily: AppFonts.kanitReg,
             color: PortColor.blue,
           ),
         ),
@@ -96,7 +98,6 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
       backgroundColor: PortColor.grey,
       body: Column(
         children: [
-          SizedBox(height: screenHeight * 0.03),
           Container(
             height: screenHeight * 0.07,
             width: screenWidth,
@@ -160,13 +161,12 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
             height: screenHeight * 0.01,
           ),
           Expanded(
-            child:
-            walletHistoryViewModel.loading
-                ?const Center(child: CircularProgressIndicator(color: Colors.blueAccent,))
-                :walletHistoryViewModel.walletHistoryModel?.data
-                ?.isNotEmpty == true
-                ?
-            Container(
+            child: walletHistoryViewModel.loading
+                ? const Center(
+              child: CircularProgressIndicator(color: Colors.blueAccent),
+            )
+                : (walletHistoryViewModel.walletHistoryModel?.data?.isNotEmpty ?? false)
+                ? Container(
               width: screenWidth,
               color: PortColor.white,
               child: ListView.builder(
@@ -179,10 +179,13 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.03,
-                            vertical: screenHeight * 0.01),
+                          horizontal: screenWidth * 0.03,
+                          vertical: screenHeight * 0.01,
+                        ),
                         child: TextConst(
-                            title: transaction.datetime.toString(), color: PortColor.gray),
+                          title: transaction.datetime.toString(),
+                          color: PortColor.gray,
+                        ),
                       ),
                       Divider(
                         thickness: screenWidth * 0.002,
@@ -199,14 +202,16 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
                               height: screenHeight * 0.07,
                               width: screenWidth * 0.13,
                             ),
-                            SizedBox(
-                              width: screenWidth * 0.02,
-                            ),
+                            SizedBox(width: screenWidth * 0.02),
                             TextConst(
-                                title: "Wallet Recharge", color: PortColor.black),
+                              title: "Wallet Recharge",
+                              color: PortColor.black,
+                            ),
                             const Spacer(),
                             TextConst(
-                                title: " ₹${transaction.amount.toString()}", color: Colors.green),
+                              title: "₹${transaction.amount.toString()}",
+                              color: Colors.green,
+                            ),
                           ],
                         ),
                       ),
@@ -215,10 +220,11 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
                 },
               ),
             )
-                  : Center(
+                : Center(
               child: Image.asset("assets/no_history.gif"),
-            )
-          ),
+            ),
+          )
+
         ],
       ),
       bottomSheet: isBottomSheetVisible

@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                // 🔹 Banner with Auto Slide
+                // Banner with Auto Slide
                 Container(
                   height: screenHeight * 0.25,
                   width: screenWidth,
@@ -134,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: PageView.builder(
                     controller: _pageController,
-                    itemCount: banner.portBannerModel?.data?.length,
+                    itemCount: banner.portBannerModel?.data?.length ?? 0,
                     itemBuilder: (context, index) {
                       final portBanner = banner.portBannerModel?.data?[index];
                       return ClipRRect(
@@ -143,13 +143,25 @@ class _HomePageState extends State<HomePage> {
                           bottomRight: Radius.circular(30),
                         ),
                         child: Image.network(
-                          portBanner?.imageUrl??"",
+                          portBanner?.imageUrl ?? "",
                           fit: BoxFit.cover,
                           width: screenWidth,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: PortColor.white,
+                              )
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) => const Center(
+                            child: Icon(Icons.error, color: Colors.red),
+                          ),
                         ),
                       );
                     },
-                  ),
+                  )
+
                 ),
 
                 // 🔹 Pickup Location Container

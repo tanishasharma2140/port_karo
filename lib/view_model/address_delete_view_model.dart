@@ -18,7 +18,7 @@ class AddressDeleteViewModel with ChangeNotifier {
   }
 
   Future<void> deleteAddressApi({
-    required  userid,
+    dynamic  userid,
     required  addressId,
     required BuildContext context,
   }) async {

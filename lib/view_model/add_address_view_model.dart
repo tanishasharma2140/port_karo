@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:port_karo/repo/add_address_repo.dart';
 import 'package:port_karo/utils/utils.dart';
+import 'package:port_karo/view_model/address_show_view_model.dart';
 import 'package:port_karo/view_model/user_view_model.dart';
+import 'package:provider/provider.dart';
 
 
 class AddAddressViewModel with ChangeNotifier {
@@ -17,32 +19,45 @@ class AddAddressViewModel with ChangeNotifier {
   }
 
   Future<void> addAddressApi({
+    required dynamic name,
     required dynamic latitude,
     required dynamic longitude,
     required dynamic address,
-    required dynamic phone,
     required dynamic addressType,
-    required dynamic name,
+    required dynamic houseArea,
     required dynamic pinCode,
-    required dynamic house,
+    required dynamic phone,
     required BuildContext context,
   }) async {
     setLoading(true);
     UserViewModel userViewModel = UserViewModel();
     String? userId = await userViewModel.getUser();
-    Map<String, dynamic> data = {
+    Map<String, dynamic> data =
+    // {
+    //   "userid": userId,
+    //   "latitude": latitude,
+    //   "longitude": longitude,
+    //   "address": address,
+    //   "contact_no": phone,
+    //   "address_type": addressType,
+    //   "name": name,
+    //   "pincode": pinCode,
+    //   "house": house,
+    // }
+    {
       "userid": userId,
+      "name": name,
       "latitude": latitude,
       "longitude": longitude,
       "address": address,
-      "contact_no": phone,
       "address_type": addressType,
-      "name": name,
+      "house_area": houseArea,
       "pincode": pinCode,
-      "house": house,
-    };
+      "contact_no": phone
+    }
+    ;
 
-    print(data);
+    print("addedede${data}");
 
     try {
 
@@ -53,6 +68,12 @@ class AddAddressViewModel with ChangeNotifier {
       if (response.status == 200) {
         print("Address added successfully: ${response.message}");
          Utils.showSuccessMessage(context, "Address added successfully!");
+         Navigator.pop(context);
+         Navigator.pop(context);
+        final addressShowViewModel =
+        Provider.of<AddressShowViewModel>(context, listen: false);
+        addressShowViewModel.addressShowApi();
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add address: ${response.message}')),
