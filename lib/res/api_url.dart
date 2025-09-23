@@ -20,6 +20,7 @@ class ApiUrl{
   static const String walletHistoryUrl="${baseUrl}wallet_history/";
   static const String portBannerUrl="${baseUrl}banner";
   static const String onBoardingUrl="${baseUrl}onboarding-image";
+  static const String goodsTypeUrl="${baseUrl}goods_type";
   static const String sendOtpUrl ="https://otp.fctechteam.org/send_otp.php?mode=test&digit=4&mobile=";
   static const String verifyOtpUrl ="https://otp.fctechteam.org/verifyotp.php?mobile=";
 }

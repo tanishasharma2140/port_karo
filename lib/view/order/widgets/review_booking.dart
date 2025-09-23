@@ -6,6 +6,7 @@ import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/utils/utils.dart';
+import 'package:port_karo/view/order/widgets/goods_type_screen.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
 import 'package:provider/provider.dart';
@@ -14,28 +15,35 @@ class ReviewBooking extends StatefulWidget {
   final int? index;
   final String price;
   final String distance;
-  const ReviewBooking({super.key, this.index, required this.price, required this.distance, });
+  const ReviewBooking({
+    super.key,
+    this.index,
+    required this.price,
+    required this.distance,
+  });
 
   @override
   State<ReviewBooking> createState() => _ReviewBookingState();
 }
 
 class _ReviewBookingState extends State<ReviewBooking> {
-  final TextEditingController _distanceController = TextEditingController();
-  final TextEditingController _amountController = TextEditingController();
+
   String PaymentMethod = "";
+  String? selectedGoodsName;   // sirf UI ke liye
+  Map<String, dynamic>? selectedGoodsType;  // API ke liye
+
   @override
   Widget build(BuildContext context) {
-     final orderViewModel = Provider.of<OrderViewModel>(context);
-    // final selectVehiclesViewModel =
-    // Provider.of<SelectVehiclesViewModel>(context);
-    final vehicle = Provider.of<SelectVehiclesViewModel>(context).selectVehiclesModel!.data![widget.index!];
+    final orderViewModel = Provider.of<OrderViewModel>(context);
+    final vehicle = Provider.of<SelectVehiclesViewModel>(
+      context,
+    ).selectVehiclesModel!.data![widget.index!];
     return Scaffold(
       backgroundColor: PortColor.grey,
       body: ListView(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth*0.009),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.009),
             height: screenHeight * 0.07,
             width: screenWidth,
             decoration: BoxDecoration(
@@ -52,10 +60,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    size: screenHeight * 0.025,
-                  ),
+                  icon: Icon(Icons.arrow_back, size: screenHeight * 0.025),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -72,22 +77,27 @@ class _ReviewBookingState extends State<ReviewBooking> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.035, vertical: screenHeight * 0.02),
+              horizontal: screenWidth * 0.035,
+              vertical: screenHeight * 0.02,
+            ),
             child: Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03,
-                  vertical: screenHeight * 0.018),
+                horizontal: screenWidth * 0.03,
+                vertical: screenHeight * 0.018,
+              ),
               height: screenHeight * 0.17,
               decoration: BoxDecoration(
-                  color: PortColor.white,
-                  borderRadius: BorderRadius.circular(10),
-                boxShadow: [BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  spreadRadius: 0.5,
-                  blurRadius: 3,
-                  offset: const Offset(0, 1),
-                ),
-              ],),
+                color: PortColor.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 0.5,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
 
               child: Column(
                 children: [
@@ -108,9 +118,15 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextConst(
-                              title: vehicle.name.toString(), color: PortColor.black,fontFamily: AppFonts.poppinsReg,),
+                            title: vehicle.name.toString(),
+                            color: PortColor.black,
+                            fontFamily: AppFonts.poppinsReg,
+                          ),
                           TextConst(
-                              title: "View Address detail", color: Colors.blue,fontFamily: AppFonts.poppinsReg,),
+                            title: "View Address detail",
+                            color: Colors.blue,
+                            fontFamily: AppFonts.poppinsReg,
+                          ),
                         ],
                       ),
                       // Spacer(),
@@ -118,12 +134,11 @@ class _ReviewBookingState extends State<ReviewBooking> {
                       // TextConst(text: "away", color: Colors.black),
                     ],
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.01,
-                  ),
+                  SizedBox(height: screenHeight * 0.01),
                   Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.01,
+                    ),
                     height: screenHeight * 0.05,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -137,20 +152,26 @@ class _ReviewBookingState extends State<ReviewBooking> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.alarm,
-                          size: screenHeight * 0.018,
-                        ),
-                        SizedBox(
-                          width: screenWidth * 0.01,
+                        Icon(Icons.alarm, size: screenHeight * 0.018),
+                        SizedBox(width: screenWidth * 0.01),
+                        TextConst(
+                          title: "Free",
+                          color: PortColor.black.withOpacity(0.6),
+                          fontFamily: AppFonts.poppinsReg,
+                          size: 12,
                         ),
                         TextConst(
-                            title: "Free",
-                            color: PortColor.black.withOpacity(0.6),fontFamily: AppFonts.poppinsReg,size: 12,),
-                        TextConst(title: " 70 mins ", color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                          title: " 70 mins ",
+                          color: PortColor.black,
+                          fontFamily: AppFonts.kanitReg,
+                          size: 12,
+                        ),
                         TextConst(
-                            title: "of loading and unloading tome include.",
-                            color: PortColor.black.withOpacity(0.6),fontFamily: AppFonts.poppinsReg,size: 12,),
+                          title: "of loading and unloading tome include.",
+                          color: PortColor.black.withOpacity(0.6),
+                          fontFamily: AppFonts.poppinsReg,
+                          size: 12,
+                        ),
                         // Icon(
                         //   Icons.info_outline,
                         //   color: PortColor.blue,
@@ -165,17 +186,20 @@ class _ReviewBookingState extends State<ReviewBooking> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
-            child: TextConst(title: "Fare Summary", color: PortColor.black,fontFamily: AppFonts.kanitReg,),
+            child: TextConst(
+              title: "Fare Summary",
+              color: PortColor.black,
+              fontFamily: AppFonts.kanitReg,
+            ),
           ),
-          SizedBox(
-            height: screenHeight * 0.02,
-          ),
+          SizedBox(height: screenHeight * 0.02),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
             child: Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03,
-                  vertical: screenHeight * 0.028),
+                horizontal: screenWidth * 0.03,
+                vertical: screenHeight * 0.028,
+              ),
               height: screenHeight * 0.27,
               decoration: BoxDecoration(
                 color: PortColor.white,
@@ -194,123 +218,143 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   Row(
                     children: [
                       TextConst(
-                          title: "Trip Fare",
-                          color: PortColor.black.withOpacity(0.8),fontFamily: AppFonts.poppinsReg,size: 12,),
+                        title: "Trip Fare",
+                        color: PortColor.black.withOpacity(0.8),
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                       TextConst(
-                          title: " (incl.Toll)",
-                          color: PortColor.black.withOpacity(0.5),fontFamily: AppFonts.poppinsReg,size: 12),
+                        title: " (incl.Toll)",
+                        color: PortColor.black.withOpacity(0.5),
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                       const Spacer(),
-                      TextConst(title: "₹${(widget.price)}", color: PortColor.black,fontFamily: AppFonts.poppinsReg,size: 12),
+                      TextConst(
+                        title: "₹${(widget.price)}",
+                        color: PortColor.black,
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                     ],
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.012,
-                  ),
+                  SizedBox(height: screenHeight * 0.012),
                   Row(
                     children: [
                       TextConst(
                         title: "GST (18%)",
                         color: PortColor.black.withOpacity(0.8),
                         fontFamily: AppFonts.poppinsReg,
-                          size: 12
+                        size: 12,
                       ),
                       const Spacer(),
                       TextConst(
-                        title: "₹${(double.parse(widget.price) * 0.18).toStringAsFixed(0)}",
+                        title:
+                            "₹${(double.parse(widget.price) * 0.18).toStringAsFixed(0)}",
                         color: Colors.green,
                         fontFamily: AppFonts.poppinsReg,
-                          size: 12
+                        size: 12,
                       ),
                     ],
                   ),
 
-                  SizedBox(
-                    height: screenHeight * 0.01,
-                  ),
+                  SizedBox(height: screenHeight * 0.01),
                   const Divider(),
-                  SizedBox(
-                    height: screenHeight * 0.01,
-                  ),
+                  SizedBox(height: screenHeight * 0.01),
                   Row(
                     children: [
                       TextConst(
-                          title: "Net Fare",
-                          color: PortColor.black.withOpacity(0.8),fontFamily: AppFonts.poppinsReg,size: 12),
+                        title: "Net Fare",
+                        color: PortColor.black.withOpacity(0.8),
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                       const Spacer(),
                       TextConst(
-                          title: "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
-                          color: PortColor.black,fontFamily: AppFonts.poppinsReg,size: 12),
+                        title:
+                            "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
+                        color: PortColor.black,
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                     ],
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.01,
-                  ),
+                  SizedBox(height: screenHeight * 0.01),
                   const Divider(),
-                  SizedBox(
-                    height: screenHeight * 0.005,
-                  ),
+                  SizedBox(height: screenHeight * 0.005),
                   Row(
                     children: [
                       TextConst(
-                          title: "Amount Payable",
-                          color: PortColor.black.withOpacity(0.8),fontFamily: AppFonts.poppinsReg,size: 12),
+                        title: "Amount Payable",
+                        color: PortColor.black.withOpacity(0.8),
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                       TextConst(
-                          title: " (rounded)",
-                          color: PortColor.black.withOpacity(0.5),fontFamily: AppFonts.poppinsReg,size: 12),
+                        title: " (rounded)",
+                        color: PortColor.black.withOpacity(0.5),
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                       const Spacer(),
-                      TextConst(title: "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
-                           color: PortColor.black,fontFamily: AppFonts.poppinsReg,size: 12),
+                      TextConst(
+                        title:
+                            "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
+                        color: PortColor.black,
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
           ),
-          // SizedBox(
-          //   height: screenHeight * 0.02,
-          // ),
-          // Padding(
-          //   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
-          //   child: Container(
-          //     padding: EdgeInsets.symmetric(
-          //         horizontal: screenWidth * 0.03,
-          //         vertical: screenHeight * 0.015),
-          //     height: screenHeight * 0.08,
-          //     decoration: BoxDecoration(
-          //       color: PortColor.white,
-          //       borderRadius: BorderRadius.circular(10),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.grey.withOpacity(0.2),
-          //           spreadRadius: 0.5,
-          //           blurRadius: 3,
-          //           offset: const Offset(0, 1),
-          //         ),
-          //       ],
-          //     ),
-          //     child: Column(
-          //       crossAxisAlignment: CrossAxisAlignment.start,
-          //       children: [
-          //         TextConst(text: "Goods Type", color: PortColor.gray),
-          //         Row(
-          //           children: [
-          //             TextConst(
-          //                 text: "General loose ", color: PortColor.black),
-          //             Spacer(),
-          //             TextConst(text: " Change ", color: Colors.blue),
-          //           ],
-          //         )
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          SizedBox(
-            height: screenHeight * 0.02,
+          SizedBox(height: 20),
+          GoodsTypeCard(
+            title: "Goods Type",
+            selectedType: selectedGoodsName ?? "Select Goods Type",
+            onChange: () async {
+              final result = await Navigator.push(
+                context,
+                PageRouteBuilder(
+                  transitionDuration: const Duration(milliseconds: 300),
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                  const GoodsTypeScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    final tween = Tween(
+                      begin: const Offset(0, 1),
+                      end: Offset.zero,
+                    ).chain(CurveTween(curve: Curves.easeInOut));
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                ),
+              );
+
+              if (result != null) {
+                setState(() {
+                  selectedGoodsName = result["goods_name"]; // UI me name show hoga
+                  selectedGoodsType = {
+                    "id": result["id"].toString(),
+                    "goods_name": result["goods_name"],
+                  }; // API ke liye map
+                });
+              }
+            },
           ),
+
+
+          SizedBox(height: screenHeight * 0.02),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
-            child:
-                TextConst(title: "Read before booking", color: PortColor.black,fontFamily: AppFonts.kanitReg,),
+            child: TextConst(
+              title: "Read before booking",
+              color: PortColor.black,
+              fontFamily: AppFonts.kanitReg,
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -332,134 +376,148 @@ class _ReviewBookingState extends State<ReviewBooking> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextConst(
-                      title:
-                          '• Fare doesn\'t include labour charges for loading & unloading',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title:
+                        '• Fare doesn\'t include labour charges for loading & unloading',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                   const SizedBox(height: 8),
                   TextConst(
-                      title:
-                          '• Fare includes 70 mins free loading/unloading time.',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title:
+                        '• Fare includes 70 mins free loading/unloading time.',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                   const SizedBox(height: 8),
                   TextConst(
-                      title:
-                          '• ₹ 3.5/min for additional loading/unloading time.',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title: '• ₹ 3.5/min for additional loading/unloading time.',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                   const SizedBox(height: 8),
                   TextConst(
-                      title: '• Fare may change if route or location changes.',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title: '• Fare may change if route or location changes.',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                   const SizedBox(height: 8),
                   TextConst(
-                      title: '• Parking charges to be paid by customer.',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title: '• Parking charges to be paid by customer.',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                   const SizedBox(height: 8),
                   TextConst(
-                      title: '• Fare includes toll and permit charges, if any.',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title: '• Fare includes toll and permit charges, if any.',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                   const SizedBox(height: 8),
                   TextConst(
-                      title: '• We don\'t allow overloading.',
-                      color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
+                    title: '• We don\'t allow overloading.',
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 12,
+                  ),
                 ],
               ),
             ),
           ),
-          SizedBox(
-            height: screenHeight * 0.007,
-          ),
+          SizedBox(height: screenHeight * 0.007),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
-            child:
-            TextConst(title: "Pay Mode", color: PortColor.black,fontFamily: AppFonts.kanitReg,),
+            child: TextConst(
+              title: "Pay Mode",
+              color: PortColor.black,
+              fontFamily: AppFonts.kanitReg,
+            ),
           ),
-          SizedBox(
-            height: screenHeight * 0.02,
+          SizedBox(height: screenHeight * 0.02),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.03,
+                vertical: screenHeight * 0.02,
+              ),
+              decoration: BoxDecoration(
+                color: PortColor.white,
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 0.5,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        PaymentMethod = "1";
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextConst(
+                            title: "Pay Via Cash",
+                            color: PortColor.black,
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 13,
+                          ),
+                        ),
+                        if (PaymentMethod == "1")
+                          const Icon(Icons.check_circle, color: Colors.green),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  const Divider(),
+                  SizedBox(height: screenHeight * 0.01),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        PaymentMethod = "2";
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextConst(
+                            title: "Pay Via PG",
+                            color: PortColor.black,
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 13,
+                          ),
+                        ),
+                        if (PaymentMethod == "2")
+                          const Icon(Icons.check_circle, color: Colors.green),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-           Padding(
-             padding:  EdgeInsets.symmetric(horizontal: screenWidth*0.035),
-             child: Container(
-               padding: EdgeInsets.symmetric(
-                   horizontal: screenWidth * 0.03,
-                   vertical: screenHeight * 0.02),
-               decoration: BoxDecoration(
-                 color: PortColor.white,
-                 borderRadius: const BorderRadius.all(Radius.circular(10)),
-                 boxShadow: [BoxShadow(
-                   color: Colors.grey.withOpacity(0.2),
-                   spreadRadius: 0.5,
-                   blurRadius: 3,
-                   offset: const Offset(0, 1),
-                 ),
-                 ],
-               ),
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                   GestureDetector(
-                     onTap: () {
-                       setState(() {
-                         PaymentMethod = "1";
-                       });
-                     },
-                     child: Row(
-                       children: [
-                         Expanded(
-                           child: TextConst(
-                             title: "Pay Via Cash",
-                             color: PortColor.black,
-                             fontFamily: AppFonts.poppinsReg,
-                             size: 13,
-                           ),
-                         ),
-                         if (PaymentMethod == "1")
-                           const Icon(
-                             Icons.check_circle,
-                             color: Colors.green,
-                           ),
-                       ],
-                     ),
-                   ),
-                   SizedBox(
-                     height: screenHeight * 0.01,
-                   ),
-                   const Divider(),
-                   SizedBox(
-                     height: screenHeight * 0.01,
-                   ),
-                   GestureDetector(
-                     onTap: () {
-                       setState(() {
-                         PaymentMethod = "2";
-                       });
-                     },
-                     child: Row(
-                       children: [
-                         Expanded(
-                           child: TextConst(
-                             title: "Pay Via PG",
-                             color: PortColor.black,
-                             fontFamily: AppFonts.poppinsReg,
-                             size: 13,
-                           ),
-                         ),
-                         if (PaymentMethod == "2")
-                           const Icon(
-                             Icons.check_circle,
-                             color: Colors.green,
-                           ),
-                       ],
-                     ),
-                   ),
-                 ],
-               ),
-             ),
-           ),
-          SizedBox(height: screenHeight*0.2,),
+          SizedBox(height: screenHeight * 0.2),
         ],
       ),
       bottomSheet: Container(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth*0.025,vertical: screenHeight*0.012),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.025,
+          vertical: screenHeight * 0.012,
+        ),
         height: screenHeight * 0.17,
         color: PortColor.white,
         child: Column(
@@ -470,36 +528,39 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   image: const AssetImage(Assets.assetsRupeetwo),
                   height: screenHeight * 0.04,
                 ),
-                TextConst(
-                    title: " Payment", color: PortColor.black),
+                TextConst(title: " Payment", color: PortColor.black),
                 const Spacer(),
-                TextConst(title: "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
-                     color: PortColor.black),
+                TextConst(
+                  title:
+                      "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
+                  color: PortColor.black,
+                ),
               ],
             ),
-            SizedBox(height: screenHeight*0.014,),
+            SizedBox(height: screenHeight * 0.014),
             InkWell(
-              onTap: (){
-
+              onTap: () {
                 if (PaymentMethod.isEmpty) {
-              Utils.showErrorMessage(context, "Please select PayMode");
-                }else {
+                  Utils.showErrorMessage(context, "Please select PayMode");
+                } else {
                   orderViewModel.orderApi(
-                      vehicle.id.toString(),
-                      orderViewModel.pickupData["address"],
-                      orderViewModel.dropData["address"],
-                      orderViewModel.dropData["latitude"],
-                      orderViewModel.dropData["longitude"],
-                      orderViewModel.pickupData["latitude"],
-                      orderViewModel.pickupData["longitude"],
-                      orderViewModel.pickupData["name"],
-                      orderViewModel.pickupData["phone"],
-                      orderViewModel.dropData["name"],
-                      orderViewModel.dropData["phone"],
-                      widget.price,
-                      widget.distance,
-                      PaymentMethod,
-                      context);
+                    vehicle.id.toString(),
+                    orderViewModel.pickupData["address"],
+                    orderViewModel.dropData["address"],
+                    orderViewModel.dropData["latitude"],
+                    orderViewModel.dropData["longitude"],
+                    orderViewModel.pickupData["latitude"],
+                    orderViewModel.pickupData["longitude"],
+                    orderViewModel.pickupData["name"],
+                    orderViewModel.pickupData["phone"],
+                    orderViewModel.dropData["name"],
+                    orderViewModel.dropData["phone"],
+                    widget.price,
+                    widget.distance,
+                    PaymentMethod,
+                    [selectedGoodsType!],
+                    context,
+                  );
                 }
               },
               child: Container(
@@ -510,9 +571,15 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   color: PortColor.buttonBlue,
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: !orderViewModel.loading?
-                    TextConst(
-                        title: "Book ${vehicle.name.toString()}", color: PortColor.white): CupertinoActivityIndicator(radius: 16,color: PortColor.white,),
+                child: !orderViewModel.loading
+                    ? TextConst(
+                        title: "Book ${vehicle.name.toString()}",
+                        color: PortColor.white,
+                      )
+                    : CupertinoActivityIndicator(
+                        radius: 16,
+                        color: PortColor.white,
+                      ),
               ),
             ),
           ],
@@ -520,10 +587,92 @@ class _ReviewBookingState extends State<ReviewBooking> {
       ),
     );
   }
+
   Widget payment({required String text, required Color color}) {
     return Text(
       text,
       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: color),
+    );
+  }
+}
+
+class GoodsTypeCard extends StatelessWidget {
+  final String title;
+  final String selectedType;
+  final VoidCallback onChange;
+
+  const GoodsTypeCard({
+    super.key,
+    required this.title,
+    required this.selectedType,
+    required this.onChange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.035,
+        vertical: 8,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 0.5,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Row: Icon + Title
+            Row(
+              children: [
+                const Icon(Icons.grid_view, size: 18, color: PortColor.gray),
+                const SizedBox(width: 6),
+                TextConst(
+                  title: title,
+                  fontFamily: AppFonts.kanitReg,
+                  size: 14,
+                  color: PortColor.gray,
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            // Bottom Row: Selected Value + Change Button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: TextConst(
+                    title: selectedType,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 13,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: onChange,
+                  child: TextConst(
+                    title: "Change",
+                    color: PortColor.blue,
+                    fontFamily: AppFonts.poppinsReg,
+                    size: 14,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

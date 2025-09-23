@@ -30,6 +30,7 @@ dependencies:
   permission_handler:
   app_settings:
   intl:
+  flutter_polyline_points:
 
 dev_dependencies:
   flutter_test:

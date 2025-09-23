@@ -24,6 +24,7 @@ class OrderViewModel with ChangeNotifier {
 
   dynamic get pickupData => _pickupData;
   dynamic get dropData => _dropData;
+  List<Map<String, dynamic>>? selectedGoodsType;
 
   setLocationData(dynamic data) {
     print("ddddd $data");
@@ -53,9 +54,10 @@ class OrderViewModel with ChangeNotifier {
     dynamic amount,
     dynamic distance,
     dynamic payMode,
-    context,
+      List<Map<String, dynamic>>? goodType,
+      context,
   ) async {
-    print("gjvk $payMode");
+    print("gjvkhjyu $payMode");
     UserViewModel userViewModel = UserViewModel();
     String? UserId = await userViewModel.getUser();
     setLoading(true);
@@ -75,8 +77,10 @@ class OrderViewModel with ChangeNotifier {
       "amount": amount,
       "distance": distance,
       "paymode": payMode,
+      "goods_type": goodType ?? [],
     };
-    print(jsonEncode(data));
+    // print("order${jsonEncode(data)}");
+    print("helotanm${data}");
     try {
       final response = await _orderRepo.orderApi(data);
       setLoading(false);

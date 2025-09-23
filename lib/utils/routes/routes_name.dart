@@ -4,6 +4,7 @@ import 'package:port_karo/view/auth/login_page.dart';
 import 'package:port_karo/view/auth/otp_page.dart';
 import 'package:port_karo/view/auth/register_page.dart';
 import 'package:port_karo/view/bottom_nav_bar.dart';
+import 'package:port_karo/view/order/widgets/goods_type_screen.dart';
 import 'package:port_karo/view/splash_screen.dart';
 class Routers {
    static WidgetBuilder generateRoute(String routeName) {
@@ -18,6 +19,8 @@ class Routers {
             return (context) => const OtpPage();
          case RoutesName.register:
             return (context) => const RegisterPage();
+         case RoutesName.goodsType:
+            return (context) => const GoodsTypeScreen();
          default:
             return (context) => const Scaffold(
                body: Center(

@@ -9,6 +9,7 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/home/widgets/category_Grid.dart';
 import 'package:port_karo/view/home/widgets/pick_up_location.dart';
 import 'package:port_karo/view/home/widgets/see_what_new.dart';
+import 'package:port_karo/view/order/driver_pickup_screen.dart';
 import 'package:port_karo/view_model/port_banner_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -245,49 +246,54 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 children: [
                   SizedBox(height: screenHeight * 0.03),
-                  Container(
-                    width: screenWidth * 0.9,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: const LinearGradient(
-                        colors: [
-                          PortColor.purple,
-                          PortColor.lightPurple,
-                          PortColor.blue
-                        ],
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Image(
-                          image: AssetImage(Assets.assetsCoin),
-                          height: 36,
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextConst(
-                              title: 'Explore Courier Reward',
-                              color: PortColor.white,
-                              fontFamily: AppFonts.kanitReg,
-                            ),
-                            TextConst(
-                              title: 'Earn 4 coins for every 100 spent',
-                              color: PortColor.grayLight,
-                              fontFamily: AppFonts.poppinsReg,
-                              size: 12,
-                            ),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>DriverPickupScreen()));
+                    },
+                    child: Container(
+                      width: screenWidth * 0.9,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [
+                            PortColor.purple,
+                            PortColor.lightPurple,
+                            PortColor.blue
                           ],
                         ),
-                        const Spacer(),
-                        Icon(
-                          Icons.arrow_forward,
-                          color: PortColor.white,
-                          size: screenHeight * 0.03,
-                        ),
-                      ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Image(
+                            image: AssetImage(Assets.assetsCoin),
+                            height: 36,
+                          ),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextConst(
+                                title: 'Explore Courier Reward',
+                                color: PortColor.white,
+                                fontFamily: AppFonts.kanitReg,
+                              ),
+                              TextConst(
+                                title: 'Earn 4 coins for every 100 spent',
+                                color: PortColor.grayLight,
+                                fontFamily: AppFonts.poppinsReg,
+                                size: 12,
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: PortColor.white,
+                            size: screenHeight * 0.03,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.02),

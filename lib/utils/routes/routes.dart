@@ -4,4 +4,5 @@ class RoutesName{
   static const bottomNavBar = "/bottomNavBar";
   static const otp = "/otp";
   static const register = "/register";
+  static const goodsType = "/goodsType";
 }
