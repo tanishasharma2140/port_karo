@@ -122,12 +122,11 @@ class _HomePageState extends State<HomePage> {
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                // Banner with Auto Slide
                 Container(
                   height: screenHeight * 0.25,
                   width: screenWidth,
                   decoration: const BoxDecoration(
-                    color: PortColor.blue,
+                    color: PortColor.gold,
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
@@ -257,10 +256,12 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(12),
                         gradient: const LinearGradient(
                           colors: [
-                            PortColor.purple,
-                            PortColor.lightPurple,
-                            PortColor.blue
+                            Color(0xFFFFF176), // Light Yellow
+                            Color(0xFFFFD54F), // Amber
+                            Color(0xFFFFA726), // Orange
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                       ),
                       child: Row(
@@ -294,7 +295,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                    ),
+                    )
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   Padding(
@@ -351,14 +352,14 @@ class _HomePageState extends State<HomePage> {
                             height: screenHeight * 0.025,
                             width: screenWidth * 0.15,
                             decoration: BoxDecoration(
-                              color: Colors.blue[50],
+                              color: Colors.yellow[50],
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Align(
                               alignment: Alignment.center,
                               child: TextConst(
                                 title: 'View all',
-                                color: PortColor.blue,
+                                color: PortColor.gold,
                                 size: 12,
                               ),
                             ),

@@ -352,10 +352,10 @@ class _OrderPageState extends State<OrderPage> {
                 height: screenHeight * 0.05,
                 width: screenWidth * 0.4,
                 decoration: BoxDecoration(
-                  color: PortColor.buttonBlue,
+                  color: PortColor.gold,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: TextConst(title: 'Book Now',color: PortColor.white,fontFamily: AppFonts.kanitReg,),
+                child: TextConst(title: 'Book Now',color: PortColor.black,fontFamily: AppFonts.kanitReg,),
               ),
             ),
           ],

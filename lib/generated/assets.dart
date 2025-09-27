@@ -21,7 +21,6 @@ class Assets {
   static const String assetsDeliveryman = 'assets/deliveryman.png';
   static const String assetsDrivebusiness = 'assets/drivebusiness.png';
   static const String assetsDrop = 'assets/drop.png';
-  // static const String assetsE loaders = 'assets/E loaders.png';
   static const String assetsEloaders = 'assets/eloaders.png';
   static const String assetsHandcoin = 'assets/handcoin.png';
   static const String assetsHandcoinremove = 'assets/handcoinremove.png';
@@ -35,6 +34,7 @@ class Assets {
   static const String assetsIntroducingporter = 'assets/introducingporter.jpg';
   static const String assetsIntroporternter = 'assets/introporternter.jpg';
   static const String assetsLocation = 'assets/location.png';
+  static const String assetsLoginDriver = 'assets/login_driver.png';
   static const String assetsMainimage = 'assets/mainimage.png';
   static const String assetsMap = 'assets/map.png';
   static const String assetsMart = 'assets/mart.png';
@@ -68,7 +68,9 @@ class Assets {
   static const String assetsSpeaker = 'assets/speaker.png';
   static const String assetsTruck = 'assets/truck.png';
   static const String assetsWashing = 'assets/washing.png';
-  static const String assetsWhatsapp = 'assets/whatsapp.png';
+  static const String assetsWhatsappIcon = 'assets/whatsapp_icon.png';
   static const String assetsWhatsappcolor = 'assets/whatsappcolor.png';
+  static const String assetsYoyoMilesLogo = 'assets/yoyo_miles_logo.png';
+  static const String assetsYoyoMilesRemoveBg = 'assets/yoyo_miles_remove_bg.png';
 
 }

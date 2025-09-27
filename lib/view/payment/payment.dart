@@ -49,11 +49,13 @@ class _PaymentsPageState extends State<PaymentsPage> {
         decoration: BoxDecoration(
           color: PortColor.blue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: PortColor.gold,width: 0.4)
         ),
         child: Center(
           child: TextConst(
             title: label,
-            color: PortColor.blue,
+            color: PortColor.gold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -116,7 +118,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                             height: screenHeight * 0.04,
                             width: screenWidth * 0.25,
                             decoration: BoxDecoration(
-                              color: Colors.blue[50],
+                              color: Colors.yellow[50],
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
@@ -131,7 +133,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                               alignment: Alignment.center,
                               child: TextConst(
                                 title: 'Add Money',
-                                color: PortColor.blue,
+                                color: PortColor.gold,
                                 fontFamily: AppFonts.poppinsReg,
                                 size: 12,
                               ),

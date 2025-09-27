@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/services.dart';
 import '../generated/assets.dart';
 
@@ -60,9 +61,9 @@ class _SplashScreenState extends State<SplashScreen>
       onWillPop: () async => false,
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
+          decoration:  BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, Color(0xFFB3E5FC)],
+              colors: [Colors.white,PortColor.blue.withOpacity(0.4)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -77,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen>
                   width: MediaQuery.of(context).size.width * 0.65,   // bigger width
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(Assets.assetsPortKaroLogo),
+                      image: AssetImage(Assets.assetsYoyoMilesRemoveBg),
                       fit: BoxFit.contain, // maintain aspect ratio
                     ),
                   ),

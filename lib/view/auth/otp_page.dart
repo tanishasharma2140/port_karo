@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/utils/utils.dart';
@@ -24,7 +25,6 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
   final TextEditingController _otpController = TextEditingController();
 
   late AnimationController _animationController;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -38,18 +38,6 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
         listen: false,
       ).sendOtpApi(arguments["mobileNumber"], context);
     });
-
-    // Animation Controller
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
-    // Move from -20px (left) to +20px (right)
-    _animation = Tween<double>(begin: -20, end: 20).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.linear),
-    );
-
     _startTimer();
   }
 
@@ -96,170 +84,158 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final otp = Provider.of<AuthViewModel>(context);
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFB3E5FC)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      backgroundColor: PortColor.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.07,
+            vertical: screenHeight * 0.08,
           ),
-        ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.07,
-              vertical: screenHeight * 0.08,
-            ),
-            child: Column(
-              children: [
-                AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(
-                        _animation.value,
-                        0,
-                      ), // left-right movement
-                      child: Container(
-                        height: screenHeight * 0.11,
-                        width: screenWidth * 0.6,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(Assets.assetsPortKaroLogo),
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+          child: Column(
+            children: [
+              Container(
+                height: screenHeight * 0.11,
+                width: screenWidth * 0.6,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(Assets.assetsYoyoMilesRemoveBg),
+                    fit: BoxFit.contain,
+                  ),
                 ),
+              ),
 
-                SizedBox(height: screenHeight * 0.015),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image(
-                      image: const AssetImage(Assets.assetsIndiaflagsquare),
-                      height: screenHeight * 0.023,
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    TextConst(
-                      title: arguments["mobileNumber"],
-                      color: PortColor.black,
-                    ),
-                    SizedBox(width: screenWidth * 0.03),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
-                        );
-                      },
-                      child: TextConst(title: "CHANGE", color: PortColor.blue),
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.03),
-                TextConst(
-                  textAlign: TextAlign.center,
-                  title: "One Time Password (OTP) has been sent to this number",
-                  color: PortColor.gray,
-                ),
-                SizedBox(height: screenHeight * 0.08),
-                TextField(
-                  controller: _otpController,
-                  decoration: InputDecoration(
-                    hintText: "Enter OTP Manually",
-                    counterText: '',
-                    hintStyle: TextStyle(color: Colors.black.withOpacity(0.3)),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: PortColor.gray,
-                        width: screenWidth * 0.001,
-                      ),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: PortColor.gray, width: 1.0),
+              SizedBox(height: screenHeight * 0.015),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image(
+                    image: const AssetImage(Assets.assetsIndiaflagsquare),
+                    height: screenHeight * 0.023,
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  TextConst(
+                    title: arguments["mobileNumber"],
+                    color: PortColor.black,
+                  ),
+                  SizedBox(width: screenWidth * 0.03),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );
+                    },
+                    child: TextConst(
+                      title: "CHANGE",
+                      color: PortColor.gold,
+                      fontFamily: AppFonts.kanitReg,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  keyboardType: TextInputType.number,
-                  cursorColor: Colors.black,
-                  maxLength: 4,
-                  style: const TextStyle(color: Colors.black),
-                  textAlign: TextAlign.center,
-                  onChanged: (value) {
-                    setState(() {
-                      _isButtonActive = value.length == 4;
-                    });
-                  },
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                InkWell(
-                  onTap: _isButtonActive ? _verifyOtp : null,
-                  child: Container(
-                    height: screenHeight * 0.06,
-                    decoration: BoxDecoration(
-                      gradient: _isButtonActive
-                          ? const LinearGradient(
-                              colors: [
-                                PortColor.portMan,
-                                PortColor.portManLight,
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            )
-                          : LinearGradient(
-                              colors: [
-                                PortColor.gray.withOpacity(0.5),
-                                PortColor.gray.withOpacity(0.3),
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                      borderRadius: BorderRadius.circular(25),
+                ],
+              ),
+              SizedBox(height: screenHeight * 0.03),
+              TextConst(
+                textAlign: TextAlign.center,
+                title: "One Time Password (OTP) has been sent to this number",
+                color: PortColor.gray,
+                fontFamily: AppFonts.kanitReg,
+              ),
+              SizedBox(height: screenHeight * 0.08),
+              TextField(
+                controller: _otpController,
+                decoration: InputDecoration(
+                  hintText: "Enter OTP Manually",
+                  counterText: '',
+                  hintStyle: TextStyle(
+                    color: Colors.black.withOpacity(0.3),
+                    fontFamily: AppFonts.poppinsReg,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: PortColor.gray,
+                      width: screenWidth * 0.001,
                     ),
-                    alignment: Alignment.center,
-                    child: otp.loading
-                        ? const CupertinoActivityIndicator(
-                      radius: 14,
-                      color: Colors.white,
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: PortColor.gray, width: 1.0),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+                cursorColor: Colors.black,
+                maxLength: 4,
+                style: const TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  setState(() {
+                    _isButtonActive = value.length == 4;
+                  });
+                },
+              ),
+              SizedBox(height: screenHeight * 0.02),
+              InkWell(
+                onTap: _isButtonActive ? _verifyOtp : null,
+                child: Container(
+                  height: screenHeight * 0.06,
+                  decoration: BoxDecoration(
+                    gradient: _isButtonActive
+                        ? const LinearGradient(
+                            colors: [
+                              Color(0xFFFFD700), // golden yellow
+                              Color(0xFFFFE135), // bright yellow
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          )
+                        : LinearGradient(
+                            colors: [
+                              PortColor.gray.withOpacity(0.5),
+                              PortColor.gray.withOpacity(0.3),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  alignment: Alignment.center,
+                  child: otp.loading
+                      ? const CupertinoActivityIndicator(
+                          radius: 14,
+                          color: Colors.white,
+                        )
+                      : TextConst(
+                          title: "Verify",
+                          color: _isButtonActive ? Colors.black : Colors.black,
+                          fontFamily: AppFonts.kanitReg,
+                          fontWeight: FontWeight.w600,
+                        ),
+                ),
+              ),
+
+              SizedBox(height: screenHeight * 0.02),
+              _remainingTime > 0
+                  ? Text(
+                      "Resend OTP in $_remainingTime seconds",
+                      style: const TextStyle(color: Colors.black54),
                     )
-                        : TextConst(
-                      title: "Verify",
-                      color: _isButtonActive ? Colors.white : Colors.black,
-                    ),
-
-                  ),
-                ),
-
-                SizedBox(height: screenHeight * 0.02),
-                _remainingTime > 0
-                    ? Text(
-                        "Resend OTP in $_remainingTime seconds",
-                        style: const TextStyle(color: Colors.black54),
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _remainingTime = 60;
-                            _startTimer();
-                          });
-                        },
-                        child: const Text(
-                          "Resend OTP",
-                          style: TextStyle(
-                            color: PortColor.blue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                  : GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _remainingTime = 60;
+                          _startTimer();
+                        });
+                      },
+                      child: const TextConst(
+                        title: "Resend OTP",
+                        color: PortColor.gold,
+                        fontFamily: AppFonts.poppinsReg,
+                        fontWeight: FontWeight.w600,
                       ),
-                SizedBox(height: screenHeight * 0.01),
-              ],
-            ),
+                    ),
+              SizedBox(height: screenHeight * 0.01),
+            ],
           ),
         ),
       ),

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class PortColor{
 
-  static const blue = Color(0xff0446da);
+  static const blue = Color(0xffffff00);
+  static const gold = Color(0xffFFD700);
   static const lightBlue = Color(0xffeff3ff);
   static const darkBlue = Color(0xff002f81);
   static const darkWhite = Color(0xffeff3ff);
