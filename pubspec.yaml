@@ -31,7 +31,7 @@ dependencies:
   app_settings:
   intl:
   flutter_polyline_points:
-
+  geocoding:
 dev_dependencies:
   flutter_test:
     sdk: flutter

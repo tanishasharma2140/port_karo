@@ -27,24 +27,26 @@ class _AddGstDetailState extends State<AddGstDetail> {
     final profileViewModel = Provider.of<ProfileViewModel>(context);
 
     return SafeArea(
+      top: false,
       child: Scaffold(
-        backgroundColor: PortColor.grey,
-        body: ListView(
-          children: [
+        backgroundColor: PortColor.bg,
+        body: SingleChildScrollView(
+          child:
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-                  height: screenHeight * 0.07,
+                    padding: EdgeInsets.only(top: 15,right: 14,left: 14),
+                  height: screenHeight * 0.095,
                   width: screenWidth,
                   decoration: BoxDecoration(
                     color: PortColor.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: PortColor.gray.withOpacity(0.2),
+                        spreadRadius: 1,
                         blurRadius: 2,
-                        offset: const Offset(0, 2),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -286,7 +288,7 @@ class _AddGstDetailState extends State<AddGstDetail> {
                 )
               ],
             ),
-          ],
+
         ),
       ),
     );

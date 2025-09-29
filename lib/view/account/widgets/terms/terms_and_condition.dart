@@ -24,40 +24,45 @@ class _TermsAndConditionState extends State<TermsAndCondition> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
-        backgroundColor: PortColor.grey,
+        backgroundColor: PortColor.bg,
         body: Column(
           children: [
             Container(
-              height: screenHeight * 0.06,
+              padding: const EdgeInsets.only(top: 17),
+              height: screenHeight * 0.085,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: PortColor.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    spreadRadius: 1,
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
-                  SizedBox(
-                    width: screenWidth * 0.06,
-                  ),
-
-                  SizedBox(
-                    width: screenWidth * 0.24,
-                  ),
+                  SizedBox(width: screenWidth * 0.06),
+                  SizedBox(width: screenWidth * 0.24),
                   TextConst(
                     title: "Terms and Condition",
                     color: PortColor.black,
                   ),
-                  SizedBox(
-                    width: screenWidth * 0.16,
-                  ),
+                  SizedBox(width: screenWidth * 0.16),
                   InkWell(
-                      onTap: (){
-                        Navigator.pop(context);
-                      },
-                      child: Icon(Icons.dangerous_outlined))
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.dangerous_outlined),
+                  ),
                 ],
               ),
-            ),
+            )
+
           ],
         ),
       

@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/res/custom_text_field.dart';
 import 'package:port_karo/view_model/add_address_view_model.dart';
-import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -61,7 +59,6 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final addAddressViewModel = Provider.of<AddAddressViewModel>(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -210,7 +207,7 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                   labelText: "Name",
                   suffixIcon: const Icon(
                     Icons.perm_contact_cal_outlined,
-                    color: PortColor.blue,
+                    color: PortColor.gold,
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
@@ -236,12 +233,12 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                         width: screenWidth * 0.056,
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: PortColor.blue,
+                            color: PortColor.gold,
                             width: screenWidth * 0.004,
                           ),
                           borderRadius: BorderRadius.circular(4),
                           color: isContactDetailsSelected
-                              ? PortColor.blue
+                              ? PortColor.gold
                               : Colors.transparent,
                         ),
                         child: isContactDetailsSelected
@@ -369,7 +366,7 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
   Widget buildLocationDetails() {
     return Row(
       children: [
-        Icon(Icons.location_on, color: PortColor.blue),
+        Icon(Icons.location_on, color: PortColor.gold),
         SizedBox(width: screenWidth * 0.009),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,8 +398,9 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
           child: Center(
             child: TextConst(
               title: "Change",
-              color: PortColor.blue,
+              color: PortColor.gold,
               fontFamily: AppFonts.poppinsReg,
+              fontWeight: FontWeight.w600,
               size: 12,
             ),
           ),
@@ -425,9 +423,9 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
         width: screenWidth * 0.25,
         height: screenHeight * 0.036,
         decoration: BoxDecoration(
-          color: isSelected ? PortColor.blue : Colors.transparent,
+          color: isSelected ? PortColor.yellowDiff : Colors.transparent,
           border: Border.all(
-            color: isSelected ? PortColor.blue : PortColor.gray,
+            color: isSelected ? PortColor.gold : PortColor.gray,
           ),
           borderRadius: BorderRadius.circular(7),
         ),
@@ -441,11 +439,6 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                 color: isSelected ? Colors.white : PortColor.black,
                 size: screenHeight * 0.02,
               ),
-            // if (asset != null)
-            //   Image(
-            //     image: AssetImage(asset),
-            //     height: screenHeight * 0.03,
-            //   ),
             SizedBox(width: screenWidth * 0.01),
             TextConst(
               title: label,
@@ -499,14 +492,23 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
             height: screenHeight * 0.03,
             width: screenWidth,
             decoration: BoxDecoration(
-              color: isMobileNumberFilled ? PortColor.blue : PortColor.grey,
+              gradient: isMobileNumberFilled
+                  ? PortColor.subBtn
+                  : const LinearGradient(
+                colors: [
+                  PortColor.grey,
+                  PortColor.grey, // same grey rakha
+                ],
+              ),
               borderRadius: BorderRadius.circular(10),
             ),
             child: TextConst(
-              title: isMobileNumberFilled ? "  Save" : "d Save",
-              color: isMobileNumberFilled ? Colors.white : PortColor.gray,
+              title: isMobileNumberFilled ? "  Save" : "Save",
+              color: isMobileNumberFilled ? Colors.black : PortColor.black,
+              fontFamily: AppFonts.kanitReg,
             ),
-          ),
+          )
+
         ),
       ),
     );

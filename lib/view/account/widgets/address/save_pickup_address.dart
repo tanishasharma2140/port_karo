@@ -23,13 +23,14 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
           backgroundColor: PortColor.bg,
           body: Column(
               children: [
             Container(
-              padding:  EdgeInsets.symmetric(horizontal:screenWidth*0.06, vertical: screenHeight*0.01),
-              height: screenHeight * 0.16,
+              padding:  EdgeInsets.symmetric(horizontal:screenWidth*0.06, vertical: screenHeight*0.02),
+              height: screenHeight * 0.18,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: const BorderRadius.only(
@@ -68,7 +69,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                         width: screenWidth * 0.03,
                         height: screenHeight * 0.01,
                         decoration: const BoxDecoration(
-                          color: PortColor.blue,
+                          color: PortColor.gold,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -83,9 +84,10 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                             hintText: "Where is your pickup?",
                             hintStyle: TextStyle(
                               color: PortColor.gray.withOpacity(0.5),
+                              fontFamily: AppFonts.kanitReg,
                               fontSize: 15,
                             ),
-                            suffixIcon: const Icon(Icons.mic, color: PortColor.blue),
+                            suffixIcon: const Icon(Icons.mic, color: PortColor.gold),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(color: PortColor.gray),
@@ -237,7 +239,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Icon(Icons.my_location_outlined, color: PortColor.blue,size: 15,),
+                  const Icon(Icons.my_location_outlined, color: PortColor.gold,size: 15,),
                   InkWell(
                       onTap: (){
                         Navigator.push(
@@ -258,7 +260,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                     ),
                   ),
 
-                  const Icon(Icons.location_on, color: PortColor.blue,size: 15,),
+                  const Icon(Icons.location_on, color: PortColor.gold,size: 15,),
                   InkWell(
                       onTap: (){
                         Navigator.push(

@@ -42,32 +42,35 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         }
         return false;
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xfff6f6f6),
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: _pages,
-        ),
-        bottomNavigationBar: Container(
-          height: 65, // Reduced from 80 to 65
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
+      child: SafeArea(
+        top:  false,
+        child: Scaffold(
+          backgroundColor: PortColor.bg,
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: _pages,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home, "Home", 0),
-              _buildNavItem(Icons.receipt_long, "Orders", 1),
-              _buildNavItem(Icons.account_balance_wallet, "Payments", 2),
-              _buildNavItem(Icons.account_circle, "Account", 3),
-            ],
+          bottomNavigationBar: Container(
+            height: 65, // Reduced from 80 to 65
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(Icons.home, "Home", 0),
+                _buildNavItem(Icons.receipt_long, "Orders", 1),
+                _buildNavItem(Icons.account_balance_wallet, "Payments", 2),
+                _buildNavItem(Icons.account_circle, "Account", 3),
+              ],
+            ),
           ),
         ),
       ),
@@ -81,24 +84,28 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
           _selectedIndex = index;
         });
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: 24,
-            color: _selectedIndex == index ? PortColor.gold : Colors.black54,
-          ),
-          const SizedBox(height: 4), // Reduced spacing
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
+      child: Container(
+        width: 80,
+        color: Colors.transparent,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 24,
               color: _selectedIndex == index ? PortColor.gold : Colors.black54,
             ),
-          ),
-        ],
+            const SizedBox(height: 4), // Reduced spacing
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: _selectedIndex == index ? PortColor.gold : Colors.black54,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

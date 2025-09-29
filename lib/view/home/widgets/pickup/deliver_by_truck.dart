@@ -107,12 +107,14 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
     final profileViewModel = Provider.of<ProfileViewModel>(context);
 
     return SafeArea(
+      top: false,
       child: Scaffold(
         backgroundColor: PortColor.grey,
         body: Column(
           children: [
             Container(
-              height: screenHeight * 0.3,
+              padding: EdgeInsets.only(top: 25),
+              height: screenHeight * 0.33,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: PortColor.white,
@@ -375,8 +377,8 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
               Container(
                 height: screenHeight * 0.4,
                 decoration: BoxDecoration(
-                  color: Colors.white, // ✅ White background
-                  borderRadius: BorderRadius.circular(10), // optional rounded corners
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),

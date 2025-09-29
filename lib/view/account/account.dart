@@ -16,7 +16,7 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     final profileViewModel = Provider.of<ProfileViewModel>(context, listen: true);
     return Scaffold(
-      backgroundColor: PortColor.greyLight.withOpacity(0.7),
+      backgroundColor: PortColor.bg,
       body: const Column(
         children: [
           ConstantAppbar(),

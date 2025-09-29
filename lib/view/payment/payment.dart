@@ -49,7 +49,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
         decoration: BoxDecoration(
           color: PortColor.blue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: PortColor.gold,width: 0.4)
+          border: Border.all(color: PortColor.gold, width: 0.4),
         ),
         child: Center(
           child: TextConst(
@@ -77,16 +77,37 @@ class _PaymentsPageState extends State<PaymentsPage> {
       child: Stack(
         children: [
           /// Main Body
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.05,
-              vertical: screenHeight * 0.02,
-            ),
-            child: ListView(
-              children: [
-                TextConst(title: "Payment", color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 16,),
-                SizedBox(height: screenHeight * 0.03),
-                Column(
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(top: 20, left: 20),
+                height: screenHeight * 0.095,
+                width: screenWidth,
+                decoration: BoxDecoration(
+                  color: PortColor.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: PortColor.gray.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 2,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextConst(
+                    title: "Payment",
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 14,
+                  ),
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.03),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 22),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
@@ -97,7 +118,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                const PaymentPorterCredit(),
+                                    const PaymentPorterCredit(),
                               ),
                             );
                           },
@@ -139,15 +160,19 @@ class _PaymentsPageState extends State<PaymentsPage> {
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
-                    TextConst(title: "Balance ₹0", color: PortColor.gray,size: 13,),
+                    TextConst(
+                      title: "Balance ₹0",
+                      color: PortColor.gray,
+                      size: 13,
+                    ),
                     Divider(thickness: screenWidth * 0.001),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
 
           /// Bottom Sheet
@@ -173,8 +198,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   ],
                 ),
                 child: Padding(
-                  padding:
-                  EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -191,22 +215,27 @@ class _PaymentsPageState extends State<PaymentsPage> {
                               onChanged: (value) => _updateProceedButton(),
                               decoration: InputDecoration(
                                 hintText: 'Enter Amount',
-                                hintStyle:
-                                const TextStyle(color: PortColor.gray),
+                                hintStyle: const TextStyle(
+                                  color: PortColor.gray,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                  const BorderSide(color: PortColor.gray),
+                                  borderSide: const BorderSide(
+                                    color: PortColor.gray,
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                  const BorderSide(color: PortColor.gray),
+                                  borderSide: const BorderSide(
+                                    color: PortColor.gray,
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(
-                                      color: PortColor.gray, width: 1.5),
+                                    color: PortColor.gray,
+                                    width: 1.5,
+                                  ),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 8,
@@ -228,37 +257,48 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       GestureDetector(
                         onTap: isProceedEnabled
                             ? () {
-                          double enteredAmount =
-                              double.tryParse(_controller.text) ?? 0;
-                          if (enteredAmount >= 10) {
-                            addWalletViewModel.addWalletApi(
-                                context, _controller.text);
-                          } else {
-                            Utils.showErrorMessage(
-                                context, "Enter Amount At-least ₹10");
-                          }
-                        }
+                                double enteredAmount =
+                                    double.tryParse(_controller.text) ?? 0;
+                                if (enteredAmount >= 10) {
+                                  addWalletViewModel.addWalletApi(
+                                    context,
+                                    _controller.text,
+                                  );
+                                } else {
+                                  Utils.showErrorMessage(
+                                    context,
+                                    "Enter Amount At-least ₹10",
+                                  );
+                                }
+                              }
                             : null,
                         child: Container(
                           height: screenHeight * 0.06,
                           width: screenWidth * 0.88,
                           decoration: BoxDecoration(
-                            color: isProceedEnabled
-                                ? PortColor.blue
-                                : PortColor.grey,
+                            gradient: isProceedEnabled
+                                ? PortColor.subBtn
+                                : const LinearGradient(
+                                    colors: [
+                                      PortColor.grey,
+                                      PortColor
+                                          .grey, // same grey rakha jab disabled ho
+                                    ],
+                                  ),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Center(
                             child: !addWalletViewModel.loading
                                 ? TextConst(
-                              title: "Proceed",
-                              color: isProceedEnabled
-                                  ? PortColor.white
-                                  : PortColor.gray,
-                            )
+                                    title: "Proceed",
+                                    fontFamily: AppFonts.kanitReg,
+                                    color: isProceedEnabled
+                                        ? PortColor.black
+                                        : PortColor.gray,
+                                  )
                                 : const CircularProgressIndicator(
-                              color: PortColor.white,
-                            ),
+                                    color: PortColor.white,
+                                  ),
                           ),
                         ),
                       ),

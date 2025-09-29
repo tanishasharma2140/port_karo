@@ -30,15 +30,25 @@ class _HelpSupportState extends State<HelpSupport> {
   Widget build(BuildContext context) {
     // final helpAndSupportViewModel = Provider.of<HelpAndSupportViewModel>(context);
     return SafeArea(
+      top: false,
       child: Scaffold(
-        backgroundColor: PortColor.grey,
+        backgroundColor: PortColor.bg,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: screenHeight * 0.07,
+              padding: EdgeInsets.only(top: 14),
+              height: screenHeight * 0.096,
               width: screenWidth,
               decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    spreadRadius: 1,
+                    blurRadius: 6,
+                    offset:  Offset(0, 3),
+                  ),
+                ],
                 color: PortColor.white,
               ),
               child: Row(
@@ -108,7 +118,7 @@ class _HelpSupportState extends State<HelpSupport> {
                               ),
                               child: Icon(
                                 Icons.call_outlined,
-                                color: PortColor.blue,
+                                color: PortColor.gold,
                                 size: screenHeight * 0.025,
                               ),
                             ),
@@ -132,7 +142,7 @@ class _HelpSupportState extends State<HelpSupport> {
                               ),
                               child: Icon(
                                 Icons.call_outlined,
-                                color: PortColor.blue,
+                                color: PortColor.gold,
                                 size: screenHeight * 0.025,
                               ),
                             ),
@@ -156,7 +166,7 @@ class _HelpSupportState extends State<HelpSupport> {
                               ),
                               child: Icon(
                                 Icons.call_outlined,
-                                color: PortColor.blue,
+                                color: PortColor.gold,
                                 size: screenHeight * 0.025,
                               ),
                             ),
@@ -199,7 +209,7 @@ class _HelpSupportState extends State<HelpSupport> {
                         ),
                         child: Icon(
                           Icons.mail_outline,
-                          color: PortColor.blue,
+                          color: PortColor.gold,
                           size: screenHeight * 0.025,
                         ),
                       ),
@@ -216,7 +226,7 @@ class _HelpSupportState extends State<HelpSupport> {
                         ),
                         child: Icon(
                           Icons.call_outlined,
-                          color: PortColor.blue,
+                          color: PortColor.gold,
                           size: screenHeight * 0.025,
                         ),
                       ),

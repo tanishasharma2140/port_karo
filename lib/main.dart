@@ -36,7 +36,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   // 🔹 Get FCM Token
   fcmToken = await FirebaseMessaging.instance.getToken();
   if (kDebugMode) {
@@ -56,6 +56,8 @@ Future<void> main() async {
 
 double screenHeight = 0.0;
 double screenWidth = 0.0;
+double topPadding = 0.0;
+double bottomPadding = 0.0;
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -79,13 +81,15 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+    topPadding = MediaQuery.of(context).padding.top;
+    bottomPadding = MediaQuery.of(context).padding.bottom;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.white,
         systemNavigationBarDividerColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
       ),
       child: MultiProvider(
         providers: [

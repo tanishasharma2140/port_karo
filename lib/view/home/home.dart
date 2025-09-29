@@ -276,7 +276,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               TextConst(
                                 title: 'Explore Courier Reward',
-                                color: PortColor.white,
+                                color: PortColor.black,
                                 fontFamily: AppFonts.kanitReg,
                               ),
                               TextConst(
@@ -290,7 +290,7 @@ class _HomePageState extends State<HomePage> {
                           const Spacer(),
                           Icon(
                             Icons.arrow_forward,
-                            color: PortColor.white,
+                            color: PortColor.black,
                             size: screenHeight * 0.03,
                           ),
                         ],

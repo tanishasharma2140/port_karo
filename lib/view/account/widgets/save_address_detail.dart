@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
@@ -31,28 +32,31 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
     final addressShowViewModel = Provider.of<AddressShowViewModel>(context);
 
     return SafeArea(
+      top: false,
       child: Scaffold(
         backgroundColor: PortColor.bg,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: screenHeight * 0.07,
+              padding: const EdgeInsets.only(top: 20, left: 5),
+              height: screenHeight * 0.095,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: PortColor.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: PortColor.gray.withOpacity(0.2),
+                    spreadRadius: 1,
                     blurRadius: 2,
-                    offset: const Offset(0, 2),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   SizedBox(
-                    width: screenWidth * 0.04,
+                    width: screenWidth * 0.03,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -106,12 +110,12 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                       ),
                       child: Icon(
                         Icons.add,
-                        color: PortColor.blue,
+                        color: PortColor.gold,
                         size: screenHeight * 0.025,
                       ),
                     ),
                     title: TextConst(
-                        title: "Add New Address", color: PortColor.blue),
+                        title: "Add New Address", color: PortColor.gold,fontFamily: AppFonts.kanitReg,),
                     trailing: Icon(
                       Icons.arrow_forward_ios_rounded,
                       color: PortColor.black,
@@ -244,6 +248,7 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                           height: screenHeight * 0.046,
                                           width: screenWidth * 0.35,
                                           decoration: BoxDecoration(
+                                            border: Border.all(color : PortColor.gold,width: 0.5),
                                             color:
                                                 PortColor.blue.withOpacity(0.1),
                                             borderRadius:
@@ -252,7 +257,10 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                           child: Center(
                                               child: TextConst(
                                                   title: 'Edit',
-                                                  color: PortColor.blue)),
+                                                  color: PortColor.gold,
+                                                  fontFamily: AppFonts.kanitReg,
+                                                fontWeight: FontWeight.w600,
+                                              )),
                                         ),
                                         SizedBox(width: screenWidth * 0.1),
                                         GestureDetector(
@@ -274,6 +282,7 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                             height: screenHeight * 0.046,
                                             width: screenWidth * 0.35,
                                             decoration: BoxDecoration(
+                                              border: Border.all(color : PortColor.gold,width: 0.5),
                                               color:
                                                   PortColor.blue.withOpacity(0.1),
                                               borderRadius:
@@ -282,7 +291,9 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                             child: Center(
                                                 child: TextConst(
                                                     title: 'Delete',
-                                                    color: PortColor.blue)),
+                                                    fontFamily: AppFonts.kanitReg,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: PortColor.gold)),
                                           ),
                                         ),
                                       ],
@@ -325,15 +336,17 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                   decoration: BoxDecoration(
                     color: PortColor.white,
                     border: Border.all(
-                        color: PortColor.blue.withOpacity(0.75),
-                        width: 2),
+                        color: PortColor.gold,
+                        width: 1.5),
                     borderRadius: const BorderRadius.all(
                         Radius.circular(20)),
                   ),
                   child: Center(
                     child: TextConst(
                         title: "No",
-                        color: PortColor.blue.withOpacity(0.75)),
+                        fontFamily: AppFonts.kanitReg,
+                        fontWeight: FontWeight.w600,
+                        color: PortColor.gold),
                   ),
                 ),
               ),
@@ -349,12 +362,14 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                   height: screenHeight * 0.058,
                   width: screenWidth * 0.4,
                   decoration: BoxDecoration(
-                    color: PortColor.blue.withOpacity(0.75),
+                    color: PortColor.gold,
                     borderRadius: const BorderRadius.all(
                         Radius.circular(20)),
                   ),
                   child: Center(
                     child: TextConst(
+                        fontFamily: AppFonts.kanitReg,
+                        fontWeight: FontWeight.w600,
                         title: "Yes", color: PortColor.white),
                   ),
                 ),

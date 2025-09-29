@@ -66,13 +66,14 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     double distance = calculateDistance(pickupLat, pickupLon, dropLat, dropLon);
     print("distance $distance");
     return SafeArea(
+      top: false,
       child: Scaffold(
-        backgroundColor: PortColor.grey,
+        backgroundColor: PortColor.bg,
         body: Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.025),
-              height: screenHeight * 0.07,
+              padding: EdgeInsets.only( top: 18 ),
+              height: screenHeight * 0.09,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: PortColor.white,
@@ -222,7 +223,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                         shape: BoxShape.circle,
                                       ),
                                       padding: EdgeInsets.all(
-                                        screenHeight * 0.006,
+                                        screenHeight * 0.001,
                                       ),
                                       child: Icon(
                                         Icons.add,
@@ -442,16 +443,21 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                       height: screenHeight * 0.03,
                       width: screenWidth,
                       decoration: BoxDecoration(
-                        color: selectedIndex != null
-                            ? PortColor.buttonBlue
-                            : PortColor.gray,
                         borderRadius: BorderRadius.circular(10),
+                        gradient: selectedIndex != null
+                            ? PortColor.subBtn
+                            : const LinearGradient(
+                          colors: [PortColor.gray, PortColor.gray], // disabled state ke liye
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                       ),
                       child: TextConst(
                         title: selectedIndex != null
                             ? "Proceed with ${selectVehiclesViewModel.selectVehiclesModel?.data![selectedIndex!].name ?? ""}"
                             : "Select a Vehicle",
-                        color: PortColor.white,
+                        color: PortColor.black,
+                        fontFamily: AppFonts.kanitReg,
                       ),
                     ),
                   ),

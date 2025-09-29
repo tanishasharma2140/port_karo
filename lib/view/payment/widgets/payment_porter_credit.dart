@@ -6,6 +6,8 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view_model/wallet_history_view_model.dart';
 import 'package:provider/provider.dart';
 
+import '../../../main.dart';
+
 class PaymentPorterCredit extends StatefulWidget {
   const PaymentPorterCredit({super.key});
 
@@ -70,9 +72,10 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
     return GestureDetector(
       onTap: () => _addAmount(amount),
       child: Container(
-        height: 40, // fixed height for button
-        width: 50, // fixed width for button
+        height: 40,
+        width: 50,
         decoration: BoxDecoration(
+          border: Border.all(color: PortColor.gold,width: 0.5),
           color: PortColor.blue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(15),
         ),
@@ -91,15 +94,14 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
   Widget build(BuildContext context) {
     final walletHistoryViewModel = Provider.of<WalletHistoryViewModel>(context);
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: PortColor.grey,
+      backgroundColor: PortColor.bg,
       body: Column(
         children: [
           Container(
-            height: screenHeight * 0.07,
+            padding: EdgeInsets.only(top: 15),
+            height: screenHeight * 0.095,
             width: screenWidth,
             decoration: BoxDecoration(
               color: PortColor.white,
@@ -133,7 +135,7 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
             height: screenHeight * 0.07,
             width: screenWidth,
             decoration: BoxDecoration(
-              color: PortColor.blue.withOpacity(0.1),
+              color: PortColor.yellowAccent.withOpacity(0.5),
               border: const Border(bottom: BorderSide(color: PortColor.white)),
             ),
             child: Padding(
@@ -150,7 +152,9 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
                     },
                     child: TextConst(
                       title: "Add Money",
-                      color: PortColor.blue,
+                      color: PortColor.gold,
+                      fontFamily: AppFonts.kanitReg,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -221,7 +225,7 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
               ),
             )
                 : Center(
-              child: Image.asset("assets/no_history.gif"),
+              child: TextConst(title: "No Data Found",fontFamily: AppFonts.kanitReg,),
             ),
           )
 
@@ -303,21 +307,27 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
                   height: screenHeight * 0.06,
                   width: screenWidth * 0.88,
                   decoration: BoxDecoration(
-                    color: isProceedEnabled
-                        ? PortColor.blue
-                        : PortColor.grey,
+                    gradient: isProceedEnabled
+                        ? PortColor.subBtn
+                        : const LinearGradient(
+                      colors: [
+                        PortColor.grey,
+                        PortColor.grey,
+                      ],
+                    ),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
                     child: TextConst(
                       title: "Proceed",
-                      color: isProceedEnabled
-                          ? PortColor.white
-                          : PortColor.gray,
+                      fontFamily: AppFonts.kanitReg,
+                      fontWeight: FontWeight.w600,
+                      color: isProceedEnabled ? PortColor.black : PortColor.gray,
                     ),
                   ),
                 ),
-              ),
+              )
+
             ],
           ),
         ),

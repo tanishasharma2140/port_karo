@@ -26,12 +26,20 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
     return  Container(
       decoration: const BoxDecoration(
         color: PortColor.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            spreadRadius: 0.5,
+            blurRadius: 3,
+            offset:  Offset(0, 2),
+          ),
+        ],
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(20),
         ),
       ),
-      padding:  EdgeInsets.symmetric(horizontal: screenWidth*0.05,vertical: screenHeight*0.03),
+      padding:  EdgeInsets.symmetric(horizontal: screenWidth*0.05,vertical: screenHeight*0.045),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -46,7 +54,7 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>const AddGstDetail()));
                   },
-                  child: TextConst(title: "Edit Profile", color: PortColor.blue)),
+                  child: TextConst(title: "Edit Profile", color: PortColor.gold)),
             ],
           ),
           SizedBox(height: screenHeight*0.001),
@@ -55,7 +63,7 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
             color: PortColor.gray,
           ),
           SizedBox(height: screenHeight*0.001),
-          TextConst(title: "Verify Email ID", color: PortColor.blue),
+          TextConst(title: "Verify Email ID", color: PortColor.gold),
           SizedBox(height: screenHeight*0.02,),
           InkWell(
             onTap: (){
@@ -70,12 +78,13 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
               width: double.infinity,
               height: screenHeight*0.05,
               decoration: BoxDecoration(
-                color: PortColor.blue.withOpacity(0.1),
+                color: PortColor.gold.withOpacity(0.1),
+                border: Border.all(color: PortColor.gold,width: 0.5),
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: Center(
                 child: TextConst(title:
-                "Add GST Details",color: PortColor.blue,
+                "Add GST Details",color: PortColor.gold,
                   fontFamily: AppFonts.kanitReg,
 
                 ),

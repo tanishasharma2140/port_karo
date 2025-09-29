@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
@@ -35,6 +36,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
   final Completer<GoogleMapController> _controller = Completer();
   bool isContactDetailsSelected = false;
   bool isFullscreenMode = false;
+  bool isLoadingAddress = false;
 
   static const LatLng defaultPosition = LatLng(26.8467, 80.9462);
   LatLng selectedLatLng = defaultPosition;
@@ -53,6 +55,61 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
     });
   }
 
+  Future<void> _getAddressFromLatLng(LatLng position) async {
+    if (isLoadingAddress) return;
+
+    setState(() {
+      isLoadingAddress = true;
+    });
+
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        setState(() {
+          selectedLocation = _formatAddress(place);
+        });
+      }
+    } catch (e) {
+      print("Error fetching address: $e");
+      if (mounted) {
+        Utils.showErrorMessage(context, "Could not fetch address details");
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoadingAddress = false;
+        });
+      }
+    }
+  }
+
+  String _formatAddress(Placemark place) {
+    List<String> addressParts = [];
+    if (place.street?.isNotEmpty ?? false) addressParts.add(place.street!);
+    if (place.locality?.isNotEmpty ?? false) addressParts.add(place.locality!);
+    if (place.subLocality?.isNotEmpty ?? false)
+      addressParts.add(place.subLocality!);
+    if (place.administrativeArea?.isNotEmpty ?? false)
+      addressParts.add(place.administrativeArea!);
+    if (place.postalCode?.isNotEmpty ?? false)
+      addressParts.add(place.postalCode!);
+    if (place.country?.isNotEmpty ?? false) addressParts.add(place.country!);
+
+    return addressParts.isNotEmpty
+        ? addressParts.join(", ")
+        : "Unknown Location";
+  }
+
+  void _changeLocation() {
+    // TODO: Implement location change functionality
+    // This could open a search dialog or navigate to location search screen
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,10 +120,25 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               target: selectedLatLng,
               zoom: 14.0,
             ),
+            onMapCreated: (controller) {
+              _controller.complete(controller);
+              mapController = controller;
+            },
+            onCameraMove: (position) {
+              // Update the marker position when camera moves (dragging)
+              setState(() {
+                selectedLatLng = position.target;
+              });
+            },
+            onCameraIdle: () async {
+              // Fetch address when dragging stops
+              await _getAddressFromLatLng(selectedLatLng);
+            },
             markers: {
               Marker(
                 markerId: const MarkerId('selected_location'),
                 position: selectedLatLng,
+                draggable: false,
                 infoWindow: InfoWindow(
                   title: "Selected Location",
                   snippet: selectedLocation,
@@ -76,10 +148,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 ),
               ),
             },
-            onMapCreated: (controller) {
-              _controller.complete(controller);
-              mapController = controller;
-            },
+            myLocationEnabled: false,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
           ),
           // Back Button
           Positioned(
@@ -247,10 +318,13 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                             fontFamily: AppFonts.poppinsReg,
                             size: 12,
                           ),
+                          SizedBox(width: screenWidth * 0.01),
                           TextConst(
                             title: profileViewModel.profileModel!.data!.phone
                                 .toString(),
-                            color: PortColor.black,
+                            color: PortColor.blue,
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 12,
                           ),
                         ],
                       ),
@@ -269,7 +343,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     buildSaveOption("Home", Icons.home_filled, null, 0),
-                    buildSaveOption("Shop", null, 'assets/shop.png', 1),
+                    buildSaveOption("Shop", null, Assets.assetsShop, 1),
                     buildSaveOption("Other", Icons.favorite, null, 2),
                   ],
                 ),
@@ -297,26 +371,37 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(height: screenHeight * 0.015),
-          Row(
-            children: [
-              Image(
-                image: const AssetImage(Assets.assetsRedlocation),
-                height: screenHeight * 0.035,
-              ),
-              SizedBox(width: screenWidth * 0.02),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: screenWidth * 0.7,
-                    child: TextConst(
-                      title: selectedLocation,
-                      color: PortColor.black,
-                    ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image(
+                  image: const AssetImage(Assets.assetsRedlocation),
+                  height: screenHeight * 0.035,
+                ),
+                SizedBox(width: screenWidth * 0.02),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextConst(
+                        title: selectedLocation,
+                        color: PortColor.black,
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 13,
+                      ),
+                      SizedBox(height: screenHeight * 0.007),
+                      if (isLoadingAddress)
+                        SizedBox(
+                          height: screenHeight * 0.02,
+                          child: const LinearProgressIndicator(),
+                        ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
           SizedBox(height: screenHeight * 0.02),
           Container(
@@ -336,17 +421,26 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 horizontal: screenWidth * 0.04,
                 vertical: screenHeight * 0.017,
               ),
-              child: Container(
-                alignment: Alignment.center,
-                height: screenHeight * 0.02,
-                width: screenWidth,
-                decoration: BoxDecoration(
-                  color: PortColor.blue,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextConst(
-                  title: "Confirm Drop Location",
-                  color: Colors.white,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isFullscreenMode = false;
+                  });
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: screenHeight * 0.055,
+                  width: screenWidth,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: PortColor.subBtn,
+                  ),
+                  child: TextConst(
+                    title: "Confirm Drop Location",
+                    color: Colors.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 16,
+                  ),
                 ),
               ),
             ),
@@ -364,26 +458,60 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
           height: screenHeight * 0.035,
         ),
         SizedBox(width: screenWidth * 0.009),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: screenWidth * 0.5,
-              child: TextConst(
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextConst(
                 title: selectedLocation,
                 color: PortColor.black,
                 fontFamily: AppFonts.poppinsReg,
-                size: 12,
+                size: 13,
               ),
-            ),
-            SizedBox(height: screenHeight * 0.004),
-          ],
+              SizedBox(height: screenHeight * 0.005),
+              if (isLoadingAddress)
+                SizedBox(
+                  height: screenHeight * 0.006,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Stack(
+                      children: [
+                        LinearProgressIndicator(
+                          value: 0.6,
+                          backgroundColor: Colors.grey.shade300,
+                          valueColor: const AlwaysStoppedAnimation(
+                            Colors.transparent,
+                          ), // transparent
+                        ),
+                        Positioned.fill(
+                          child: ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return LinearGradient(
+                                colors: [
+                                  PortColor.yellowDiff,
+                                  PortColor.yellowAccent,
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ).createShader(bounds);
+                            },
+                            blendMode: BlendMode.srcIn,
+                            child: Container(
+                              color: Colors
+                                  .white, // color is ignored, shader will override
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
-        const Spacer(),
+        SizedBox(width: screenWidth * 0.02),
         GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
+          onTap: _changeLocation,
           child: Container(
             height: screenHeight * 0.038,
             width: screenWidth * 0.14,
@@ -395,6 +523,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               child: TextConst(
                 title: "Change",
                 color: PortColor.blue,
+                fontFamily: AppFonts.poppinsReg,
                 size: 12,
               ),
             ),
@@ -404,7 +533,12 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
     );
   }
 
-  Widget buildSaveOption(String label, IconData? icon, String? asset, int index) {
+  Widget buildSaveOption(
+    String label,
+    IconData? icon,
+    String? asset,
+    int index,
+  ) {
     bool isSelected = index == selectedIndex;
 
     return GestureDetector(
@@ -414,11 +548,13 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
         });
       },
       child: Container(
-        width: 90,
-        height: 30,
+        width: screenWidth * 0.25,
+        height: screenHeight * 0.036,
         decoration: BoxDecoration(
-          color: isSelected ? PortColor.blue : Colors.transparent,
-          border: Border.all(color: PortColor.gray),
+          color: isSelected ? PortColor.gold : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? PortColor.gold : PortColor.gray,
+          ),
           borderRadius: BorderRadius.circular(7),
         ),
         child: Row(
@@ -429,20 +565,20 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               Icon(
                 icon,
                 color: isSelected ? Colors.white : PortColor.black,
-                size: 20,
+                size: screenHeight * 0.02,
               ),
             if (asset != null)
               Image(
                 image: AssetImage(asset),
-                height: 20,
-                color: isSelected ? Colors.white : null, // Optional: color overlay
+                height: screenHeight * 0.02,
+                color: isSelected ? Colors.white : null,
               ),
-            SizedBox(width: 5),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : PortColor.black,
-              ),
+            SizedBox(width: screenWidth * 0.01),
+            TextConst(
+              title: label,
+              color: isSelected ? Colors.white : PortColor.black,
+              fontFamily: AppFonts.poppinsReg,
+              size: 12,
             ),
           ],
         ),
@@ -452,8 +588,13 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
 
   Widget buildProceedButton(BuildContext context) {
     final orderViewModel = Provider.of<OrderViewModel>(context);
-    bool isMobileNumberFilled =
-        mobileController.text.isNotEmpty && mobileController.text.length == 10;
+
+    bool isNameFilled = nameController.text.trim().isNotEmpty;
+    bool isMobileValid =
+        mobileController.text.length == 10 &&
+        RegExp(r'^[6-9]\d{9}$').hasMatch(mobileController.text);
+    bool canProceed = isNameFilled && isMobileValid;
+
     return Container(
       height: screenHeight * 0.09,
       decoration: BoxDecoration(
@@ -472,39 +613,45 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
           vertical: screenHeight * 0.017,
         ),
         child: GestureDetector(
-          onTap: () {
-            if (nameController.text.isEmpty) {
-              Utils.showErrorMessage(context, "Enter receiver name ");
-            } else if (mobileController.text.isEmpty) {
-              Utils.showErrorMessage(context, "Enter Mobile number");
-            } else {
-              final data = {
-                "address": selectedLocation,
-                "name": nameController.text,
-                "phone": mobileController.text,
-                " latitude": selectedLatLng.latitude,
-                "longitude": selectedLatLng.longitude,
-              };
-              orderViewModel.setLocationData(data);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SelectVehicles()),
-              );
-            }
-          },
+          onTap: canProceed
+              ? () {
+                  final data = {
+                    "address": selectedLocation,
+                    "name": nameController.text.trim(),
+                    "phone": mobileController.text.trim(),
+                    "latitude": selectedLatLng.latitude,
+                    "longitude": selectedLatLng.longitude,
+                  };
+                  orderViewModel.setLocationData(data);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SelectVehicles(),
+                    ),
+                  );
+                }
+              : null,
           child: Container(
             alignment: Alignment.center,
-            height: screenHeight * 0.03,
+            height: screenHeight * 0.055,
             width: screenWidth,
             decoration: BoxDecoration(
-              color: isMobileNumberFilled ? PortColor.blue : PortColor.grey,
               borderRadius: BorderRadius.circular(10),
+              gradient: canProceed
+                  ? PortColor.subBtn
+                  : const LinearGradient(
+                      colors: [PortColor.grey, PortColor.grey],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
             ),
             child: TextConst(
-              title: isMobileNumberFilled
+              fontFamily: AppFonts.kanitReg,
+              title: canProceed
                   ? "Confirm and Proceed"
                   : "Enter Contact Details",
-              color: isMobileNumberFilled ? Colors.white : PortColor.gray,
+              color: canProceed ? Colors.black : PortColor.gray,
+              size: 16,
             ),
           ),
         ),

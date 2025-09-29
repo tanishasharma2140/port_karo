@@ -23,12 +23,13 @@ class _PickUpLocationState extends State<PickUpLocation> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
           backgroundColor: PortColor.bg,
           body: Column(children: [
             Container(
-              padding:  EdgeInsets.symmetric(horizontal:screenWidth*0.06, vertical: screenHeight*0.01),
-              height: screenHeight * 0.16,
+              padding:  EdgeInsets.symmetric(horizontal:screenWidth*0.06, vertical: screenHeight*0.03),
+              height: screenHeight * 0.2,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: const BorderRadius.only(

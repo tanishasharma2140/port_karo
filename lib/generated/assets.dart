@@ -34,6 +34,7 @@ class Assets {
   static const String assetsIntroducingporter = 'assets/introducingporter.jpg';
   static const String assetsIntroporternter = 'assets/introporternter.jpg';
   static const String assetsLocation = 'assets/location.png';
+  static const String assetsLocationPin = 'assets/location_pin.png';
   static const String assetsLoginDriver = 'assets/login_driver.png';
   static const String assetsMainimage = 'assets/mainimage.png';
   static const String assetsMap = 'assets/map.png';

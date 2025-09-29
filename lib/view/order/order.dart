@@ -41,8 +41,8 @@ class _OrderPageState extends State<OrderPage> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.only(top: 10, left: 7),
-          height: screenHeight * 0.088,
+          padding: const EdgeInsets.only(top: 20, left: 20),
+          height: screenHeight * 0.095,
           width: screenWidth,
           decoration: BoxDecoration(
             color: PortColor.white,
@@ -347,16 +347,21 @@ class _OrderPageState extends State<OrderPage> {
             SizedBox(height: screenHeight * 0.025),
             InkWell(
               onTap: () {},
-              child: Container(
+              child:Container(
                 alignment: Alignment.center,
                 height: screenHeight * 0.05,
                 width: screenWidth * 0.4,
                 decoration: BoxDecoration(
-                  color: PortColor.gold,
+                  gradient: PortColor.subBtn,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: TextConst(title: 'Book Now',color: PortColor.black,fontFamily: AppFonts.kanitReg,),
-              ),
+                child: TextConst(
+                  title: 'Book Now',
+                  color: PortColor.black,
+                  fontFamily: AppFonts.kanitReg,
+                ),
+              )
+
             ),
           ],
         ),

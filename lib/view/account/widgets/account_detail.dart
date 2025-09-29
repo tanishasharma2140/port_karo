@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_constant.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/res/launcher.dart';
@@ -241,7 +242,9 @@ class AccountDetail extends StatelessWidget {
                   ),
                   child: Center(
                     child: TextConst(
-                        title: "No", color: PortColor.blue.withOpacity(0.75)),
+                      fontWeight: FontWeight.w600,
+                        fontFamily: AppFonts.kanitReg,
+                        title: "No", color: PortColor.blue),
                   ),
                 ),
               ),
@@ -264,7 +267,7 @@ class AccountDetail extends StatelessWidget {
                   height: screenHeight * 0.058,
                   width: screenWidth * 0.4,
                   decoration: BoxDecoration(
-                    color: PortColor.blue.withOpacity(0.75),
+                    color: PortColor.gold,
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                   child: Center(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PortColor{
 
-  static const blue = Color(0xffffff00);
+  static const blue = Color(0xffFFD700);
   static const gold = Color(0xffFFD700);
   static const lightBlue = Color(0xffeff3ff);
   static const darkBlue = Color(0xff002f81);
@@ -33,5 +33,24 @@ class PortColor{
   static const Color blackList = Color(0xff171717);
   static const Color blackLight = Color(0xff414141);
   static const Color bg = Color(0xfff6f6f6);
+  static const Color yellowDiff = Color(0xffE5AC3F);
+  static const Color yellowAccent = Color(0xffFDF6A0);
+  static const Color yellowCoin = Color(0xffDFBF58);
+  static const Color darkYellow = Color(0xffD99C35);
+  static const Color lightYellow = Color(0xffF3D45B);
+
+
+  static const LinearGradient subBtn = LinearGradient(
+    colors: [
+      PortColor.yellowDiff,
+      PortColor.yellowAccent,
+      PortColor.yellowDiff,
+    ],
+  );
+
+  static const LinearGradient susCoin = LinearGradient(
+      colors: [yellowAccent, yellowDiff],
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight);
 
 }

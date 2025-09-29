@@ -24,15 +24,25 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
-        backgroundColor: PortColor.grey,
+        backgroundColor: PortColor.bg,
         body: Column(
           children: [
             Container(
-              height: screenHeight * 0.06,
+              padding: const EdgeInsets.only(top: 17),
+              height: screenHeight * 0.085,
               width: screenWidth,
               decoration: BoxDecoration(
                 color: PortColor.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    spreadRadius: 1,
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
