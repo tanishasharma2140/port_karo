@@ -184,7 +184,7 @@ class _OtpPageState extends State<OtpPage> with SingleTickerProviderStateMixin {
                         ? const LinearGradient(
                             colors: [
                               Color(0xFFFFD700), // golden yellow
-                              Color(0xFFFFE135), // bright yellow
+                              PortColor.rapidSplash, // bright yellow
                             ],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,

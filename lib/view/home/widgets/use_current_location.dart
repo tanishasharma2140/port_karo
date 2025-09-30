@@ -195,7 +195,7 @@ class _UseCurrentLocationState extends State<UseCurrentLocation> {
                     ),
                     SizedBox(height: screenHeight * 0.013),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           width: screenWidth * 0.25,
@@ -217,6 +217,7 @@ class _UseCurrentLocationState extends State<UseCurrentLocation> {
                               TextConst(
                                 title: "Home",
                                 color: PortColor.black,
+                                size: 13,
                               ),
                             ],
                           ),
@@ -239,6 +240,7 @@ class _UseCurrentLocationState extends State<UseCurrentLocation> {
                               TextConst(
                                 title: "Shop",
                                 color: PortColor.black,
+                                size: 13,
                               ),
                             ],
                           ),
@@ -263,6 +265,7 @@ class _UseCurrentLocationState extends State<UseCurrentLocation> {
                               TextConst(
                                 title: "Other",
                                 color: PortColor.black,
+                                size: 13,
                               ),
                             ],
                           ),
@@ -337,11 +340,9 @@ class _UseCurrentLocationState extends State<UseCurrentLocation> {
                         fontFamily: AppFonts.kanitReg,
                       ),
                     )
-
                   ),
                 ),
               ),
-
             ],
           ),
         ),

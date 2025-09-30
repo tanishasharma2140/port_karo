@@ -1,69 +1,74 @@
-class SelectVehiclesModel {
-  List<Data>? data;
+class SelectVehicleModel {
   int? status;
-  String? message;
+  List<Data>? data;
 
-  SelectVehiclesModel({this.data, this.status, this.message});
+  SelectVehicleModel({this.status, this.data});
 
-  SelectVehiclesModel.fromJson(Map<String, dynamic> json) {
+  SelectVehicleModel.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
         data!.add(Data.fromJson(v));
       });
     }
-    status = json['status'];
-    message = json['message'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['status'] = status;
-    data['message'] = message;
     return data;
   }
 }
 
 class Data {
-  int? id;
-  String? name;
-  String? image;
-  int? time;
-  int? price;
-  int? maxWeight;
+  int? vehicleId;
+  String? vehicleName;
+  String? vehicleImage;
   String? datetime;
+  int? bodyTypeId;
+  String? bodyType;
+  String? bodyTypeImage;
+  String? amountPrKm;
+  String? bodyDetail;
 
   Data(
-      {this.id,
-        this.name,
-        this.image,
-        this.time,
-        this.price,
-        this.maxWeight,
-        this.datetime});
+      {this.vehicleId,
+        this.vehicleName,
+        this.vehicleImage,
+        this.datetime,
+        this.bodyTypeId,
+        this.bodyType,
+        this.bodyTypeImage,
+        this.amountPrKm,
+        this.bodyDetail});
 
   Data.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    image = json['image'];
-    time = json['time'];
-    price = json['price'];
-    maxWeight = json['max_weight'];
+    vehicleId = json['vehicle_id'];
+    vehicleName = json['vehicle_name'];
+    vehicleImage = json['vehicle_image'];
     datetime = json['datetime'];
+    bodyTypeId = json['body_type_id'];
+    bodyType = json['body_type'];
+    bodyTypeImage = json['body_type_image'];
+    amountPrKm = json['amount_pr_km'];
+    bodyDetail = json['body_detail'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['id'] = id;
-    data['name'] = name;
-    data['image'] = image;
-    data['time'] = time;
-    data['price'] = price;
-    data['max_weight'] = maxWeight;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['vehicle_id'] = vehicleId;
+    data['vehicle_name'] = vehicleName;
+    data['vehicle_image'] = vehicleImage;
     data['datetime'] = datetime;
+    data['body_type_id'] = bodyTypeId;
+    data['body_type'] = bodyType;
+    data['body_type_image'] = bodyTypeImage;
+    data['amount_pr_km'] = amountPrKm;
+    data['body_detail'] = bodyDetail;
     return data;
   }
 }

@@ -31,6 +31,7 @@ class AccountDetail extends StatelessWidget {
               child: buttonLayoutUi(
                 context,
                 Icons.favorite_border,
+                color: PortColor.rapidBlue,
                 "Saved Address",
                 page: const SaveAddressDetail(),
               )),
@@ -58,6 +59,7 @@ class AccountDetail extends StatelessWidget {
                 buttonLayoutUi(
                   page: const CoinsPage(),
                   context,
+                  color: PortColor.rapidPurple,
                   Icons.star_border_purple500_outlined,
                   "Courier Rewards",
                   trailing: Row(
@@ -92,7 +94,8 @@ class AccountDetail extends StatelessWidget {
                 buttonLayoutUi(
                   context,
                   Icons.share,
-                  "Refer your Friends!",
+                  "Refer your Friends!",   // label String
+                  color: PortColor.portKaro,
                   trailing: GestureDetector(
                     onTap: () {
                       Launcher.shareApk(AppConstant.apkUrl, context);
@@ -110,13 +113,14 @@ class AccountDetail extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.share,
-                            color: PortColor.blue,
+                            color: PortColor.blackList,
                             size: screenHeight * 0.02,
                           ),
                           const SizedBox(width: 4.0),
                           TextConst(
                             title: "Invite",
-                            color: PortColor.blue,
+                            color: PortColor.blackList,
+                            size: 12,
                           ),
                         ],
                       ),
@@ -147,9 +151,9 @@ class AccountDetail extends StatelessWidget {
             ),
             child: Column(
               children: [
-                buttonLayoutUi(context, Icons.help_outline, "Help & Support",
+                buttonLayoutUi(context, Icons.help_outline,color: PortColor.rapidGreen ,"Help & Support",
                     page: const HelpSupport()),
-                buttonLayoutUi(context, Icons.copy_all, "Terms and Condition",
+                buttonLayoutUi(context, Icons.copy_all, color: PortColor.darkBlue,"Terms and Condition",
                     page: const TermsCondition())
               ],
             ),
@@ -171,12 +175,12 @@ class AccountDetail extends StatelessWidget {
               leading: Container(
                 padding: const EdgeInsets.all(6.0),
                 decoration: BoxDecoration(
-                  color: PortColor.blue.withOpacity(0.1),
+                  color: PortColor.rapidRed.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.logout,
-                  color: PortColor.blue,
+                  color: PortColor.rapidRed,
                   size: screenHeight * 0.025,
                 ),
               ),
@@ -271,7 +275,7 @@ class AccountDetail extends StatelessWidget {
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                   ),
                   child: Center(
-                    child: TextConst(title: "Yes", color: PortColor.white),
+                    child: TextConst(title: "Yes", color: PortColor.black,fontFamily:AppFonts.kanitReg,fontWeight: FontWeight.w400,),
                   ),
                 ),
               ),
@@ -282,27 +286,37 @@ class AccountDetail extends StatelessWidget {
     );
   }
 
-  Widget buttonLayoutUi(context, IconData icon, String label,
-      {Widget? page, Widget? trailing}) {
+  Widget buttonLayoutUi(
+      BuildContext context,
+      IconData icon,
+      String label, {
+        Widget? page,
+        Widget? trailing,
+        Color? color, // 🔹 extra parameter
+      }) {
+    final Color effectiveColor = color ?? PortColor.blue;
+
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.025),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => page!,
-          ),
-        );
+        if (page != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => page,
+            ),
+          );
+        }
       },
       leading: Container(
         padding: const EdgeInsets.all(6.0),
         decoration: BoxDecoration(
-          color: PortColor.blue.withOpacity(0.1),
+          color: effectiveColor.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          color: PortColor.blue,
+          color: effectiveColor,
           size: screenHeight * 0.025,
         ),
       ),
@@ -319,4 +333,5 @@ class AccountDetail extends StatelessWidget {
           ),
     );
   }
+
 }

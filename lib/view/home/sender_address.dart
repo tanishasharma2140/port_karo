@@ -30,6 +30,7 @@ class SenderAddress extends StatefulWidget {
 class _SenderAddressState extends State<SenderAddress> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
+  int selectedIndex = -1;
   late String selectedLocation;
   late GoogleMapController mapController;
   final Completer<GoogleMapController> _controller = Completer();
@@ -285,7 +286,6 @@ class _SenderAddressState extends State<SenderAddress> {
               children: [
                 buildLocationDetails(),
                 SizedBox(height: screenHeight * 0.03),
-
                 // Time Selection Section
                 _buildTimeSelectionSection(),
                 SizedBox(height: screenHeight * 0.03),
@@ -377,11 +377,11 @@ class _SenderAddressState extends State<SenderAddress> {
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildSaveOption("Home", Icons.home_filled),
-                    buildSaveOption("Shop", null, Assets.assetsShop),
-                    buildSaveOption("Other", Icons.favorite),
+                    buildSaveOption("Home", Icons.home_filled, null, 0),
+                    buildSaveOption("Shop", null, Assets.assetsShop, 1),
+                    buildSaveOption("Other", Icons.favorite, null, 2),
                   ],
                 ),
               ],
@@ -406,7 +406,7 @@ class _SenderAddressState extends State<SenderAddress> {
           title: "Pickup Time",
           color: PortColor.black,
           fontFamily: AppFonts.poppinsReg,
-          size: 16,
+          size: 14,
         ),
         SizedBox(height: screenHeight * 0.015),
 
@@ -414,11 +414,11 @@ class _SenderAddressState extends State<SenderAddress> {
         Row(
           children: [
             _buildTimeRadioButton("Now", true),
-            SizedBox(width: screenWidth * 0.08),
+            SizedBox(width: screenWidth * 0.06),
             _buildTimeRadioButton("Later", false),
           ],
         ),
-        SizedBox(height: screenHeight * 0.02),
+        SizedBox(height: screenHeight * 0.015),
 
         // Date and Time Pickers (only show when Later is selected)
         if (!_isNowSelected) _buildDateTimePickers(),
@@ -447,10 +447,10 @@ class _SenderAddressState extends State<SenderAddress> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: isSelected ? PortColor.blue : PortColor.gray,
+                color: isSelected ? PortColor.rapidBlue : PortColor.gray,
                 width: 2,
               ),
-              color: isSelected ? PortColor.blue : Colors.transparent,
+              color: isSelected ? PortColor.rapidBlue : Colors.transparent,
             ),
             child: isSelected
                 ? Icon(
@@ -463,7 +463,7 @@ class _SenderAddressState extends State<SenderAddress> {
           SizedBox(width: screenWidth * 0.02),
           TextConst(
             title: title,
-            color: isSelected ? PortColor.blue : PortColor.gray,
+            color: isSelected ? PortColor.rapidBlue : PortColor.gray,
             fontFamily: AppFonts.poppinsReg,
             size: 14,
           ),
@@ -587,17 +587,38 @@ class _SenderAddressState extends State<SenderAddress> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: PortColor.blue,
-            colorScheme: const ColorScheme.light(primary: PortColor.blue),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            primaryColor: Colors.yellow[700], // 🔹 Yellow primary color
+            colorScheme: ColorScheme.light(
+              primary: Colors.yellow[700]!, // 🔹 Yellow primary
+              onPrimary: Colors.black, // 🔹 Text color on yellow background
+              surface: Colors.white, // 🔹 Background color
+              onSurface: Colors.black, // 🔹 Text color
+            ),
+            buttonTheme: ButtonThemeData(
+              textTheme: ButtonTextTheme.primary,
+            ),
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: Colors.white,
+              hourMinuteColor: Colors.yellow[300], // 🔹 Hour/minute selection background
+              hourMinuteTextColor: Colors.black,
+              dayPeriodColor: Colors.yellow[300], // 🔹 AM/PM background
+              dayPeriodTextColor: Colors.black,
+              dialBackgroundColor: Colors.yellow[50], // 🔹 Dial background
+              dialHandColor: Colors.yellow[700]!, // 🔹 Dial hand color
+              dialTextColor: Colors.black,
+              entryModeIconColor: Colors.yellow[700], // 🔹 Input mode icon
+            ),
           ),
           child: child!,
         );
       },
     );
 
-    buildProceedButton(context);
-
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
   }
 
   Widget buildLocationDetailsSmall(BuildContext context) {
@@ -727,7 +748,7 @@ class _SenderAddressState extends State<SenderAddress> {
       children: [
         Image(
           image: const AssetImage(Assets.assetsLocation),
-          height: screenHeight * 0.035,
+          height: screenHeight * 0.033,
         ),
         SizedBox(width: screenWidth * 0.009),
         Expanded(
@@ -743,9 +764,35 @@ class _SenderAddressState extends State<SenderAddress> {
               SizedBox(height: screenHeight * 0.005),
               if (isLoadingAddress)
                 SizedBox(
-                  height: screenHeight * 0.02,
-                  child: const LinearProgressIndicator(),
-                ),
+                  height: screenHeight * 0.006,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Stack(
+                      children: [
+                        LinearProgressIndicator(
+                          value: 0.6,
+                          backgroundColor: Colors.grey.shade300,
+                          valueColor: const AlwaysStoppedAnimation(Colors.transparent), // transparent
+                        ),
+                        Positioned.fill(
+                          child: ShaderMask(
+                            shaderCallback: (Rect bounds) {
+                              return  LinearGradient(
+                                colors: [PortColor.yellowDiff, PortColor.yellowAccent],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ).createShader(bounds);
+                            },
+                            blendMode: BlendMode.srcIn,
+                            child: Container(
+                              color: Colors.white, // color is ignored, shader will override
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
             ],
           ),
         ),
@@ -753,7 +800,7 @@ class _SenderAddressState extends State<SenderAddress> {
         GestureDetector(
           onTap: _changeLocation,
           child: Container(
-            height: screenHeight * 0.038,
+            height: screenHeight * 0.036,
             width: screenWidth * 0.15,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
@@ -764,7 +811,7 @@ class _SenderAddressState extends State<SenderAddress> {
                 title: "Change",
                 color: PortColor.blue,
                 fontFamily: AppFonts.poppinsReg,
-                size: 12,
+                size: 11,
               ),
             ),
           ),
@@ -773,43 +820,61 @@ class _SenderAddressState extends State<SenderAddress> {
     );
   }
 
-  Widget buildSaveOption(String label, IconData? icon, [String? asset]) {
-    return Container(
-      width: screenWidth * 0.25,
-      height: screenHeight * 0.036,
-      decoration: BoxDecoration(
-        border: Border.all(color: PortColor.gray),
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (icon != null)
-            Icon(
-              icon,
-              color: PortColor.black,
-              size: screenHeight * 0.02,
-            ),
-          if (asset != null)
-            Image(
-              image: AssetImage(asset),
-              height: screenHeight * 0.02,
-            ),
-          SizedBox(width: screenWidth * 0.01),
-          TextConst(
-            title: label,
-            color: PortColor.black,
-            fontFamily: AppFonts.poppinsReg,
-            size: 12,
+  Widget buildSaveOption(
+      String label,
+      IconData? icon,
+      String? asset,
+      int index,
+      ) {
+    bool isSelected = index == selectedIndex;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+        });
+      },
+      child: Container(
+        width: screenWidth * 0.25,
+        height: screenHeight * 0.036,
+        decoration: BoxDecoration(
+          color: isSelected ? PortColor.gold : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? PortColor.gold : PortColor.gray,
           ),
-        ],
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            if (icon != null)
+              Icon(
+                icon,
+                color: isSelected ? PortColor.blackLight : PortColor.black,
+                size: screenHeight * 0.02,
+              ),
+            if (asset != null)
+              Image(
+                image: AssetImage(asset),
+                height: screenHeight * 0.02,
+                color: isSelected ? Colors.white : null,
+              ),
+            SizedBox(width: screenWidth * 0.01),
+            TextConst(
+              title: label,
+              color: isSelected ? PortColor.blackLight : PortColor.black,
+              fontFamily: AppFonts.poppinsReg,
+              size: 12,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget buildProceedButton(BuildContext context) {
-    final orderViewModel = Provider.of<OrderViewModel>(context);
+    final orderViewModel = Provider.of<OrderViewModel>(context,listen: false);
 
     bool isMobileNumberFilled =
         mobileController.text.isNotEmpty && mobileController.text.length == 10;

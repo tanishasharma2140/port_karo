@@ -125,7 +125,7 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
               child: Text(
                 "Update",
                 style: TextStyle(
-                  color: selectedIndex == null ? Colors.black : Colors.white,
+                  color: selectedIndex == null ? Colors.black : Colors.black,
                   fontFamily: AppFonts.kanitReg,
                 ),
               ),

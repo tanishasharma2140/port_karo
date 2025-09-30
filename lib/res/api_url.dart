@@ -6,7 +6,7 @@ class ApiUrl{
   static const String loginUrl="${baseUrl}login";
   static const String profileUpdateUrl="${baseUrl}update_profile";
   static const String orderUrl="${baseUrl}order";
-  static const String selectVehiclesUrl="${baseUrl}vehicle_type";
+  static const String selectVehiclesUrl="${baseUrl}select_vehicle?";
   static const String serviceTypeUrl="${baseUrl}service_type";
   static const String addAddressUrl="${baseUrl}address";
   static const String addressShowUrl="${baseUrl}view_address/";

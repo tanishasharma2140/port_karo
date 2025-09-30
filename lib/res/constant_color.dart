@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class PortColor{
 
-  static const blue = Color(0xffFFD700);
-  static const gold = Color(0xffFFD700);
+  static const blue = Color(0xFFfeca1f);
+  static const gold = Color(0xFFfeca1f);
   static const lightBlue = Color(0xffeff3ff);
   static const darkBlue = Color(0xff002f81);
   static const darkWhite = Color(0xffeff3ff);
@@ -23,7 +23,7 @@ class PortColor{
   static const  gradientLightPurple = Color(0xFFf7eafe);
   static const  card = Color(0xFFebeaef);
   static const  greyLight = Color(0xFFe6e6e6);
-  static const  button = Color(0xFF011367);
+  static const  button = Color(0xFFfeca1f);
   static const  red = Color(0xFFE53935);
   static const  lightGreen = Color(0xFFe4edea);
   static const  lightGreen2 = Color(0xFFebf1ef);
@@ -39,12 +39,18 @@ class PortColor{
   static const Color darkYellow = Color(0xffD99C35);
   static const Color lightYellow = Color(0xffF3D45B);
 
+  static const Color rapidPurple = Color(0xFF6B5B95);
+  static const Color rapidGreen = Color(0xFF00A859);
+  static const Color rapidGreenLight = Color(0xFF00C96D);
+  static const Color rapidBlue = Color(0xFF0077B6);
+  static const Color rapidRed = Color(0xFFE63946);
+  static const Color rapidSplash = Color(0xFFfeca1f);
+
 
   static const LinearGradient subBtn = LinearGradient(
     colors: [
-      PortColor.yellowDiff,
-      PortColor.yellowAccent,
-      PortColor.yellowDiff,
+      Color(0xFFFFD700), // golden yellow
+      Color(0xFFfeca1f),
     ],
   );
 

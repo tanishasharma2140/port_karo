@@ -180,12 +180,14 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
         backgroundColor: PortColor.grey,
         body: Stack(
           children: [
             Column(
               children: [
+                SizedBox(height: topPadding,),
                 // Header + Steps
                 Container(
                   padding: EdgeInsets.symmetric(

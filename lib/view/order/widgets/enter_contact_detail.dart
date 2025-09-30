@@ -110,6 +110,232 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
     // This could open a search dialog or navigate to location search screen
   }
 
+  bool _isNowSelected = true;
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+
+  Widget _buildTimeSelectionSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextConst(
+          title: "Drop Time",
+          color: PortColor.black,
+          fontFamily: AppFonts.poppinsReg,
+          size: 14,
+        ),
+        SizedBox(height: screenHeight * 0.015),
+
+        // Radio Buttons for Now/Later
+        Row(
+          children: [
+            _buildTimeRadioButton("Now", true),
+            SizedBox(width: screenWidth * 0.06),
+            _buildTimeRadioButton("Later", false),
+          ],
+        ),
+        SizedBox(height: screenHeight * 0.015),
+
+        // Date and Time Pickers (only show when Later is selected)
+        if (!_isNowSelected) _buildDateTimePickers(),
+      ],
+    );
+  }
+
+  Widget _buildTimeRadioButton(String title, bool isNow) {
+    bool isSelected = _isNowSelected == isNow;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isNowSelected = isNow;
+          if (isNow) {
+            _selectedDate = null;
+            _selectedTime = null;
+          }
+        });
+      },
+      child: Row(
+        children: [
+          Container(
+            width: screenHeight * 0.024,
+            height: screenHeight * 0.024,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected ? PortColor.rapidBlue : PortColor.gray,
+                width: 2,
+              ),
+              color: isSelected ? PortColor.rapidBlue : Colors.transparent,
+            ),
+            child: isSelected
+                ? Icon(
+              Icons.circle,
+              color: Colors.white,
+              size: screenHeight * 0.012,
+            ) : null,
+          ),
+          SizedBox(width: screenWidth * 0.02),
+          TextConst(
+            title: title,
+            color: isSelected ? PortColor.rapidBlue: PortColor.gray,
+            fontFamily: AppFonts.poppinsReg,
+            size: 14,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateTimePickers() {
+    return Column(
+      children: [
+        // Date Picker
+        GestureDetector(
+          onTap: _selectDate,
+          child: Container(
+            height: screenHeight * 0.055,
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            decoration: BoxDecoration(
+              border: Border.all(color: PortColor.gray),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: PortColor.blue,
+                  size: screenHeight * 0.02,
+                ),
+                SizedBox(width: screenWidth * 0.03),
+                Expanded(
+                  child: TextConst(
+                    title: _selectedDate == null
+                        ? "Select Date"
+                        : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+                    color: _selectedDate == null ? PortColor.gray : PortColor.black,
+                    fontFamily: AppFonts.poppinsReg,
+                    size: 14,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: PortColor.gray,
+                  size: screenHeight * 0.025,
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: screenHeight * 0.02),
+
+        // Time Picker
+        GestureDetector(
+          onTap: _selectTime,
+          child: Container(
+            height: screenHeight * 0.055,
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            decoration: BoxDecoration(
+              border: Border.all(color: PortColor.gray),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.access_time,
+                  color: PortColor.blue,
+                  size: screenHeight * 0.02,
+                ),
+                SizedBox(width: screenWidth * 0.03),
+                Expanded(
+                  child: TextConst(
+                    title: _selectedTime == null
+                        ? "Select Time"
+                        : "${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}",
+                    color: _selectedTime == null ? PortColor.gray : PortColor.black,
+                    fontFamily: AppFonts.poppinsReg,
+                    size: 14,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: PortColor.gray,
+                  size: screenHeight * 0.025,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 30)),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: PortColor.blue,
+            colorScheme: const ColorScheme.light(primary: PortColor.blue),
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectTime() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.yellow[700], // 🔹 Yellow primary color
+            colorScheme: ColorScheme.light(
+              primary: Colors.yellow[700]!, // 🔹 Yellow primary
+              onPrimary: Colors.black, // 🔹 Text color on yellow background
+              surface: Colors.white, // 🔹 Background color
+              onSurface: Colors.black, // 🔹 Text color
+            ),
+            buttonTheme: ButtonThemeData(
+              textTheme: ButtonTextTheme.primary,
+            ),
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: Colors.white,
+              hourMinuteColor: Colors.yellow[300], // 🔹 Hour/minute selection background
+              hourMinuteTextColor: Colors.black,
+              dayPeriodColor: Colors.yellow[300], // 🔹 AM/PM background
+              dayPeriodTextColor: Colors.black,
+              dialBackgroundColor: Colors.yellow[50], // 🔹 Dial background
+              dialHandColor: Colors.yellow[700]!, // 🔹 Dial hand color
+              dialTextColor: Colors.black,
+              entryModeIconColor: Colors.yellow[700], // 🔹 Input mode icon
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,6 +477,8 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               children: [
                 buildLocationDetails(),
                 SizedBox(height: screenHeight * 0.03),
+                _buildTimeSelectionSection(),
+                SizedBox(height: screenHeight * 0.03),
                 CustomTextField(
                   controller: nameController,
                   height: screenHeight * 0.055,
@@ -304,7 +532,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                         child: isContactDetailsSelected
                             ? Icon(
                                 Icons.check,
-                                color: Colors.white,
+                                color: PortColor.blackLight,
                                 size: screenHeight * 0.02,
                               )
                             : null,
@@ -340,7 +568,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     buildSaveOption("Home", Icons.home_filled, null, 0),
                     buildSaveOption("Shop", null, Assets.assetsShop, 1),
@@ -378,7 +606,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               children: [
                 Image(
                   image: const AssetImage(Assets.assetsRedlocation),
-                  height: screenHeight * 0.035,
+                  height: screenHeight * 0.02,
                 ),
                 SizedBox(width: screenWidth * 0.02),
                 Expanded(
@@ -394,8 +622,40 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                       SizedBox(height: screenHeight * 0.007),
                       if (isLoadingAddress)
                         SizedBox(
-                          height: screenHeight * 0.02,
-                          child: const LinearProgressIndicator(),
+                          height: screenHeight * 0.006,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Stack(
+                              children: [
+                                LinearProgressIndicator(
+                                  value: 0.6,
+                                  backgroundColor: Colors.grey.shade300,
+                                  valueColor: const AlwaysStoppedAnimation(
+                                    Colors.transparent,
+                                  ), // transparent
+                                ),
+                                Positioned.fill(
+                                  child: ShaderMask(
+                                    shaderCallback: (Rect bounds) {
+                                      return LinearGradient(
+                                        colors: [
+                                          PortColor.yellowDiff,
+                                          PortColor.yellowAccent,
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ).createShader(bounds);
+                                    },
+                                    blendMode: BlendMode.srcIn,
+                                    child: Container(
+                                      color: Colors
+                                          .white, // color is ignored, shader will override
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                     ],
                   ),
@@ -439,7 +699,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                     title: "Confirm Drop Location",
                     color: Colors.black,
                     fontFamily: AppFonts.kanitReg,
-                    size: 16,
+                    size: 14,
                   ),
                 ),
               ),
@@ -513,7 +773,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
         GestureDetector(
           onTap: _changeLocation,
           child: Container(
-            height: screenHeight * 0.038,
+            height: screenHeight * 0.036,
             width: screenWidth * 0.14,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
@@ -524,7 +784,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 title: "Change",
                 color: PortColor.blue,
                 fontFamily: AppFonts.poppinsReg,
-                size: 12,
+                size: 11,
               ),
             ),
           ),
@@ -564,7 +824,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
             if (icon != null)
               Icon(
                 icon,
-                color: isSelected ? Colors.white : PortColor.black,
+                color: isSelected ? PortColor.blackLight : PortColor.black,
                 size: screenHeight * 0.02,
               ),
             if (asset != null)
@@ -576,7 +836,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
             SizedBox(width: screenWidth * 0.01),
             TextConst(
               title: label,
-              color: isSelected ? Colors.white : PortColor.black,
+              color: isSelected ? PortColor.blackLight : PortColor.black,
               fontFamily: AppFonts.poppinsReg,
               size: 12,
             ),
@@ -651,7 +911,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   ? "Confirm and Proceed"
                   : "Enter Contact Details",
               color: canProceed ? Colors.black : PortColor.gray,
-              size: 16,
+              size: 14,
             ),
           ),
         ),

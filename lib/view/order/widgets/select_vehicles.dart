@@ -9,6 +9,7 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/order/widgets/review_booking.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
+import 'package:port_karo/view_model/service_type_view_model.dart';
 import 'package:provider/provider.dart';
 
 class SelectVehicles extends StatefulWidget {
@@ -24,11 +25,14 @@ class _SelectVehiclesState extends State<SelectVehicles> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context, listen: false);
       final selectVehiclesViewModel = Provider.of<SelectVehiclesViewModel>(
         context,
         listen: false,
       );
-      selectVehiclesViewModel.selectVehiclesApi();
+      selectVehiclesViewModel.selectVehiclesApi(
+          serviceTypeViewModel.selectedVehicleId!
+      );
     });
   }
 
@@ -227,7 +231,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                       ),
                                       child: Icon(
                                         Icons.add,
-                                        color: PortColor.white,
+                                        color: PortColor.blackLight,
                                         size: screenHeight * 0.02,
                                       ),
                                     ),
@@ -299,18 +303,18 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                         child: CircularProgressIndicator(color: PortColor.blue),
                       )
                     : selectVehiclesViewModel
-                              .selectVehiclesModel
+                              .selectVehicleModel
                               ?.data
                               ?.isNotEmpty ==
                           true
                     ? ListView.builder(
                         itemCount: selectVehiclesViewModel
-                            .selectVehiclesModel
+                            .selectVehicleModel
                             ?.data
                             ?.length,
                         itemBuilder: (context, index) {
                           final vehicle = selectVehiclesViewModel
-                              .selectVehiclesModel
+                              .selectVehicleModel
                               ?.data![index];
                           final isSelected = selectedIndex == index;
 
@@ -324,7 +328,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                               margin: EdgeInsets.only(
                                 bottom: screenHeight * 0.02,
                               ),
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? PortColor.blue.withOpacity(0.1)
@@ -334,8 +338,8 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Image.network(
-                                    vehicle?.image ?? "",
-                                    height: screenHeight * 0.06,
+                                    vehicle?.bodyTypeImage ?? "",
+                                    height: screenHeight * 0.05,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Image.asset(
                                         Assets.assetsBike,
@@ -352,7 +356,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                         Row(
                                           children: [
                                             TextConst(
-                                              title: vehicle?.name ?? "",
+                                              title: vehicle?.vehicleName ?? "",
                                               color: PortColor.black,
                                               fontFamily: AppFonts.kanitReg,
                                             ),
@@ -366,15 +370,17 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                           children: [
                                             TextConst(
                                               title:
-                                                  "${vehicle?.maxWeight?.toString() ?? ""} kg",
+                                              vehicle?.bodyDetail?.toString() ?? "",
                                               color: PortColor.gray,
                                               fontFamily: AppFonts.poppinsReg,
-                                              size: 12,
+                                              size: 11,
                                             ),
                                             TextConst(
                                               title:
-                                                  "${vehicle?.time?.toString() ?? ""} min",
-                                              color: PortColor.gray,
+                                              vehicle?.bodyType?.toString() ?? "",
+                                              color: PortColor.rapidGreen,
+                                              size: 11,
+
                                             ),
                                           ],
                                         ),
@@ -385,8 +391,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                   Column(
                                     children: [
                                       TextConst(
-                                        title:
-                                            "₹${((vehicle?.price ?? 0) * distance).toStringAsFixed(0)}",
+                                        title: "₹${((double.tryParse(vehicle?.amountPrKm.toString() ?? "0") ?? 0) * distance).toStringAsFixed(0)}",
                                         color: PortColor.black,
                                       ),
                                     ],
@@ -419,24 +424,28 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                   child: InkWell(
                     onTap: selectedIndex != null
                         ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ReviewBooking(
-                                  index: selectedIndex,
-                                  price:
-                                      ((selectVehiclesViewModel
-                                                      .selectVehiclesModel
-                                                      ?.data![selectedIndex!]
-                                                      .price ??
-                                                  0) *
-                                              distance)
-                                          .toStringAsFixed(0),
-                                  distance: distance.toStringAsFixed(0),
-                                ),
-                              ),
-                            );
-                          }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReviewBooking(
+                            index: selectedIndex,
+                            price: (
+                                (double.tryParse(
+                                    selectVehiclesViewModel
+                                        .selectVehicleModel
+                                        ?.data![selectedIndex!]
+                                        .amountPrKm
+                                        .toString() ?? "0"
+                                ) ?? 0) // 🔹 null safe
+                                    * distance
+                            ).toStringAsFixed(0),
+                            distance: distance.toStringAsFixed(0),
+                          ),
+                        ),
+                      );
+
+
+                    }
                         : null,
                     child: Container(
                       alignment: Alignment.center,
@@ -446,15 +455,15 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                         borderRadius: BorderRadius.circular(10),
                         gradient: selectedIndex != null
                             ? PortColor.subBtn
-                            : const LinearGradient(
-                          colors: [PortColor.gray, PortColor.gray], // disabled state ke liye
+                            :  LinearGradient(
+                          colors: [PortColor.darkPurple, PortColor.darkPurple], // disabled state ke liye
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                       ),
                       child: TextConst(
                         title: selectedIndex != null
-                            ? "Proceed with ${selectVehiclesViewModel.selectVehiclesModel?.data![selectedIndex!].name ?? ""}"
+                            ? "Proceed with ${selectVehiclesViewModel.selectVehicleModel?.data![selectedIndex!].vehicleName ?? ""}"
                             : "Select a Vehicle",
                         color: PortColor.black,
                         fontFamily: AppFonts.kanitReg,

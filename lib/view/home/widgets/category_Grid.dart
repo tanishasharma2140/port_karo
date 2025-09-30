@@ -17,6 +17,10 @@ class CategoryGrid extends StatefulWidget {
 }
 
 class _CategoryGridState extends State<CategoryGrid> {
+  // Store selected vehicle IDs locally
+  String? _selectedVehicleId;
+  String? _selectedAnotherId;
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +94,49 @@ class _CategoryGridState extends State<CategoryGrid> {
     );
   }
 
+  // Method to set vehicle IDs when grid is tapped
+// Method to set vehicle IDs when grid is tapped
+  void _setVehicleIds(int index) {
+    final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context, listen: false);
+    final services = serviceTypeViewModel.serviceTypeModel!.data![index];
+
+    setState(() {
+      // API data se actual ID le rahe hain
+      _selectedVehicleId = services.id?.toString() ?? "vehicle_${index + 1}";
+      _selectedAnotherId = "another_id_${index + 1}";
+    });
+
+    // ✅ ServiceTypeViewModel mein ID store karo
+    serviceTypeViewModel.setSelectedVehicleId(_selectedVehicleId!);
+
+    print("Vehicle ID Set: $_selectedVehicleId");
+    print("Another ID Set: $_selectedAnotherId");
+
+    // Your existing navigation logic
+    if (index == 0 || index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const DeliverByTruck(),
+        ),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const DeliverByPackerMover(),
+        ),
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const DeliverAllIndiaParcel(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context);
@@ -114,111 +161,85 @@ class _CategoryGridState extends State<CategoryGrid> {
       },
     )
         : serviceTypeViewModel.serviceTypeModel?.data?.isNotEmpty == true
-        ? GridView.builder(
-      padding: const EdgeInsets.all(12),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 7,
-        childAspectRatio: 1.1
-      ),
-      itemCount:
-      serviceTypeViewModel.serviceTypeModel!.data!.length,
-      itemBuilder: (context, index) {
-        final services =
-        serviceTypeViewModel.serviceTypeModel!.data![index];
-        return GestureDetector(
-          onTap: () {
-            if (index == 0 || index == 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DeliverByTruck(),
-                ),
-              );
-            } else if (index == 2) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DeliverByPackerMover(),
-                ),
-              );
-            } else if (index == 3) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DeliverAllIndiaParcel(),
-                ),
-              );
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(19),
-              boxShadow: [
-                // Stronger shadow for floating effect
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08), // darker shadow
-                  blurRadius: 12, // more blur for soft edges
-                  spreadRadius: 2, // expand a bit
-                  offset: const Offset(0, 6), // vertical lift
-                ),
-                // Subtle secondary shadow for depth
-                // BoxShadow(
-                //   color: Colors.black.withOpacity(0.03),
-                //   blurRadius: 20,
-                //   offset: const Offset(0, 12),
-                // ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: screenHeight * 0.01,
-                    horizontal: screenWidth * 0.03,
-                  ),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      children: [
-                        Text(
-                          services.name ?? "",
-                          style:  TextStyle(
-                              fontSize: 14,
-                              fontFamily: AppFonts.kanitReg,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const Spacer(),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          size: 10,
-                          color: PortColor.grayLight,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.006),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Image.network(
-                      services.images ?? "",
-                      height: 90,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        ? Column(
+      children: [
+        GridView.builder(
+          padding: const EdgeInsets.all(12),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 7,
+              childAspectRatio: 1.1
           ),
-        );
-      },
+          itemCount: serviceTypeViewModel.serviceTypeModel!.data!.length,
+          itemBuilder: (context, index) {
+            final services = serviceTypeViewModel.serviceTypeModel!.data![index];
+            return GestureDetector(
+              onTap: () {
+                _setVehicleIds(index);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(19),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: screenHeight * 0.01,
+                        horizontal: screenWidth * 0.03,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Row(
+                          children: [
+                            Text(
+                              services.name ?? "",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: AppFonts.kanitReg,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 10,
+                              color: PortColor.grayLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.006),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Image.network(
+                          services.images ?? "",
+                          height: 75,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     )
         : const Center(child: Text("No vehicles Available"));
   }

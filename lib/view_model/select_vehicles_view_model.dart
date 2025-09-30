@@ -3,7 +3,7 @@ import 'package:port_karo/model/select_vehicles_model.dart';
 import 'package:port_karo/repo/select_vehicles_repo.dart';
 
 class SelectVehiclesViewModel with ChangeNotifier {
-  final _selectVehiclesRepo = SelectVehiclesRepo();
+  final _selectVehicleRepo = SelectVehicleRepo();
   bool _loading = false;
   bool get loading => _loading;
 
@@ -12,17 +12,18 @@ class SelectVehiclesViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  SelectVehiclesModel? _selectVehiclesModel;
-  SelectVehiclesModel? get selectVehiclesModel => _selectVehiclesModel;
+  SelectVehicleModel? _selectVehicleModel;
+  SelectVehicleModel? get selectVehicleModel => _selectVehicleModel;
 
-  setModelData(SelectVehiclesModel value) {
-    _selectVehiclesModel = value;
+  setModelData(SelectVehicleModel value) {
+    _selectVehicleModel = value;
     notifyListeners();
   }
-  Future<void> selectVehiclesApi() async {
+
+  Future<void> selectVehiclesApi(String vehicleId) async {
     setLoading(true);
     try {
-      final response = await _selectVehiclesRepo.selectVehiclesApi();
+      final response = await _selectVehicleRepo.selectVehicleApi(vehicleId);
       if (response.status == 200) {
         setModelData(response);
       }

@@ -29,12 +29,15 @@ class UserHistoryModel {
 
 class Data {
   int? id;
+  String? deviceId;
   String? firstName;
   String? lastName;
   String? email;
   String? type;
   int? phone;
   int? status;
+  dynamic wallet;
+  dynamic fcm;
   String? createdAt;
   String? updatedAt;
   int? userid;
@@ -55,17 +58,25 @@ class Data {
   int? distance;
   String? datetime;
   int? paymentStatus;
-  dynamic paymode;
-  String? txnId;
+  int? paymode;
+  dynamic txnId;
+  String? goodsType;
+  String? dbVehicleName;
+  String? vehicleImage;
+  String? amountPrKm;
+  String? vehicleName;
 
   Data(
       {this.id,
+        this.deviceId,
         this.firstName,
         this.lastName,
         this.email,
         this.type,
         this.phone,
         this.status,
+        this.wallet,
+        this.fcm,
         this.createdAt,
         this.updatedAt,
         this.userid,
@@ -87,16 +98,24 @@ class Data {
         this.datetime,
         this.paymentStatus,
         this.paymode,
-        this.txnId});
+        this.txnId,
+        this.goodsType,
+        this.dbVehicleName,
+        this.vehicleImage,
+        this.amountPrKm,
+        this.vehicleName});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    deviceId = json['device_id'];
     firstName = json['first_name'];
     lastName = json['last_name'];
     email = json['email'];
     type = json['type'];
     phone = json['phone'];
     status = json['status'];
+    wallet = json['wallet'];
+    fcm = json['fcm'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     userid = json['userid'];
@@ -119,17 +138,25 @@ class Data {
     paymentStatus = json['payment_status'];
     paymode = json['paymode'];
     txnId = json['txn_id'];
+    goodsType = json['goods_type'];
+    dbVehicleName = json['db_vehicle_name'];
+    vehicleImage = json['vehicle_image'];
+    amountPrKm = json['amount_pr_km'];
+    vehicleName = json['vehicle_name'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['device_id'] = deviceId;
     data['first_name'] = firstName;
     data['last_name'] = lastName;
     data['email'] = email;
     data['type'] = type;
     data['phone'] = phone;
     data['status'] = status;
+    data['wallet'] = wallet;
+    data['fcm'] = fcm;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['userid'] = userid;
@@ -152,6 +179,11 @@ class Data {
     data['payment_status'] = paymentStatus;
     data['paymode'] = paymode;
     data['txn_id'] = txnId;
+    data['goods_type'] = goodsType;
+    data['db_vehicle_name'] = dbVehicleName;
+    data['vehicle_image'] = vehicleImage;
+    data['amount_pr_km'] = amountPrKm;
+    data['vehicle_name'] = vehicleName;
     return data;
   }
 }

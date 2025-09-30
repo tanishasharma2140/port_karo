@@ -19,6 +19,16 @@ class ServiceTypeViewModel with ChangeNotifier {
     _serviceTypeModel = value;
     notifyListeners();
   }
+
+  // ✅ Yahan add karo selected vehicle ID
+  String? _selectedVehicleId;
+  String? get selectedVehicleId => _selectedVehicleId;
+
+  void setSelectedVehicleId(String id) {
+    _selectedVehicleId = id;
+    notifyListeners();
+  }
+
   Future<void> serviceTypeApi() async {
     setLoading(true);
     try {
@@ -35,4 +45,3 @@ class ServiceTypeViewModel with ChangeNotifier {
     }
   }
 }
-

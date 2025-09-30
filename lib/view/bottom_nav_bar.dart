@@ -93,7 +93,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             Icon(
               icon,
               size: 24,
-              color: _selectedIndex == index ? PortColor.gold : Colors.black54,
+              color: _selectedIndex == index ? PortColor.blackLight : PortColor.gray,
             ),
             const SizedBox(height: 4), // Reduced spacing
             Text(
@@ -101,7 +101,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: _selectedIndex == index ? PortColor.gold : Colors.black54,
+                color: _selectedIndex == index ? PortColor.blackLight : PortColor.gray,
               ),
             ),
           ],

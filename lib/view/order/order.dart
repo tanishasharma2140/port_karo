@@ -85,7 +85,7 @@ class _OrderPageState extends State<OrderPage> {
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.03,
-                  vertical: screenHeight * 0.018),
+                  vertical: screenHeight * 0.01),
               child: TextConst(title: "Past", color: PortColor.gray),
             ),
             Container(
@@ -97,8 +97,8 @@ class _OrderPageState extends State<OrderPage> {
                 children: [
                   Row(
                     children: [
-                      const Image(
-                        image: AssetImage(Assets.assetsBookingtruck),
+                       Image.network(
+                        history.vehicleImage??"",
                         height: 50,
                       ),
                       SizedBox(width: screenWidth * 0.03),
@@ -106,7 +106,7 @@ class _OrderPageState extends State<OrderPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           TextConst(
-                              title: history.vehicleType ?? "",
+                              title: history.vehicleName ?? "",
                               color: PortColor.black),
                           TextConst(
                             title: formatDateTime(history.datetime.toString()),
@@ -294,7 +294,7 @@ class _OrderPageState extends State<OrderPage> {
                             color: PortColor.blue,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: TextConst(title: 'Book Again',color: PortColor.white,fontFamily: AppFonts.kanitReg,),
+                          child: TextConst(title: 'Book Again',color: PortColor.blackLight,fontFamily: AppFonts.kanitReg,),
                         ),
                       ],
                     ),

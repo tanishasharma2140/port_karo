@@ -8,6 +8,7 @@ import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/home/widgets/pick_up_location.dart';
+import 'package:port_karo/view/home/widgets/use_current_location.dart';
 import 'package:port_karo/view/order/widgets/enter_contact_detail.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
@@ -500,8 +501,18 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.location_on, color: PortColor.blue),
-              TextConst(
-                  title: " Locate on the map", color: PortColor.black),
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UseCurrentLocation(),
+                    ),
+                  );
+                },
+                child: TextConst(
+                    title: " Locate on the map", color: PortColor.black),
+              ),
             ],
           ),
         ),

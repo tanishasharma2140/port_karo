@@ -111,7 +111,7 @@ class _PickUpLocationState extends State<PickUpLocation> {
             ),
             if (searchResults.isNotEmpty)
               Container(
-                height: screenHeight * 0.4,
+                height: screenHeight * 0.33,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),

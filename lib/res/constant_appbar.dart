@@ -54,7 +54,7 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
                   onTap: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>const AddGstDetail()));
                   },
-                  child: TextConst(title: "Edit Profile", color: PortColor.gold)),
+                  child: TextConst(title: "Edit Profile", color: PortColor.blackLight)),
             ],
           ),
           SizedBox(height: screenHeight*0.001),
@@ -63,7 +63,7 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
             color: PortColor.gray,
           ),
           SizedBox(height: screenHeight*0.001),
-          TextConst(title: "Verify Email ID", color: PortColor.gold),
+          TextConst(title: "Verify Email ID", color: PortColor.blackList),
           SizedBox(height: screenHeight*0.02,),
           InkWell(
             onTap: (){
@@ -78,13 +78,13 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
               width: double.infinity,
               height: screenHeight*0.05,
               decoration: BoxDecoration(
-                color: PortColor.gold.withOpacity(0.1),
+                color: PortColor.rapidSplash,
                 border: Border.all(color: PortColor.gold,width: 0.5),
                 borderRadius: BorderRadius.circular(8.0),
               ),
               child: Center(
                 child: TextConst(title:
-                "Add GST Details",color: PortColor.gold,
+                "Add GST Details",color: PortColor.blackList,
                   fontFamily: AppFonts.kanitReg,
 
                 ),

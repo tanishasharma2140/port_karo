@@ -62,11 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
       child: Scaffold(
         body: Container(
           decoration:  BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white,PortColor.blue.withOpacity(0.4)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+      color: PortColor.rapidSplash,
           ),
           child: Center(
             child: SlideTransition(

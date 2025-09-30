@@ -16,10 +16,12 @@ class _DeliverAllIndiaParcelState extends State<DeliverAllIndiaParcel> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
         backgroundColor: PortColor.grey,
         body: Column(
           children: [
+            SizedBox(height: topPadding,),
             Container(
               height: screenHeight * 0.17,
               width: screenWidth,
@@ -148,12 +150,12 @@ class _DeliverAllIndiaParcelState extends State<DeliverAllIndiaParcel> {
                             height: screenHeight * 0.06,
                             width: screenWidth * 0.9,
                             decoration: BoxDecoration(
-                              color: PortColor.buttonBlue,
+                              color: PortColor.gold,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               children: [
-                                TextConst(title: "Add Pick up Detail",color: PortColor.white,fontFamily: AppFonts.kanitReg,),
+                                TextConst(title: "Add Pick up Detail",color: PortColor.black,fontFamily: AppFonts.kanitReg,),
                                 const Spacer(),
                                 GestureDetector(
                                   onTap: (){

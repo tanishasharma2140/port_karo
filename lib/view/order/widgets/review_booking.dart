@@ -27,7 +27,6 @@ class ReviewBooking extends StatefulWidget {
 }
 
 class _ReviewBookingState extends State<ReviewBooking> {
-
   String PaymentMethod = "";
   String? selectedGoodsName;
   Map<String, dynamic>? selectedGoodsType;
@@ -37,7 +36,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
     final orderViewModel = Provider.of<OrderViewModel>(context);
     final vehicle = Provider.of<SelectVehiclesViewModel>(
       context,
-    ).selectVehiclesModel!.data![widget.index!];
+    ).selectVehicleModel!.data![widget.index!];
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -71,7 +70,6 @@ class _ReviewBookingState extends State<ReviewBooking> {
 
         body: ListView(
           children: [
-
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: screenWidth * 0.035,
@@ -101,7 +99,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                     Row(
                       children: [
                         Image.network(
-                          vehicle.image.toString(),
+                          vehicle.bodyTypeImage.toString(),
                           height: screenHeight * 0.065,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
@@ -115,7 +113,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextConst(
-                              title: vehicle.name.toString(),
+                              title: vehicle.vehicleName.toString(),
                               color: PortColor.black,
                               fontFamily: AppFonts.poppinsReg,
                             ),
@@ -317,23 +315,25 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   PageRouteBuilder(
                     transitionDuration: const Duration(milliseconds: 300),
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                    const GoodsTypeScreen(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      final tween = Tween(
-                        begin: const Offset(0, 1),
-                        end: Offset.zero,
-                      ).chain(CurveTween(curve: Curves.easeInOut));
-                      return SlideTransition(
-                        position: animation.drive(tween),
-                        child: child,
-                      );
-                    },
+                        const GoodsTypeScreen(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          final tween = Tween(
+                            begin: const Offset(0, 1),
+                            end: Offset.zero,
+                          ).chain(CurveTween(curve: Curves.easeInOut));
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
                   ),
                 );
 
                 if (result != null) {
                   setState(() {
-                    selectedGoodsName = result["goods_name"]; // UI me name show hoga
+                    selectedGoodsName =
+                        result["goods_name"]; // UI me name show hoga
                     selectedGoodsType = {
                       "id": result["id"].toString(),
                       "goods_name": result["goods_name"],
@@ -342,7 +342,6 @@ class _ReviewBookingState extends State<ReviewBooking> {
                 }
               },
             ),
-
 
             SizedBox(height: screenHeight * 0.02),
             Padding(
@@ -389,7 +388,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                     ),
                     const SizedBox(height: 8),
                     TextConst(
-                      title: '• ₹ 3.5/min for additional loading/unloading time.',
+                      title:
+                          '• ₹ 3.5/min for additional loading/unloading time.',
                       color: PortColor.black,
                       fontFamily: AppFonts.kanitReg,
                       size: 12,
@@ -537,11 +537,13 @@ class _ReviewBookingState extends State<ReviewBooking> {
               SizedBox(height: screenHeight * 0.014),
               InkWell(
                 onTap: () {
-                  if (PaymentMethod.isEmpty) {
+                  if (selectedGoodsType == null) {
+                    Utils.showErrorMessage(context, "Please select Goods Type");
+                  } else if (PaymentMethod.isEmpty) {
                     Utils.showErrorMessage(context, "Please select PayMode");
                   } else {
                     orderViewModel.orderApi(
-                      vehicle.id.toString(),
+                      vehicle.vehicleId.toString(),
                       orderViewModel.pickupData["address"],
                       orderViewModel.dropData["address"],
                       orderViewModel.dropData["latitude"],
@@ -555,31 +557,33 @@ class _ReviewBookingState extends State<ReviewBooking> {
                       widget.price,
                       widget.distance,
                       PaymentMethod,
-                      [selectedGoodsType!],
+                      [
+                        selectedGoodsType!,
+                      ], // ab safe hai kyunki upar null check kar liya
                       context,
                     );
                   }
                 },
+
                 child: Container(
                   alignment: Alignment.center,
                   height: screenHeight * 0.06,
                   width: screenWidth,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    gradient: PortColor.subBtn
+                    gradient: PortColor.subBtn,
                   ),
                   child: !orderViewModel.loading
                       ? TextConst(
-                    title: "Book ${vehicle.name.toString()}",
-                    color: PortColor.black,
-                    fontFamily: AppFonts.kanitReg,
-                  )
+                          title: "Book ${vehicle.vehicleName.toString()}",
+                          color: PortColor.black,
+                          fontFamily: AppFonts.kanitReg,
+                        )
                       : CupertinoActivityIndicator(
-                    radius: 16,
-                    color: PortColor.white,
-                  ),
-                )
-                ,
+                          radius: 16,
+                          color: PortColor.white,
+                        ),
+                ),
               ),
             ],
           ),
