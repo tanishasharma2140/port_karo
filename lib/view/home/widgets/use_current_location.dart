@@ -307,6 +307,7 @@ class _UseCurrentLocationState extends State<UseCurrentLocation> {
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
+
                         blurRadius: 5,
                         offset: const Offset(0, -3),
                       ),

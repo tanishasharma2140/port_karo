@@ -45,19 +45,19 @@ class _LoginPageState extends State<LoginPage>
       name: "United Arab Emirates",
       code: "UAE",
       dialCode: "+971",
-      flagAsset: Assets.assetsIndiaflag, // You'll need to add this asset
+      flagAsset: Assets.assetsIndiaflag,
     ),
     Country(
       name: "Bangladesh",
       code: "BD",
       dialCode: "+880",
-      flagAsset: Assets.assetsIndiaflag, // You'll need to add this asset
+      flagAsset: Assets.assetsIndiaflag,
     ),
     Country(
       name: "Turkey",
       code: "TUR",
       dialCode: "+90",
-      flagAsset: Assets.assetsIndiaflag, // You'll need to add this asset
+      flagAsset: Assets.assetsIndiaflag,
     ),
   ];
 
@@ -102,7 +102,8 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     final loginViewModel = Provider.of<AuthViewModel>(context);
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => false
+      ,
       child: Scaffold(
         backgroundColor: Colors.grey[50],
         body: Stack(

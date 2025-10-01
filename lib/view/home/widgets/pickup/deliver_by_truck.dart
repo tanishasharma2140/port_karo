@@ -503,6 +503,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
               const Icon(Icons.location_on, color: PortColor.blue),
               GestureDetector(
                 onTap: (){
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(

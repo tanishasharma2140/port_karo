@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                       decoration: const BoxDecoration(
                         gradient:  LinearGradient(
                           colors: [
-                            Color(0xFFFFF176), // Light Yellow
+                            Color(0xFFFFF176),
                             Color(0xFFFFD54F), // Amber
                             Color(0xFFFFA726), // Orange
                           ],

@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? hintText;
   final TextStyle? hintStyle;
+  final TextStyle? textStyle; // ✅ New parameter
   final Color? fillColor;
   final TextInputType? keyboardType;
   final FocusNode? focusNode;
@@ -22,7 +23,7 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     this.controller,
     this.height,
     this.width,
@@ -32,6 +33,7 @@ class CustomTextField extends StatelessWidget {
     this.textInputAction,
     this.hintText,
     this.hintStyle,
+    this.textStyle, // ✅
     this.fillColor,
     this.keyboardType,
     this.focusNode,
@@ -39,7 +41,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.focusedBorder = PortColor.gray,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,12 +79,15 @@ class CustomTextField extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(color: focusedBorder ?? PortColor.gray, width: screenWidth*0.002),
+            borderSide: BorderSide(
+              color: focusedBorder ?? PortColor.gray,
+              width: screenWidth * 0.002,
+            ),
           ),
           counterText: "",
         ),
         cursorColor: PortColor.gray,
-        style: const TextStyle(color: PortColor.black),
+        style: textStyle ?? const TextStyle(color: PortColor.black),
         cursorHeight: cursorHeight,
         textInputAction: textInputAction,
         keyboardType: keyboardType,

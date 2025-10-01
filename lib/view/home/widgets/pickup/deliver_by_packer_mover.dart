@@ -39,6 +39,42 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
   // Step management
   int currentStep = 0; // 0: Moving details, 1: Add items, 2: Schedule
 
+  // Vehicle types
+  final List<Map<String, dynamic>> _vehicleTypes = [
+    {
+      'name': 'Tata Ace',
+      'capacity': 'Up to 600 kg',
+      'size': '5.5 ft x 5 ft x 4.5 ft',
+      'icon': Icons.local_shipping,
+      'price': '₹1,564',
+      'selected': false,
+    },
+    {
+      'name': 'Tata 407',
+      'capacity': 'Up to 2000 kg',
+      'size': '9 ft x 6 ft x 6 ft',
+      'icon': Icons.fire_truck,
+      'price': '₹2,564',
+      'selected': false,
+    },
+    {
+      'name': 'Pickup Truck',
+      'capacity': 'Up to 1000 kg',
+      'size': '7 ft x 5 ft x 4 ft',
+      'icon': Icons.directions_car,
+      'price': '₹1,864',
+      'selected': false,
+    },
+    {
+      'name': 'Tempo Traveller',
+      'capacity': 'Up to 1500 kg',
+      'size': '8 ft x 6 ft x 5 ft',
+      'icon': Icons.airport_shuttle,
+      'price': '₹2,164',
+      'selected': false,
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -64,13 +100,13 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
     setState(() => isLoading = true);
 
     Uri uri =
-        Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
-          "input": selectedCity.isNotEmpty
-              ? "$searchCon, $selectedCity"
-              : searchCon,
-          "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
-          "components": "country:in",
-        });
+    Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
+      "input": selectedCity.isNotEmpty
+          ? "$searchCon, $selectedCity"
+          : searchCon,
+      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+      "components": "country:in",
+    });
 
     try {
       var response = await http.get(uri);
@@ -104,8 +140,6 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
       return const LatLng(0.0, 0.0);
     }
   }
-
-
 
   Future<void> pickDate() async {
     DateTime today = DateTime.now();
@@ -148,34 +182,321 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
     } else if (day == "Tomorrow") {
       final tomorrow = today.add(const Duration(days: 1));
       dateController.text =
-          "${tomorrow.day}/${tomorrow.month}/${tomorrow.year}";
+      "${tomorrow.day}/${tomorrow.month}/${tomorrow.year}";
     }
     setState(() {
       selectedDay = day;
     });
   }
 
+  void _showVehicleTypeModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: BoxDecoration(
+              color: PortColor.bg,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.02,
+                  ),
+                  decoration: BoxDecoration(
+                    color: PortColor.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(
+                          Icons.close,
+                          color: PortColor.black,
+                          size: screenHeight * 0.025,
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.03),
+                      TextConst(
+                        title: "Select Vehicle Type",
+                        color: PortColor.black,
+                        fontFamily: AppFonts.kanitReg,
+                        fontWeight: FontWeight.w600,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(screenWidth * 0.05),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextConst(
+                          title: "Choose the right vehicle for your move",
+                          fontFamily: AppFonts.kanitReg,
+                          color: Colors.grey.shade600,
+                          size: 14,
+                        ),
+                        SizedBox(height: screenHeight * 0.03),
+
+                        // Vehicle Types List
+                        Column(
+                          children: _vehicleTypes.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final vehicle = entry.value;
+                            return _buildVehicleTypeItem(
+                              vehicle['name'],
+                              vehicle['capacity'],
+                              vehicle['size'],
+                              vehicle['icon'],
+                              vehicle['price'],
+                              vehicle['selected'],
+                              index,
+                              setModalState,
+                            );
+                          }).toList(),
+                        ),
+
+                        SizedBox(height: screenHeight * 0.05),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Confirm Button
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.02,
+                  ),
+                  decoration: BoxDecoration(
+                    color: PortColor.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      final selectedVehicle = _vehicleTypes.firstWhere(
+                            (vehicle) => vehicle['selected'] == true,
+                        orElse: () => {},
+                      );
+
+                      if (selectedVehicle.isNotEmpty) {
+                        Navigator.pop(context);
+                        // Navigate to Add Items screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AddItemsScreen()),
+                        );
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
+                      decoration: BoxDecoration(
+                        color: _vehicleTypes.any((vehicle) => vehicle['selected'] == true)
+                            ? PortColor.button
+                            : Colors.grey,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: TextConst(
+                          title: "Confirm Vehicle",
+                          fontFamily: AppFonts.kanitReg,
+                          color: _vehicleTypes.any((vehicle) => vehicle['selected'] == true)
+                              ? PortColor.black
+                              : Colors.grey.shade700,
+                          fontWeight: FontWeight.w600,
+                          size: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildVehicleTypeItem(
+      String name,
+      String capacity,
+      String size,
+      IconData icon,
+      String price,
+      bool isSelected,
+      int index,
+      StateSetter setModalState,
+      ) {
+    return Container(
+      margin: EdgeInsets.only(bottom: screenHeight * 0.02),
+      child: GestureDetector(
+        onTap: () {
+          setModalState(() {
+            for (var i = 0; i < _vehicleTypes.length; i++) {
+              _vehicleTypes[i]['selected'] = (i == index);
+            }
+          });
+        },
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.04,
+            vertical: screenHeight * 0.02,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? PortColor.gold.withOpacity(0.2) : PortColor.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? PortColor.gold : PortColor.gray.withOpacity(0.3),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Vehicle Icon
+              Container(
+                padding: EdgeInsets.all(screenWidth * 0.03),
+                decoration: BoxDecoration(
+                  color: isSelected ? PortColor.gold : PortColor.gold.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: isSelected ? PortColor.white : PortColor.gold,
+                  size: screenHeight * 0.025,
+                ),
+              ),
+
+              SizedBox(width: screenWidth * 0.03),
+
+              // Vehicle Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextConst(
+                      title: name,
+                      fontFamily: AppFonts.kanitReg,
+                      fontWeight: FontWeight.w600,
+                      size: 16,
+                      color: PortColor.black,
+                    ),
+                    SizedBox(height: screenHeight * 0.005),
+                    TextConst(
+                      title: capacity,
+                      fontFamily: AppFonts.kanitReg,
+                      color: Colors.grey.shade600,
+                      size: 12,
+                    ),
+                    SizedBox(height: screenHeight * 0.002),
+                    TextConst(
+                      title: size,
+                      fontFamily: AppFonts.kanitReg,
+                      color: Colors.grey.shade600,
+                      size: 12,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Price and Selection Indicator
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextConst(
+                    title: price,
+                    fontFamily: AppFonts.kanitReg,
+                    fontWeight: FontWeight.w600,
+                    size: 14,
+                    color: PortColor.black,
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  Container(
+                    width: screenWidth * 0.05,
+                    height: screenWidth * 0.05,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? PortColor.gold : Colors.grey.shade400,
+                        width: 2,
+                      ),
+                      color: isSelected ? PortColor.gold : Colors.transparent,
+                    ),
+                    child: isSelected
+                        ? Icon(
+                      Icons.check,
+                      color: PortColor.white,
+                      size: screenWidth * 0.03,
+                    )
+                        : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void proceedToNextStep() {
     if (pickupController.text.isNotEmpty &&
         dropController.text.isNotEmpty &&
         dateController.text.isNotEmpty) {
-      setState(() {
-        currentStep = 1; // Move to Add Items step
-      });
-
-      // Navigate to Add Items screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => AddItemsScreen()),
-      );
+      _showVehicleTypeModal();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill all fields first")),
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +559,6 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                                   return const FAQModalSheet();
                                 },
                               );
-
                             },
                             child: TextConst(
                               title: "FAQs",
@@ -297,8 +617,13 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                       CustomTextField(
                         controller: pickupController,
                         focusNode: pickupFocus,
+                        textStyle: TextStyle(
+                          color: Colors.black54,
+                          fontFamily: AppFonts.kanitReg,
+                          fontSize: 13,
+                        ),
                         onChanged: (val) => placeSearchApi(val),
-                        focusedBorder: PortColor.buttonBlue,
+                        focusedBorder: PortColor.gold,
                         height: screenHeight * 0.055,
                         cursorHeight: screenHeight * 0.022,
                         prefixIcon: Padding(
@@ -332,6 +657,8 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                                 child: TextConst(
                                   title: "Service lift available at pickup",
                                   color: PortColor.black.withOpacity(0.7),
+                                  fontFamily: AppFonts.kanitReg,
+                                  size: 13,
                                 ),
                               ),
                               Switch(
@@ -361,7 +688,12 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                         controller: dropController,
                         focusNode: dropFocus,
                         onChanged: (val) => placeSearchApi(val),
-                        focusedBorder: PortColor.buttonBlue,
+                        textStyle: TextStyle(
+                          color: Colors.black54,
+                          fontFamily: AppFonts.kanitReg,
+                          fontSize: 13,
+                        ),
+                        focusedBorder: PortColor.gold,
                         height: screenHeight * 0.055,
                         cursorHeight: screenHeight * 0.022,
                         prefixIcon: Padding(
@@ -395,6 +727,8 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                                 child: TextConst(
                                   title: "Service lift available at drop",
                                   color: PortColor.black.withOpacity(0.7),
+                                  fontFamily: AppFonts.kanitReg,
+                                  size: 13,
                                 ),
                               ),
                               Switch(
@@ -422,8 +756,13 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                     child: AbsorbPointer(
                       child: CustomTextField(
                         controller: dateController,
-                        prefixIcon: const Icon(Icons.calendar_month),
+                        prefixIcon: const Icon(Icons.calendar_month,size: 17,),
                         hintText: 'Shifting Date',
+                        textStyle: TextStyle(
+                          color: Colors.black54,
+                          fontFamily: AppFonts.kanitReg,
+                          fontSize: 13,
+                        ),
                         hintStyle: TextStyle(
                           color: Colors.black54,
                           fontFamily: AppFonts.kanitReg,
@@ -463,7 +802,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                             child: TextConst(
                               title: "Today",
                               color: selectedDay == "Today"
-                                  ? Colors.white
+                                  ? Colors.black
                                   : PortColor.black.withOpacity(0.7),
                             ),
                           ),
@@ -493,7 +832,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                             child: TextConst(
                               title: "Tomorrow",
                               color: selectedDay == "Tomorrow"
-                                  ? Colors.white
+                                  ? Colors.black
                                   : PortColor.black.withOpacity(0.7),
                             ),
                           ),
@@ -527,44 +866,44 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                   child: isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ListView.builder(
-                          itemCount: searchResults.length,
-                          itemBuilder: (context, index) {
-                            final place = searchResults[index];
-                            return Column(
-                              children: [
-                                ListTile(
-                                  title: TextConst(
-                                    title: place['description'],
-                                    color: PortColor.black.withOpacity(0.7),
-                                  ),
-                                  onTap: () async {
-                                    LatLng latLng = await fetchLatLng(
-                                      place['place_id'],
-                                    );
-                                    setState(() {
-                                      if (isPickupActive) {
-                                        pickupController.text =
-                                            place['description'];
-                                      } else {
-                                        dropController.text =
-                                            place['description'];
-                                      }
-                                      searchResults.clear();
-                                    });
-                                    print(
-                                      "Selected: ${place['description']} - $latLng",
-                                    );
-                                  },
-                                ),
-                                if (index < searchResults.length - 1)
-                                  Divider(
-                                    color: PortColor.gray,
-                                    thickness: 0.5,
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
+                    itemCount: searchResults.length,
+                    itemBuilder: (context, index) {
+                      final place = searchResults[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: TextConst(
+                              title: place['description'],
+                              color: PortColor.black.withOpacity(0.7),
+                            ),
+                            onTap: () async {
+                              LatLng latLng = await fetchLatLng(
+                                place['place_id'],
+                              );
+                              setState(() {
+                                if (isPickupActive) {
+                                  pickupController.text =
+                                  place['description'];
+                                } else {
+                                  dropController.text =
+                                  place['description'];
+                                }
+                                searchResults.clear();
+                              });
+                              print(
+                                "Selected: ${place['description']} - $latLng",
+                              );
+                            },
+                          ),
+                          if (index < searchResults.length - 1)
+                            Divider(
+                              color: PortColor.gray,
+                              thickness: 0.5,
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
           ],
@@ -583,9 +922,9 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                 ),
                 decoration: BoxDecoration(
                   color:
-                      (pickupController.text.isNotEmpty &&
-                          dropController.text.isNotEmpty &&
-                          dateController.text.isNotEmpty)
+                  (pickupController.text.isNotEmpty &&
+                      dropController.text.isNotEmpty &&
+                      dateController.text.isNotEmpty)
                       ? PortColor.button
                       : PortColor.gray.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(7),
@@ -595,12 +934,13 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color:
-                        (pickupController.text.isNotEmpty &&
-                            dropController.text.isNotEmpty &&
-                            dateController.text.isNotEmpty)
-                        ? Colors.white
+                    (pickupController.text.isNotEmpty &&
+                        dropController.text.isNotEmpty &&
+                        dateController.text.isNotEmpty)
+                        ? Colors.black
                         : PortColor.black.withOpacity(0.5),
                     fontSize: 14,
+                    fontFamily: AppFonts.kanitReg,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -609,6 +949,83 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class StepWidget extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final bool isActive;
+  final bool isCompleted;
+
+  const StepWidget({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.isActive,
+    this.isCompleted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: isActive ? PortColor.button : Colors.grey[300],
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            isCompleted ? Icons.check : icon,
+            color: isActive ? Colors.white : Colors.grey,
+            size: 15,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          text,
+          style: TextStyle(
+              color: isActive ? Colors.black : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              fontSize: 10,
+              fontFamily: AppFonts.kanitReg
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// DottedLine
+class DottedLine extends StatelessWidget {
+  final int dotCount;
+  final double dotWidth;
+  final double dotHeight;
+  final double spacing;
+
+  const DottedLine({
+    super.key,
+    this.dotCount = 16,
+    this.dotWidth = 2,
+    this.dotHeight = 1,
+    this.spacing = 3,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(dotCount, (index) {
+        return Container(
+          width: dotWidth,
+          height: dotHeight,
+          color: PortColor.gray,
+          margin: EdgeInsets.symmetric(horizontal: spacing / 2),
+        );
+      }),
     );
   }
 }
@@ -749,296 +1166,300 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: PortColor.bg,
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.03,
-              vertical: screenHeight * 0.02,
-            ),
-            height: screenHeight * 0.17,
-            decoration: BoxDecoration(
-              color: PortColor.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: PortColor.gray,
-                  width: screenWidth * 0.002,
-                ),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: PortColor.bg,
+        body: Column(
+          children: [
+            SizedBox(height: topPadding,),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.03,
+                vertical: screenHeight * 0.02,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: PortColor.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, -1),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: PortColor.black,
-                        size: screenHeight * 0.02,
-                      ),
-                    ),
-                    SizedBox(width: screenWidth * 0.02),
-                    TextConst(
-                      title: "Packer and Mover",
-                      color: PortColor.black,
-                    ),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.03),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    StepWidget(
-                      icon: Icons.check,
-                      text: 'Moving details',
-                      isActive: true,
-                      isCompleted: true,
-                    ),
-                    const DottedLine(),
-                    StepWidget(
-                      icon: Icons.inventory,
-                      text: 'Add items',
-                      isActive: true,
-                      isCompleted: false,
-                    ),
-                    const DottedLine(),
-                    StepWidget(
-                      icon: Icons.receipt,
-                      text: 'Schedule',
-                      isActive: false,
-                      isCompleted: false,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.02),
-          SizedBox(height: screenHeight * 0.02),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Container(
-              height: screenHeight * 0.04,
+              height: screenHeight * 0.17,
               decoration: BoxDecoration(
-                color: PortColor.grey,
-                borderRadius: BorderRadius.circular(6),
+                color: PortColor.white,
+                border: Border(
+                  bottom: BorderSide(
+                    color: PortColor.gray,
+                    width: screenWidth * 0.002,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: PortColor.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, -1),
+                  ),
+                ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: ['Living Room', 'Bedroom', 'Kitchen', 'Others']
-                    .map(
-                      (category) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = category;
-                          });
-                          _scrollToCategory(category);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.03,
-                          ),
-                          decoration: BoxDecoration(
-                            color: selectedCategory == category
-                                ? PortColor.button
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Center(
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                color: selectedCategory == category
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontFamily: AppFonts.kanitReg,
-                                fontSize: 12,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: PortColor.black,
+                          size: screenHeight * 0.02,
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.02),
+                      TextConst(
+                        title: "Packer and Mover",
+                        color: PortColor.black,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight * 0.03),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      StepWidget(
+                        icon: Icons.check,
+                        text: 'Moving details',
+                        isActive: true,
+                        isCompleted: true,
+                      ),
+                      const DottedLine(),
+                      StepWidget(
+                        icon: Icons.inventory,
+                        text: 'Add items',
+                        isActive: true,
+                        isCompleted: false,
+                      ),
+                      const DottedLine(),
+                      StepWidget(
+                        icon: Icons.receipt,
+                        text: 'Schedule',
+                        isActive: false,
+                        isCompleted: false,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.02),
+            SizedBox(height: screenHeight * 0.02),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Container(
+                height: screenHeight * 0.04,
+                decoration: BoxDecoration(
+                  color: PortColor.grey,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: ['Living Room', 'Bedroom', 'Kitchen', 'Others']
+                      .map(
+                        (category) => GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedCategory = category;
+                            });
+                            _scrollToCategory(category);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.03,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selectedCategory == category
+                                  ? PortColor.button
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Center(
+                              child: Text(
+                                category,
+                                style: TextStyle(
+                                  color: selectedCategory == category
+                                      ? Colors.black
+                                      : Colors.black,
+                                  fontFamily: AppFonts.kanitReg,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
+                      )
+                      .toList(),
+                ),
               ),
             ),
-          ),
 
-          SizedBox(height: screenHeight * 0.02),
+            SizedBox(height: screenHeight * 0.02),
 
-          Expanded(
-            child: ListView(
-              controller: _scrollController,
+            Expanded(
+              child: ListView(
+                controller: _scrollController,
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04,
+                  vertical: screenHeight * 0.02,
+                ),
+                children: [
+                  _buildCategorySection('Living Room'),
+                  SizedBox(height: screenHeight * 0.03),
+                  _buildCategorySection('Bedroom'),
+                  SizedBox(height: screenHeight * 0.03),
+                  _buildCategorySection('Kitchen'),
+                  SizedBox(height: screenHeight * 0.03),
+                  _buildCategorySection('Others'),
+                ],
+              ),
+            ),
+
+            Container(
               padding: EdgeInsets.symmetric(
                 horizontal: screenWidth * 0.04,
                 vertical: screenHeight * 0.02,
               ),
-              children: [
-                _buildCategorySection('Living Room'),
-                SizedBox(height: screenHeight * 0.03),
-                _buildCategorySection('Bedroom'),
-                SizedBox(height: screenHeight * 0.03),
-                _buildCategorySection('Kitchen'),
-                SizedBox(height: screenHeight * 0.03),
-                _buildCategorySection('Others'),
-              ],
-            ),
-          ),
-
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.04,
-              vertical: screenHeight * 0.02,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Text(
-                  '$selectedItemsCount Items added',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    // Show all selected items in bottom sheet
-                    List<String> selectedItemNames = [];
-                    categoryItems.forEach((category, items) {
-                      for (var item in items) {
-                        if (item['selected'] && item['count'] > 0) {
-                          selectedItemNames.add(
-                            "${item['name']} x${item['count']}",
-                          );
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '$selectedItemsCount Items added',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      // Show all selected items in bottom sheet
+                      List<String> selectedItemNames = [];
+                      categoryItems.forEach((category, items) {
+                        for (var item in items) {
+                          if (item['selected'] && item['count'] > 0) {
+                            selectedItemNames.add(
+                              "${item['name']} x${item['count']}",
+                            );
+                          }
                         }
+                      });
+
+                      if (selectedItemNames.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("No items selected")),
+                        );
+                        return;
                       }
-                    });
 
-                    if (selectedItemNames.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("No items selected")),
-                      );
-                      return;
-                    }
-
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return SizedBox(
-                          height: screenHeight * 0.4,
-                          child: Stack(
-                            children: [
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(
-                                      screenHeight * 0.02,
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return SizedBox(
+                            height: screenHeight * 0.4,
+                            child: Stack(
+                              children: [
+                                Column(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(
+                                        screenHeight * 0.02,
+                                      ),
+                                      child: Text(
+                                        "Selected Items",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: PortColor.black,
+                                        ),
+                                      ),
                                     ),
-                                    child: Text(
-                                      "Selected Items",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: PortColor.black,
+                                    const Divider(),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        itemCount: selectedItemNames.length,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text(
+                                              selectedItemNames[index],
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: PortColor.black
+                                                    .withOpacity(0.8),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Positioned(
+                                  right: 10,
+                                  top: 10,
+                                  child: GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: const CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: Colors.black12,
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 18,
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ),
-                                  const Divider(),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: selectedItemNames.length,
-                                      itemBuilder: (context, index) {
-                                        return ListTile(
-                                          title: Text(
-                                            selectedItemNames[index],
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: PortColor.black
-                                                  .withOpacity(0.8),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Positioned(
-                                right: 10,
-                                top: 10,
-                                child: GestureDetector(
-                                  onTap: () => Navigator.pop(context),
-                                  child: const CircleAvatar(
-                                    radius: 16,
-                                    backgroundColor: Colors.black12,
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 18,
-                                      color: Colors.black,
-                                    ),
-                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: Text(
-                    'View all',
-                    style: TextStyle(
-                      color: PortColor.button,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-
-                SizedBox(width: screenWidth * 0.05),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _confirmItems,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.015,
-                      ),
-                      decoration: BoxDecoration(
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      'View all',
+                      style: TextStyle(
                         color: PortColor.button,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: TextConst(
-                        title: "Confirm items",
-                        fontFamily: AppFonts.poppinsReg,
-                        color: PortColor.white,
-                        size: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                ),
-              ],
+
+                  SizedBox(width: screenWidth * 0.05),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _confirmItems,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.015,
+                        ),
+                        decoration: BoxDecoration(
+                          color: PortColor.button,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        alignment: Alignment.center,
+                        child: TextConst(
+                          title: "Confirm items",
+                          fontFamily: AppFonts.kanitReg,
+                          color: PortColor.black,
+                          size: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1186,79 +1607,79 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
 /// Schedule Screen - Based on the image provided
 
 /// Updated StepWidget to support checkmark for completed steps
-class StepWidget extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final bool isActive;
-  final bool isCompleted;
-
-  const StepWidget({
-    super.key,
-    required this.icon,
-    required this.text,
-    required this.isActive,
-    this.isCompleted = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: isActive ? PortColor.button : Colors.grey[300],
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            isCompleted ? Icons.check : icon,
-            color: isActive ? Colors.white : Colors.grey,
-            size: 15,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          text,
-          style: TextStyle(
-            color: isActive ? Colors.black : Colors.grey,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            fontSize: 10,
-            fontFamily: AppFonts.kanitReg,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// DottedLine
-class DottedLine extends StatelessWidget {
-  final int dotCount;
-  final double dotWidth;
-  final double dotHeight;
-  final double spacing;
-
-  const DottedLine({
-    super.key,
-    this.dotCount = 16,
-    this.dotWidth = 2,
-    this.dotHeight = 1,
-    this.spacing = 3,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(dotCount, (index) {
-        return Container(
-          width: dotWidth,
-          height: dotHeight,
-          color: PortColor.gray,
-          margin: EdgeInsets.symmetric(horizontal: spacing / 2),
-        );
-      }),
-    );
-  }
-}
+// class StepWidget extends StatelessWidget {
+//   final IconData icon;
+//   final String text;
+//   final bool isActive;
+//   final bool isCompleted;
+//
+//   const StepWidget({
+//     super.key,
+//     required this.icon,
+//     required this.text,
+//     required this.isActive,
+//     this.isCompleted = false,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Container(
+//           width: 30,
+//           height: 30,
+//           decoration: BoxDecoration(
+//             color: isActive ? PortColor.button : Colors.grey[300],
+//             shape: BoxShape.circle,
+//           ),
+//           child: Icon(
+//             isCompleted ? Icons.check : icon,
+//             color: isActive ? Colors.white : Colors.grey,
+//             size: 15,
+//           ),
+//         ),
+//         const SizedBox(height: 4),
+//         Text(
+//           text,
+//           style: TextStyle(
+//             color: isActive ? Colors.black : Colors.grey,
+//             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+//             fontSize: 10,
+//             fontFamily: AppFonts.kanitReg,
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+//
+// /// DottedLine
+// class DottedLine extends StatelessWidget {
+//   final int dotCount;
+//   final double dotWidth;
+//   final double dotHeight;
+//   final double spacing;
+//
+//   const DottedLine({
+//     super.key,
+//     this.dotCount = 16,
+//     this.dotWidth = 2,
+//     this.dotHeight = 1,
+//     this.spacing = 3,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: List.generate(dotCount, (index) {
+//         return Container(
+//           width: dotWidth,
+//           height: dotHeight,
+//           color: PortColor.gray,
+//           margin: EdgeInsets.symmetric(horizontal: spacing / 2),
+//         );
+//       }),
+//     );
+//   }
+// }

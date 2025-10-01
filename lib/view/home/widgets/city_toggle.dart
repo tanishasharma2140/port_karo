@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:port_karo/main.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 
 class CityToggle extends StatefulWidget {
@@ -31,8 +32,9 @@ class _CityToggleState extends State<CityToggle> {
                   child: Text(
                     "Within city",
                     style: TextStyle(
-                      color: isWithinCitySelected ? Colors.white : Colors.black,
+                      color: isWithinCitySelected ? Colors.black : Colors.black,
                       fontWeight: FontWeight.bold,
+                      fontFamily: AppFonts.kanitReg
                     ),
                   ),
                 ),
@@ -57,8 +59,9 @@ class _CityToggleState extends State<CityToggle> {
                   child: Text(
                     "Between cities",
                     style: TextStyle(
-                      color: !isWithinCitySelected ? Colors.white : Colors.black,
+                      color: !isWithinCitySelected ? Colors.black : Colors.black,
                       fontWeight: FontWeight.bold,
+                        fontFamily: AppFonts.kanitReg
                     ),
                   ),
                 ),

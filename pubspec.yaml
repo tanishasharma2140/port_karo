@@ -32,6 +32,9 @@ dependencies:
   intl:
   flutter_polyline_points:
   geocoding:
+  pdf: ^3.11.0
+  open_filex: ^4.3.2
+  path_provider:
 dev_dependencies:
   flutter_test:
     sdk: flutter

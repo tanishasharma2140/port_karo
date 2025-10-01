@@ -7,7 +7,7 @@ import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/home/sender_address.dart';
 import 'package:port_karo/view/home/widgets/use_current_location.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 
 class PickUpLocation extends StatefulWidget {
   const PickUpLocation({super.key});
@@ -25,10 +25,14 @@ class _PickUpLocationState extends State<PickUpLocation> {
     return SafeArea(
       top: false,
       child: Scaffold(
-          backgroundColor: PortColor.bg,
-          body: Column(children: [
+        backgroundColor: PortColor.bg,
+        body: Column(
+          children: [
             Container(
-              padding:  EdgeInsets.symmetric(horizontal:screenWidth*0.06, vertical: screenHeight*0.03),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.06,
+                vertical: screenHeight * 0.03,
+              ),
               height: screenHeight * 0.2,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -47,21 +51,18 @@ class _PickUpLocationState extends State<PickUpLocation> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: screenHeight * 0.025,
-                  ),
+                  SizedBox(height: screenHeight * 0.025),
                   InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: screenHeight * 0.03,
-                        color: PortColor.black.withOpacity(0.7),
-                      )),
-                  SizedBox(
-                    height: screenHeight * 0.02,
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: screenHeight * 0.03,
+                      color: PortColor.black.withOpacity(0.7),
+                    ),
                   ),
+                  SizedBox(height: screenHeight * 0.02),
                   Row(
                     children: [
                       Container(
@@ -79,17 +80,24 @@ class _PickUpLocationState extends State<PickUpLocation> {
                             placeSearchApi(value);
                           },
                           decoration: InputDecoration(
-                            constraints: BoxConstraints(maxHeight: screenHeight * 0.055),
+                            constraints: BoxConstraints(
+                              maxHeight: screenHeight * 0.055,
+                            ),
                             hintText: "Where is your pickup?",
                             hintStyle: TextStyle(
                               color: PortColor.gray.withOpacity(0.5),
                               fontFamily: AppFonts.kanitReg,
                               fontSize: 15,
                             ),
-                            suffixIcon: const Icon(Icons.mic, color: PortColor.blue),
+                            suffixIcon: const Icon(
+                              Icons.mic,
+                              color: PortColor.blue,
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: PortColor.gray),
+                              borderSide: const BorderSide(
+                                color: PortColor.gray,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -99,16 +107,13 @@ class _PickUpLocationState extends State<PickUpLocation> {
                             fillColor: PortColor.white,
                           ),
                         ),
-
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: screenHeight * 0.02,
-            ),
+            SizedBox(height: screenHeight * 0.02),
             if (searchResults.isNotEmpty)
               Container(
                 height: screenHeight * 0.33,
@@ -128,7 +133,9 @@ class _PickUpLocationState extends State<PickUpLocation> {
                   itemBuilder: (context, index) {
                     final place = searchResults[index];
                     return ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.04,
+                      ),
                       title: TextConst(
                         title: place['description'],
                         color: PortColor.black.withOpacity(0.5),
@@ -151,81 +158,76 @@ class _PickUpLocationState extends State<PickUpLocation> {
                     );
                   },
                   separatorBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                    child: Divider(
-                      color: Colors.grey.shade300,
-                      thickness: 0.5,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.04,
                     ),
+                    child: Divider(color: Colors.grey.shade300, thickness: 0.5),
                   ),
                 ),
               ),
-
-
             if (searchResults.isEmpty)
-            Container(
-              padding: EdgeInsets.symmetric(
+              Container(
+                padding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.04,
-                  vertical: screenHeight * 0.02),
-              height: screenHeight * 0.16,
-              color: PortColor.white,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextConst(
-                    title: "Recent Pickups",
-                    color: PortColor.gray,
-                    fontFamily: AppFonts.kanitReg,
-                    size: 12,
-                  ),
-                  SizedBox(
-                    height: screenHeight * 0.02,
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.watch_later_outlined,
-                        color: PortColor.black.withOpacity(0.6),
-                        size: screenHeight * 0.028,
-                      ),
-                      SizedBox(
-                        width: screenWidth * 0.04,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextConst(
+                  vertical: screenHeight * 0.02,
+                ),
+                height: screenHeight * 0.16,
+                color: PortColor.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextConst(
+                      title: "Recent Pickups",
+                      color: PortColor.gray,
+                      fontFamily: AppFonts.kanitReg,
+                      size: 12,
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.watch_later_outlined,
+                          color: PortColor.black.withOpacity(0.6),
+                          size: screenHeight * 0.028,
+                        ),
+                        SizedBox(width: screenWidth * 0.04),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextConst(
                               title: "Sector H",
                               color: PortColor.black.withOpacity(0.6),
-                            fontFamily: AppFonts.poppinsReg,
-                            size: 13,
-                          ),
-                          TextConst(
+                              fontFamily: AppFonts.poppinsReg,
+                              size: 13,
+                            ),
+                            TextConst(
                               title:
                                   "Jankipuram,lucknow,UttarPradesh 2260..\nPrachi Singh 3213456787",
                               color: PortColor.gray,
-                            fontFamily: AppFonts.poppinsReg,
-                            size: 12,
-                          )
-                        ],
-                      ),
-                      const Spacer(),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.favorite_border_sharp,
-                            color: PortColor.black.withOpacity(0.6),
-                            size: screenHeight * 0.025,
-                          ),
-                          TextConst(
+                              fontFamily: AppFonts.poppinsReg,
+                              size: 12,
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.favorite_border_sharp,
+                              color: PortColor.black.withOpacity(0.6),
+                              size: screenHeight * 0.025,
+                            ),
+                            TextConst(
                               title: "Save",
-                              color: PortColor.black.withOpacity(0.6))
-                        ],
-                      )
-                    ],
-                  )
-                ],
+                              color: PortColor.black.withOpacity(0.6),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
             const Spacer(),
             Container(
               height: screenHeight * 0.08,
@@ -234,50 +236,75 @@ class _PickUpLocationState extends State<PickUpLocation> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Icon(Icons.my_location_outlined, color: PortColor.blue,size: 15,),
+                  const Icon(
+                    Icons.my_location_outlined,
+                    color: PortColor.blue,
+                    size: 15,
+                  ),
                   InkWell(
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UseCurrentLocation(),
-                          ),
-                        );
-                      },
-                      child: TextConst(title: " Use current location", color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,)),
-                  // SizedBox(width: screenWidth * 0.04),
-
-                  Padding(
-                    padding:  EdgeInsets.symmetric(vertical: screenHeight*0.02),
-                    child: VerticalDivider(
-                      color: PortColor.gray.withOpacity(0.5),
-                      thickness: screenWidth*0.002,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UseCurrentLocation(),
+                        ),
+                      );
+                    },
+                    child: TextConst(
+                      title: " Use current location",
+                      color: PortColor.black,
+                      fontFamily: AppFonts.kanitReg,
+                      size: 12,
                     ),
                   ),
 
-                  const Icon(Icons.location_on, color: PortColor.blue,size: 15,),
+                  // SizedBox(width: screenWidth * 0.04),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02,
+                    ),
+                    child: VerticalDivider(
+                      color: PortColor.gray.withOpacity(0.5),
+                      thickness: screenWidth * 0.002,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.location_on,
+                    color: PortColor.blue,
+                    size: 15,
+                  ),
                   InkWell(
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UseCurrentLocation(),
-                          ),
-                        );
-                      },
-                      child: TextConst(title: " Locate on the map", color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,)),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UseCurrentLocation(),
+                        ),
+                      );
+                    },
+                    child: TextConst(
+                      title: " Locate on the map",
+                      color: PortColor.black,
+                      fontFamily: AppFonts.kanitReg,
+                      size: 12,
+                    ),
+                  ),
                 ],
               ),
-            )
-          ])),
+            ),
+          ],
+        ),
+      ),
     );
   }
+
   Future<void> placeSearchApi(String searchCon) async {
-    Uri uri = Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
-      "input": searchCon,
-      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
-      "components": "country:in",
-    });
+    Uri uri =
+        Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
+          "input": searchCon,
+          "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+          "components": "country:in",
+        });
     var response = await http.get(uri);
     print(response.body);
     print("hello");
@@ -292,6 +319,7 @@ class _PickUpLocationState extends State<PickUpLocation> {
       print('Error fetching suggestions: ${response.body}');
     }
   }
+
   Future<LatLng> fetchLatLng(String placeId) async {
     Uri uri = Uri.https("maps.googleapis.com", 'maps/api/place/details/json', {
       "place_id": placeId,

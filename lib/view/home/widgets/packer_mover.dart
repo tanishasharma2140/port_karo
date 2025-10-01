@@ -89,6 +89,7 @@ class _PackerMoverState extends State<PackerMover> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
         backgroundColor: PortColor.grey,
         body: Stack(

@@ -447,6 +447,7 @@ class _SenderAddressState extends State<SenderAddress> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
+
                 color: isSelected ? PortColor.rapidBlue : PortColor.gray,
                 width: 2,
               ),
