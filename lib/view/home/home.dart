@@ -67,6 +67,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _refresh() async {
+    // Banner reload
+    final portBannerVm = Provider.of<PortBannerViewModel>(context, listen: false);
+    await portBannerVm.portBannerApi();
+
+    // Location reload
+    await _getCurrentLocation();
+  }
+
   Future<void> _getCurrentLocation() async {
     try {
       // Permission check karo
@@ -178,280 +187,284 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () => _onWillPop(context),
       child: Container(
         color: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                      height: screenHeight * 0.25,
-                      width: screenWidth,
-                      decoration: const BoxDecoration(
-                        gradient:  LinearGradient(
-                          colors: [
-                            Color(0xFFFFF176),
-                            Color(0xFFFFD54F), // Amber
-                            Color(0xFFFFA726), // Orange
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
-                      ),
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: banner.portBannerModel?.data?.length ?? 0,
-                        itemBuilder: (context, index) {
-                          final portBanner = banner.portBannerModel?.data?[index];
-                          return ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(30),
-                              bottomRight: Radius.circular(30),
-                            ),
-                            child: Image.network(
-                              portBanner?.imageUrl ?? "",
-                              fit: BoxFit.cover,
-                              width: screenWidth,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                    child: CircularProgressIndicator(
-                                      color: PortColor.white,
-                                    )
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) => const Center(
-                                child: Icon(Icons.error, color: Colors.red),
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                  ),
-
-                  // 🔹 Pickup Location Container
-                  Positioned(
-                    bottom: -30,
-                    child: Container(
-                      height: screenHeight * 0.08,
-                      width: screenWidth * 0.9,
-                      decoration: BoxDecoration(
-                        color: PortColor.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PickUpLocation(),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            SizedBox(width: screenWidth * 0.02),
-                            Image.asset(
-                              Assets.assetsLocation,
-                              height: screenHeight * 0.04,
-                            ),
-                            SizedBox(width: screenWidth * 0.02),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                TextConst(
-                                  title: 'Picked up from',
-                                  color: PortColor.black,
-                                  fontFamily: AppFonts.poppinsReg,
-                                ),
-                                _isLoadingLocation
-                                    ? SizedBox(
-                                  height: screenHeight * 0.015,
-                                  width: screenWidth * 0.3,
-                                  child: const LinearProgressIndicator(
-                                    backgroundColor: Colors.grey,
-                                    valueColor: AlwaysStoppedAnimation<Color>(PortColor.blue),
-                                  ),
-                                )
-                                    : TextConst(
-                                  title: currentAddress,
-                                  color: PortColor.gray,
-                                  fontFamily: AppFonts.poppinsReg,
-                                  size: 12,
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: PortColor.black,
-                            ),
-                            SizedBox(width: screenWidth * 0.02)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // Rest of your code remains same
-              SizedBox(height: screenHeight * 0.04),
-              const CategoryGrid(),
-              Container(
-                width: screenWidth,
-                decoration: const BoxDecoration(
-                  color: PortColor.white,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    topLeft: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
+        child: RefreshIndicator(
+          color: PortColor.gold,
+          onRefresh: _refresh,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
                   children: [
-                    SizedBox(height: screenHeight * 0.03),
-                    GestureDetector(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>DriverPickupScreen()));
-                        },
-                        child: Container(
-                          width: screenWidth * 0.9,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFFFFF176), // Light Yellow
-                                Color(0xFFFFD54F), // Amber
-                                Color(0xFFFFA726), // Orange
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                    Container(
+                        height: screenHeight * 0.25,
+                        width: screenWidth,
+                        decoration: const BoxDecoration(
+                          gradient:  LinearGradient(
+                            colors: [
+                              Color(0xFFFFF176),
+                              Color(0xFFFFD54F), // Amber
+                              Color(0xFFFFA726), // Orange
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(30),
+                            bottomRight: Radius.circular(30),
+                          ),
+                        ),
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: banner.portBannerModel?.data?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final portBanner = banner.portBannerModel?.data?[index];
+                            return ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
+                              ),
+                              child: Image.network(
+                                portBanner?.imageUrl ?? "",
+                                fit: BoxFit.cover,
+                                width: screenWidth,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                      child: CircularProgressIndicator(
+                                        color: PortColor.white,
+                                      )
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) => const Center(
+                                  child: Icon(Icons.error, color: Colors.red),
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                    ),
+          
+                    // 🔹 Pickup Location Container
+                    Positioned(
+                      bottom: -30,
+                      child: Container(
+                        height: screenHeight * 0.08,
+                        width: screenWidth * 0.9,
+                        decoration: BoxDecoration(
+                          color: PortColor.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PickUpLocation(),
+                              ),
+                            );
+                          },
                           child: Row(
                             children: [
-                              const Image(
-                                image: AssetImage(Assets.assetsCoin),
-                                height: 36,
+                              SizedBox(width: screenWidth * 0.02),
+                              Image.asset(
+                                Assets.assetsLocation,
+                                height: screenHeight * 0.04,
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: screenWidth * 0.02),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   TextConst(
-                                    title: 'Explore Courier Reward',
+                                    title: 'Picked up from',
                                     color: PortColor.black,
-                                    fontFamily: AppFonts.kanitReg,
+                                    fontFamily: AppFonts.poppinsReg,
                                   ),
-                                  TextConst(
-                                    title: 'Earn 4 coins for every 100 spent',
-                                    color: PortColor.grayLight,
+                                  _isLoadingLocation
+                                      ? SizedBox(
+                                    height: screenHeight * 0.015,
+                                    width: screenWidth * 0.3,
+                                    child: const LinearProgressIndicator(
+                                      backgroundColor: Colors.grey,
+                                      valueColor: AlwaysStoppedAnimation<Color>(PortColor.blue),
+                                    ),
+                                  )
+                                      : TextConst(
+                                    title: currentAddress,
+                                    color: PortColor.gray,
                                     fontFamily: AppFonts.poppinsReg,
                                     size: 12,
                                   ),
                                 ],
                               ),
                               const Spacer(),
-                              Icon(
-                                Icons.arrow_forward,
+                              const Icon(
+                                Icons.keyboard_arrow_down_rounded,
                                 color: PortColor.black,
-                                size: screenHeight * 0.03,
                               ),
+                              SizedBox(width: screenWidth * 0.02)
                             ],
                           ),
-                        )
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    Padding(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextConst(
-                          title: "Announcements",
-                          color: PortColor.gray,
                         ),
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.02),
-                    Container(
-                      margin:
-                      EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                      height: screenHeight * 0.09,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: PortColor.grayLight.withOpacity(0.2),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(12),
-                        color: PortColor.white,
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SeeWhatNew(),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            Image(
-                              image: const AssetImage(Assets.assetsSpeaker),
-                              height: screenHeight * 0.065,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextConst(
-                                title: 'Packers & Movers',
-                                color: PortColor.black,
-                              ),
-                            ),
-                            Container(
-                              height: screenHeight * 0.025,
-                              width: screenWidth * 0.15,
-                              decoration: BoxDecoration(
-                                color: Colors.yellow[50],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: TextConst(
-                                  title: 'View all',
-                                  color: PortColor.gold,
-                                  size: 12,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.02),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
                   ],
                 ),
-              ),
-            ],
+          
+                // Rest of your code remains same
+                SizedBox(height: screenHeight * 0.04),
+                const CategoryGrid(),
+                Container(
+                  width: screenWidth,
+                  decoration: const BoxDecoration(
+                    color: PortColor.white,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(30),
+                      topLeft: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: screenHeight * 0.03),
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>DriverPickupScreen()));
+                          },
+                          child: Container(
+                            width: screenWidth * 0.9,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFFFFF176), // Light Yellow
+                                  Color(0xFFFFD54F), // Amber
+                                  Color(0xFFFFA726), // Orange
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Image(
+                                  image: AssetImage(Assets.assetsCoin),
+                                  height: 36,
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextConst(
+                                      title: 'Explore Courier Reward',
+                                      color: PortColor.black,
+                                      fontFamily: AppFonts.kanitReg,
+                                    ),
+                                    TextConst(
+                                      title: 'Earn 4 coins for every 100 spent',
+                                      color: PortColor.grayLight,
+                                      fontFamily: AppFonts.poppinsReg,
+                                      size: 12,
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                Icon(
+                                  Icons.arrow_forward,
+                                  color: PortColor.black,
+                                  size: screenHeight * 0.03,
+                                ),
+                              ],
+                            ),
+                          )
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      Padding(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextConst(
+                            title: "Announcements",
+                            color: PortColor.gray,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      Container(
+                        margin:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                        height: screenHeight * 0.09,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: PortColor.grayLight.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(12),
+                          color: PortColor.white,
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SeeWhatNew(),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Image(
+                                image: const AssetImage(Assets.assetsSpeaker),
+                                height: screenHeight * 0.065,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextConst(
+                                  title: 'Packers & Movers',
+                                  color: PortColor.black,
+                                ),
+                              ),
+                              Container(
+                                height: screenHeight * 0.025,
+                                width: screenWidth * 0.15,
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: TextConst(
+                                    title: 'View all',
+                                    color: PortColor.gold,
+                                    size: 12,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: screenWidth * 0.02),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

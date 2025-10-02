@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -1032,6 +1033,9 @@ class DottedLine extends StatelessWidget {
 
 /// Add Items Screen
 /// Add Items Screen - Updated with navigation to Schedule screen
+/// Add Items Screen - Updated with dropdown quantity selection
+
+
 class AddItemsScreen extends StatefulWidget {
   const AddItemsScreen({super.key});
 
@@ -1044,78 +1048,135 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
   String selectedCategory = 'Living Room';
   final ScrollController _scrollController = ScrollController();
 
-  // Sample items data with icons
+  // Add debounce timer to prevent blinking
+  Timer? _scrollTimer;
+  bool _isScrolling = false;
+
+  // Category keys list for easy access
+  final List<String> _categories = ['Living Room', 'Bedroom', 'Kitchen', 'Others'];
+
+  // Sample items data with expanded state and quantities
   Map<String, List<Map<String, dynamic>>> categoryItems = {
     'Living Room': [
-      {'name': 'Chairs', 'selected': true, 'count': 2, 'icon': Icons.chair},
+      {
+        'name': 'Chairs',
+        'expanded': false,
+        'subItems': [
+          {'name': 'Plastic/Folding Chair', 'count': 0},
+          {'name': 'Dining Table Chairs', 'count': 0},
+          {'name': 'Office Chair', 'count': 0},
+          {'name': 'Recliner', 'count': 0},
+        ]
+      },
       {
         'name': 'Tables',
-        'selected': true,
-        'count': 1,
-        'icon': Icons.table_restaurant,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Coffee Table', 'count': 0},
+          {'name': 'Dining Table', 'count': 0},
+          {'name': 'Study Table', 'count': 0},
+          {'name': 'Side Table', 'count': 0},
+        ]
       },
-      {'name': 'TV/Monitor', 'selected': true, 'count': 1, 'icon': Icons.tv},
+      {
+        'name': 'TV/Monitor',
+        'expanded': false,
+        'subItems': [
+          {'name': 'LED TV', 'count': 0},
+          {'name': 'LCD TV', 'count': 0},
+          {'name': 'Computer Monitor', 'count': 0},
+          {'name': 'Home Theater', 'count': 0},
+        ]
+      },
       {
         'name': 'Cabinet/Storage',
-        'selected': true,
-        'count': 1,
-        'icon': Icons.weekend,
-      },
-      {'name': 'Sofa', 'selected': true, 'count': 1, 'icon': Icons.weekend},
-      {
-        'name': 'Home Utility',
-        'selected': true,
-        'count': 1,
-        'icon': Icons.home,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Bookshelf', 'count': 0},
+          {'name': 'Showcase', 'count': 0},
+          {'name': 'Storage Cabinet', 'count': 0},
+          {'name': 'TV Unit', 'count': 0},
+        ]
       },
     ],
     'Bedroom': [
-      {'name': 'Bed', 'selected': false, 'count': 0, 'icon': Icons.bed},
+      {
+        'name': 'Bed',
+        'expanded': false,
+        'subItems': [
+          {'name': 'Single Bed', 'count': 0},
+          {'name': 'Double Bed', 'count': 0},
+          {'name': 'King Size Bed', 'count': 0},
+          {'name': 'Bunk Bed', 'count': 0},
+        ]
+      },
       {
         'name': 'Wardrobe',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.weekend,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Single Door', 'count': 0},
+          {'name': 'Double Door', 'count': 0},
+          {'name': 'Sliding Door', 'count': 0},
+          {'name': 'Walk-in Wardrobe', 'count': 0},
+        ]
       },
       {
         'name': 'Dressing Table',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.table_restaurant,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Wooden Dressing', 'count': 0},
+          {'name': 'Modern Dressing', 'count': 0},
+          {'name': 'Wall Mounted', 'count': 0},
+        ]
       },
     ],
     'Kitchen': [
       {
         'name': 'Refrigerator',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.kitchen,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Single Door', 'count': 0},
+          {'name': 'Double Door', 'count': 0},
+          {'name': 'Side by Side', 'count': 0},
+        ]
       },
       {
         'name': 'Microwave',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.microwave,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Solo Microwave', 'count': 0},
+          {'name': 'Grill Microwave', 'count': 0},
+          {'name': 'Convection Microwave', 'count': 0},
+        ]
       },
       {
         'name': 'Gas Stove',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.local_fire_department,
+        'expanded': false,
+        'subItems': [
+          {'name': '2 Burner', 'count': 0},
+          {'name': '3 Burner', 'count': 0},
+          {'name': '4 Burner', 'count': 0},
+        ]
       },
     ],
     'Others': [
       {
         'name': 'Plants',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.local_florist,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Small Plants', 'count': 0},
+          {'name': 'Medium Plants', 'count': 0},
+          {'name': 'Large Plants', 'count': 0},
+        ]
       },
       {
         'name': 'Sports Equipment',
-        'selected': false,
-        'count': 0,
-        'icon': Icons.sports_basketball,
+        'expanded': false,
+        'subItems': [
+          {'name': 'Treadmill', 'count': 0},
+          {'name': 'Exercise Bike', 'count': 0},
+          {'name': 'Weights', 'count': 0},
+        ]
       },
     ],
   };
@@ -1124,25 +1185,140 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     int count = 0;
     categoryItems.forEach((category, items) {
       for (var item in items) {
-        if (item['selected']) {
-          count += (item['count'] as num).toInt();
+        for (var subItem in item['subItems']) {
+          count += (subItem['count'] as int);
         }
       }
     });
     return count;
   }
 
+  List<Map<String, dynamic>> get selectedItemsList {
+    List<Map<String, dynamic>> selected = [];
+    categoryItems.forEach((category, items) {
+      for (var item in items) {
+        for (var subItem in item['subItems']) {
+          if (subItem['count'] > 0) {
+            selected.add({
+              'category': category,
+              'mainItem': item['name'],
+              'subItem': subItem['name'],
+              'count': subItem['count'],
+            });
+          }
+        }
+      }
+    });
+    return selected;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Add scroll listener to detect which category is visible
+    _scrollController.addListener(_onScroll);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCategory(selectedCategory);
+    });
+  }
+
+  void _onScroll() {
+    // Cancel previous timer
+    _scrollTimer?.cancel();
+
+    // Set scrolling flag
+    _isScrolling = true;
+
+    // Set new timer to delay the category update (debounce)
+    _scrollTimer = Timer(const Duration(milliseconds: 50), () {
+      if (!_scrollController.hasClients || !mounted) return;
+
+      final scrollOffset = _scrollController.offset;
+
+      // Define approximate section heights
+      final Map<String, double> sectionHeights = {
+        'Living Room': _calculateSectionHeight('Living Room'),
+        'Bedroom': _calculateSectionHeight('Bedroom'),
+        'Kitchen': _calculateSectionHeight('Kitchen'),
+        'Others': _calculateSectionHeight('Others'),
+      };
+
+      double accumulatedHeight = 0;
+      String? newSelectedCategory;
+
+      for (final category in _categories) {
+        final sectionHeight = sectionHeights[category] ?? 0;
+
+        // Check if current scroll position is within this category's section
+        if (scrollOffset >= accumulatedHeight - 50 &&
+            scrollOffset < accumulatedHeight + sectionHeight - 50) {
+          newSelectedCategory = category;
+          break;
+        }
+
+        accumulatedHeight += sectionHeight;
+      }
+
+      // Only update if category actually changed and we're not in the middle of programmatic scroll
+      if (newSelectedCategory != null && newSelectedCategory != selectedCategory) {
+        setState(() {
+          selectedCategory = newSelectedCategory!;
+        });
+      }
+
+      _isScrolling = false;
+    });
+  }
+
+  double _calculateSectionHeight(String category) {
+    final items = categoryItems[category]!;
+    double height = screenHeight * 0.08; // Category header height
+
+    for (var item in items) {
+      height += screenHeight * 0.07; // Main item height
+      if (item['expanded']) {
+        height += (item['subItems'].length * screenHeight * 0.06); // Sub items height
+      }
+    }
+
+    height += screenHeight * 0.03; // Padding
+    return height;
+  }
+
   void _scrollToCategory(String category) {
-    final categoryIndex = categoryItems.keys.toList().indexOf(category);
-    final itemHeight = screenHeight * 0.07;
-    _scrollController.animateTo(
-      categoryIndex * categoryItems.values.first.length * itemHeight,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    // Cancel any ongoing scroll detection
+    _scrollTimer?.cancel();
+
+    final categoryIndex = _categories.indexOf(category);
+    if (categoryIndex == -1) return;
+
+    double scrollOffset = 0;
+
+    // Calculate scroll position for the selected category
+    for (int i = 0; i < categoryIndex; i++) {
+      final cat = _categories[i];
+      scrollOffset += _calculateSectionHeight(cat);
+    }
+
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        scrollOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   void _confirmItems() {
+    if (selectedItemsCount == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please add at least one item")),
+      );
+      return;
+    }
+
     // Navigate to Schedule screen
     Navigator.push(
       context,
@@ -1151,15 +1327,9 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCategory(selectedCategory);
-    });
-  }
-
-  @override
   void dispose() {
+    _scrollTimer?.cancel();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
@@ -1172,7 +1342,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         backgroundColor: PortColor.bg,
         body: Column(
           children: [
-            SizedBox(height: topPadding,),
+            SizedBox(height: topPadding),
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: screenWidth * 0.03,
@@ -1243,8 +1413,45 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                 ],
               ),
             ),
-            SizedBox(height: screenHeight * 0.02),
-            SizedBox(height: screenHeight * 0.02),
+
+            // Search Bar
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.04,
+                vertical: screenHeight * 0.02,
+              ),
+              child: Container(
+                height: screenHeight * 0.05,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search item',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 14,
+                      fontFamily: AppFonts.kanitReg,
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade500, size: 20),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.03,
+                      vertical: screenHeight * 0.01,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
               child: Container(
@@ -1255,41 +1462,56 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: ['Living Room', 'Bedroom', 'Kitchen', 'Others']
+                  children: _categories
                       .map(
                         (category) => GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedCategory = category;
-                            });
-                            _scrollToCategory(category);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.03,
-                            ),
-                            decoration: BoxDecoration(
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = category;
+                        });
+                        _scrollToCategory(category);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.03,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selectedCategory == category
+                              ? PortColor.button
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Center(
+                          child: Text(
+                            category,
+                            style: TextStyle(
                               color: selectedCategory == category
-                                  ? PortColor.button
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Center(
-                              child: Text(
-                                category,
-                                style: TextStyle(
-                                  color: selectedCategory == category
-                                      ? Colors.black
-                                      : Colors.black,
-                                  fontFamily: AppFonts.kanitReg,
-                                  fontSize: 12,
-                                ),
-                              ),
+                                  ? Colors.black
+                                  : Colors.black,
+                              fontFamily: AppFonts.kanitReg,
+                              fontSize: 12,
                             ),
                           ),
                         ),
-                      )
+                      ),
+                    ),
+                  )
                       .toList(),
+                ),
+              ),
+            ),
+
+            SizedBox(height: screenHeight * 0.02),
+
+            // Instruction Text
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              child: Text(
+                'Add items to get the exact quote, you can edit this later',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 12,
+                  fontFamily: AppFonts.kanitReg,
                 ),
               ),
             ),
@@ -1315,6 +1537,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               ),
             ),
 
+            // Bottom Summary Bar
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: screenWidth * 0.04,
@@ -1334,106 +1557,53 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               ),
               child: Row(
                 children: [
-                  Text(
-                    '$selectedItemsCount Items added',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$selectedItemsCount Items added',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: PortColor.black,
+                        ),
+                      ),
+                      if (selectedItemsCount > 0)
+                        GestureDetector(
+                          onTap: _showSelectedItems,
+                          child: Text(
+                            'View all',
+                            style: TextStyle(
+                              color: PortColor.button,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const Spacer(),
                   GestureDetector(
-                    onTap: () {
-                      // Show all selected items in bottom sheet
-                      List<String> selectedItemNames = [];
-                      categoryItems.forEach((category, items) {
-                        for (var item in items) {
-                          if (item['selected'] && item['count'] > 0) {
-                            selectedItemNames.add(
-                              "${item['name']} x${item['count']}",
-                            );
-                          }
-                        }
-                      });
-
-                      if (selectedItemNames.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("No items selected")),
-                        );
-                        return;
-                      }
-
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return SizedBox(
-                            height: screenHeight * 0.4,
-                            child: Stack(
-                              children: [
-                                Column(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(
-                                        screenHeight * 0.02,
-                                      ),
-                                      child: Text(
-                                        "Selected Items",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: PortColor.black,
-                                        ),
-                                      ),
-                                    ),
-                                    const Divider(),
-                                    Expanded(
-                                      child: ListView.builder(
-                                        itemCount: selectedItemNames.length,
-                                        itemBuilder: (context, index) {
-                                          return ListTile(
-                                            title: Text(
-                                              selectedItemNames[index],
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: PortColor.black
-                                                    .withOpacity(0.8),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Positioned(
-                                  right: 10,
-                                  top: 10,
-                                  child: GestureDetector(
-                                    onTap: () => Navigator.pop(context),
-                                    child: const CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor: Colors.black12,
-                                      child: Icon(
-                                        Icons.close,
-                                        size: 18,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      'View all',
-                      style: TextStyle(
-                        color: PortColor.button,
-                        fontWeight: FontWeight.bold,
+                    onTap: _showSelectedItems,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.06,
+                        vertical: screenHeight * 0.012,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: PortColor.button),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'View all',
+                        style: TextStyle(
+                          color: PortColor.button,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
-
-                  SizedBox(width: screenWidth * 0.05),
+                  SizedBox(width: screenWidth * 0.03),
                   Expanded(
                     child: GestureDetector(
                       onTap: _confirmItems,
@@ -1446,11 +1616,14 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         alignment: Alignment.center,
-                        child: TextConst(
-                          title: "Confirm items",
-                          fontFamily: AppFonts.kanitReg,
-                          color: PortColor.black,
-                          size: 11,
+                        child: Text(
+                          "Check price",
+                          style: TextStyle(
+                            fontFamily: AppFonts.kanitReg,
+                            color: PortColor.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -1464,44 +1637,234 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     );
   }
 
+  void _showSelectedItems() {
+    if (selectedItemsList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No items selected")),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          height: screenHeight * 0.7,
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Selected Items",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: PortColor.black,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: screenHeight * 0.02),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: selectedItemsList.length,
+                  itemBuilder: (context, index) {
+                    final item = selectedItemsList[index];
+                    return Container(
+                      margin: EdgeInsets.only(bottom: screenHeight * 0.01),
+                      padding: EdgeInsets.all(screenWidth * 0.03),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: PortColor.button,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _getIconForItem(item['mainItem']),
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                          SizedBox(width: screenWidth * 0.03),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item['subItem'],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: PortColor.black,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  item['mainItem'],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: PortColor.button.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'x${item['count']}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: PortColor.button,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.02),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+                decoration: BoxDecoration(
+                  color: PortColor.button,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    "Total Items: $selectedItemsCount",
+                    style: TextStyle(
+                      fontFamily: AppFonts.kanitReg,
+                      color: PortColor.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildCategorySection(String category) {
+    final items = categoryItems[category]!;
+    final totalItemsInCategory = items.fold<int>(0, (sum, item) {
+      return sum + (item['subItems'] as List<Map<String, dynamic>>).fold<int>(0, (subSum, subItem) => subSum + (subItem['count'] as int));
+    });
+
     return Column(
+      key: Key(category),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          category,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: AppFonts.kanitReg,
-            fontWeight: FontWeight.w400,
-          ),
+        Row(
+          children: [
+            Text(
+              category,
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: AppFonts.kanitReg,
+                fontWeight: FontWeight.w600,
+                color: PortColor.black,
+              ),
+            ),
+            SizedBox(width: screenWidth * 0.02),
+            if (totalItemsInCategory > 0)
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.03,
+                  vertical: screenHeight * 0.005,
+                ),
+                decoration: BoxDecoration(
+                  color: PortColor.button,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 2,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '$totalItemsInCategory items added',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+          ],
         ),
-        SizedBox(height: screenHeight * 0.01),
+        SizedBox(height: screenHeight * 0.015),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
               ),
             ],
           ),
           child: Column(
             children: [
-              for (int i = 0; i < categoryItems[category]!.length; i++)
+              for (int i = 0; i < items.length; i++)
                 Column(
                   children: [
-                    _buildItemTile(categoryItems[category]![i]),
-                    if (i < categoryItems[category]!.length - 1)
+                    _buildExpandableItem(items[i], category),
+                    if (i < items.length - 1)
                       Divider(
                         height: 1,
                         thickness: 1,
                         color: Colors.grey[200],
-                        indent: screenWidth * 0.05,
-                        endIndent: screenWidth * 0.05,
                       ),
                   ],
                 ),
@@ -1512,101 +1875,248 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     );
   }
 
-  Widget _buildItemTile(Map<String, dynamic> item) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: item['selected'] ? PortColor.button : Colors.grey[200],
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          item['icon'] as IconData,
-          color: item['selected'] ? Colors.white : Colors.black,
-          size: 20,
-        ),
-      ),
-      title: TextConst(
-        title: item['name'],
-        fontFamily: AppFonts.poppinsReg,
-        size: 13,
-      ),
-      trailing: item['selected']
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (item['count'] > 1) {
-                        item['count']--;
-                      } else {
-                        item['selected'] = false;
-                        item['count'] = 0;
-                      }
-                    });
-                  },
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(
-                      Icons.remove,
-                      color: Colors.blue,
-                      size: 18,
-                    ),
-                  ),
+  Widget _buildExpandableItem(Map<String, dynamic> item, String category) {
+    final subItems = item['subItems'] as List<Map<String, dynamic>>;
+    final totalSubItems = subItems.fold<int>(0, (sum, subItem) => sum + (subItem['count'] as int));
+
+    return Column(
+      children: [
+        // Main Item Header
+        ListTile(
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.04,
+            vertical: screenHeight * 0.005,
+          ),
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: totalSubItems > 0 ? PortColor.button : Colors.grey.shade200,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              ],
+            ),
+            child: Icon(
+              _getIconForItem(item['name']),
+              color: totalSubItems > 0 ? Colors.white : Colors.grey.shade600,
+              size: 20,
+            ),
+          ),
+          title: Text(
+            item['name'],
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+              color: PortColor.black,
+              fontFamily: AppFonts.kanitReg,
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (totalSubItems > 0)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: PortColor.button.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Text(
-                    '${item['count']}',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    '$totalSubItems',
+                    style: TextStyle(
+                      color: PortColor.button,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
+              SizedBox(width: screenWidth * 0.02),
+              Icon(
+                item['expanded'] ? Icons.expand_less : Icons.expand_more,
+                color: Colors.grey.shade600,
+                size: 20,
+              ),
+            ],
+          ),
+          onTap: () {
+            setState(() {
+              item['expanded'] = !item['expanded'];
+            });
+          },
+        ),
+
+        // Expanded Sub-items
+        if (item['expanded'])
+          Padding(
+            padding: EdgeInsets.only(
+              left: screenWidth * 0.12,
+              right: screenWidth * 0.04,
+              bottom: screenHeight * 0.01,
+            ),
+            child: Column(
+              children: [
+                for (int i = 0; i < subItems.length; i++)
+                  Column(
+                    children: [
+                      _buildSubItemTile(subItems[i]),
+                      if (i < subItems.length - 1)
+                        Divider(
+                          height: screenHeight * 0.02,
+                          thickness: 0.5,
+                          color: Colors.grey.shade200,
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSubItemTile(Map<String, dynamic> subItem) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.008),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              subItem['name'],
+              style: TextStyle(
+                fontSize: 13,
+                color: PortColor.black.withOpacity(0.8),
+                fontFamily: AppFonts.kanitReg,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          SizedBox(width: screenWidth * 0.02),
+          // Quantity Selector
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // Decrease Button
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      item['count']++;
+                      if (subItem['count'] > 0) {
+                        subItem['count']--;
+                      }
                     });
                   },
                   child: Container(
-                    width: 28,
-                    height: 28,
+                    width: 30,
+                    height: 30,
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
+                      color: subItem['count'] > 0 ? Colors.red.shade50 : Colors.grey.shade50,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(6),
+                        bottomLeft: Radius.circular(6),
+                      ),
                     ),
-                    child: const Icon(Icons.add, color: Colors.blue, size: 18),
+                    child: Icon(
+                      Icons.remove,
+                      size: 16,
+                      color: subItem['count'] > 0 ? Colors.red : Colors.grey,
+                    ),
+                  ),
+                ),
+                // Count Display
+                Container(
+                  width: 40,
+                  height: 30,
+                  color: Colors.white,
+                  child: Center(
+                    child: Text(
+                      '${subItem['count']}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: PortColor.black,
+                      ),
+                    ),
+                  ),
+                ),
+                // Increase Button
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      subItem['count']++;
+                    });
+                  },
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(6),
+                        bottomRight: Radius.circular(6),
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      size: 16,
+                      color: Colors.green,
+                    ),
                   ),
                 ),
               ],
-            )
-          : null,
-
-      onTap: () {
-        setState(() {
-          item['selected'] = !item['selected'];
-          if (item['selected'] && item['count'] == 0) {
-            item['count'] = 1;
-          }
-        });
-      },
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  IconData _getIconForItem(String itemName) {
+    switch (itemName) {
+      case 'Chairs':
+        return Icons.chair;
+      case 'Tables':
+        return Icons.table_restaurant;
+      case 'TV/Monitor':
+        return Icons.tv;
+      case 'Cabinet/Storage':
+        return Icons.weekend;
+      case 'Bed':
+        return Icons.bed;
+      case 'Wardrobe':
+        return Icons.weekend;
+      case 'Dressing Table':
+        return Icons.table_restaurant;
+      case 'Refrigerator':
+        return Icons.kitchen;
+      case 'Microwave':
+        return Icons.microwave;
+      case 'Gas Stove':
+        return Icons.local_fire_department;
+      case 'Plants':
+        return Icons.local_florist;
+      case 'Sports Equipment':
+        return Icons.sports_basketball;
+      default:
+        return Icons.category;
+    }
   }
 }
 
-/// Schedule Screen - Based on the image provided
-
-/// Updated StepWidget to support checkmark for completed steps
 // class StepWidget extends StatelessWidget {
 //   final IconData icon;
 //   final String text;
@@ -1642,10 +2152,10 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
 //         Text(
 //           text,
 //           style: TextStyle(
-//             color: isActive ? Colors.black : Colors.grey,
-//             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-//             fontSize: 10,
-//             fontFamily: AppFonts.kanitReg,
+//               color: isActive ? Colors.black : Colors.grey,
+//               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+//               fontSize: 10,
+//               fontFamily: AppFonts.kanitReg
 //           ),
 //         ),
 //       ],
@@ -1653,7 +2163,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
 //   }
 // }
 //
-// /// DottedLine
 // class DottedLine extends StatelessWidget {
 //   final int dotCount;
 //   final double dotWidth;
@@ -1683,3 +2192,5 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
 //     );
 //   }
 // }
+
+
