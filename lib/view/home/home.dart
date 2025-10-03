@@ -8,6 +8,7 @@ import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
+import 'package:port_karo/services/internet_checker_service.dart';
 import 'package:port_karo/view/home/widgets/category_Grid.dart';
 import 'package:port_karo/view/home/widgets/pick_up_location.dart';
 import 'package:port_karo/view/home/widgets/see_what_new.dart';
@@ -24,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController(initialPage: 0);
+  final checker = InternetCheckerService();
   int _currentPage = 0;
   Timer? _timer;
 
@@ -36,6 +38,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     // 🔹 Banner API call after build
+    checker.startMonitoring(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final portBannerVm = Provider.of<PortBannerViewModel>(context, listen: false);
       portBannerVm.portBannerApi();

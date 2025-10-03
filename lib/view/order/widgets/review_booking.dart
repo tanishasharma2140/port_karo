@@ -6,6 +6,7 @@ import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/utils/utils.dart';
+import 'package:port_karo/view/home/apply_coupon/coupons_and_offers.dart';
 import 'package:port_karo/view/order/widgets/goods_type_screen.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
@@ -179,6 +180,78 @@ class _ReviewBookingState extends State<ReviewBooking> {
                 ),
               ),
             ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
+              child: TextConst(
+                title: "Offers and Discounts",
+                color: PortColor.black,
+                fontFamily: AppFonts.kanitReg,
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.02),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 400),
+                pageBuilder: (context, animation, secondaryAnimation) => CouponsAndOffers(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(0.0, 1.0); // bottom se start
+                  const end = Offset.zero;        // normal position
+                  const curve = Curves.easeInOut;
+
+                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.035,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 0.5,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Image.asset(
+                    Assets.assetsApplyCoupon,
+                    height: 30,
+                    width: 30,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(width: 6),
+                  TextConst(
+                    title: "Apply Coupon",
+                    fontFamily: AppFonts.kanitReg,
+                    size: 14,
+                    color: PortColor.black,
+                  ),
+                  const Spacer(),
+                  Icon(Icons.arrow_forward_ios, size: 15, color: PortColor.black),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+            Container(),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
               child: TextConst(
@@ -559,7 +632,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                       PaymentMethod,
                       [
                         selectedGoodsType!,
-                      ], // ab safe hai kyunki upar null check kar liya
+                      ],
                       context,
                     );
                   }

@@ -20,6 +20,7 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
       profileViewModel.profileApi(context);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final profileViewModel = Provider.of<ProfileViewModel>(context);

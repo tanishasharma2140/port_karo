@@ -11,8 +11,7 @@ class ApiUrl{
   static const String addAddressUrl="${baseUrl}address";
   static const String addressShowUrl="${baseUrl}view_address/";
   static const String addressDeleteUrl="${baseUrl}address_delete";
-  static const String termAndConditionUrl="${baseUrl}term_condition";
-  static const String privacyPolicyUrl="${baseUrl}privacy_policy";
+  static const String policyUrl ="${baseUrl}policy/";
   static const String helpSupportUrl="${baseUrl}help";
   static const String userHistoryUrl="${baseUrl}user_history/";
   static const String paymentGatewayUrl="${baseUrl}payment_gateway";
@@ -21,6 +20,8 @@ class ApiUrl{
   static const String portBannerUrl="${baseUrl}banner";
   static const String onBoardingUrl="${baseUrl}onboarding-image";
   static const String goodsTypeUrl="${baseUrl}goods_type";
+  static const String packerMoverUrl="${baseUrl}packer_and_mover";
+  static const String couponListUrl ="${baseUrl}coupon_list?";
   static const String sendOtpUrl ="https://otp.fctechteam.org/send_otp.php?mode=test&digit=4&mobile=";
   static const String verifyOtpUrl ="https://otp.fctechteam.org/verifyotp.php?mobile=";
 }

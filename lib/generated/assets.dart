@@ -2,6 +2,7 @@
 class Assets {
   Assets._();
 
+  static const String assetsApplyCoupon = 'assets/apply_coupon.png';
   static const String assetsAuto = 'assets/auto.png';
   static const String assetsBankaccount = 'assets/bankaccount.png';
   static const String assetsBike = 'assets/bike.png';
@@ -36,6 +37,7 @@ class Assets {
   static const String assetsLocation = 'assets/location.png';
   static const String assetsLocationPin = 'assets/location_pin.png';
   static const String assetsLoginDriver = 'assets/login_driver.png';
+  static const String assetsLostnetwork = 'assets/lostnetwork.gif';
   static const String assetsMainimage = 'assets/mainimage.png';
   static const String assetsMap = 'assets/map.png';
   static const String assetsMart = 'assets/mart.png';

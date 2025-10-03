@@ -18,8 +18,8 @@ class ProfileUpdateViewModel with ChangeNotifier {
       dynamic lastname,
       dynamic email,
       dynamic mobileNumber,
+      dynamic gstAddress,
       dynamic gstNumber,
-      dynamic gstRegistration,
        context,
       ) async {
     setLoading(true);
@@ -31,8 +31,8 @@ class ProfileUpdateViewModel with ChangeNotifier {
       "last_name": lastname,
       "email": email,
       "phone": mobileNumber,
+      "gst_address ": gstAddress,
       "gst_number": gstNumber,
-      "gst_registration": gstRegistration,
     };
     try {
       final response = await _profileUpdateRepo.profileUpdateApi(data);

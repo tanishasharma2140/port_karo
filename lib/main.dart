@@ -12,19 +12,20 @@ import 'package:port_karo/view_model/add_address_view_model.dart';
 import 'package:port_karo/view_model/add_wallet_view_model.dart';
 import 'package:port_karo/view_model/address_delete_view_model.dart';
 import 'package:port_karo/view_model/address_show_view_model.dart';
+import 'package:port_karo/view_model/coupon_list_view_model.dart';
 import 'package:port_karo/view_model/goods_type_view_model.dart';
 import 'package:port_karo/view_model/help_and_support_view_model.dart';
 import 'package:port_karo/view_model/login_view_model.dart';
 import 'package:port_karo/view_model/on_boarding_view_model.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
+import 'package:port_karo/view_model/packer_mover_view_model.dart';
+import 'package:port_karo/view_model/policy_view_model.dart';
 import 'package:port_karo/view_model/port_banner_view_model.dart';
-import 'package:port_karo/view_model/privacy_policy_view_model.dart';
 import 'package:port_karo/view_model/profile_update_view_model.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
 import 'package:port_karo/view_model/register_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
 import 'package:port_karo/view_model/service_type_view_model.dart';
-import 'package:port_karo/view_model/terms_and_condition_view_model.dart';
 import 'package:port_karo/view_model/user_history_view_model.dart';
 import 'package:port_karo/view_model/wallet_history_view_model.dart';
 import 'package:provider/provider.dart';
@@ -103,8 +104,6 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> AddAddressViewModel()),
           ChangeNotifierProvider(create: (context)=> AddressShowViewModel()),
           ChangeNotifierProvider(create: (context)=> AddressDeleteViewModel()),
-          ChangeNotifierProvider(create: (context)=> TermAndConditionViewModel()),
-          ChangeNotifierProvider(create: (context)=> PrivacyPolicyViewModel()),
           ChangeNotifierProvider(create: (context)=> HelpAndSupportViewModel()),
           ChangeNotifierProvider(create: (context)=> UserHistoryViewModel()),
           ChangeNotifierProvider(create: (context)=> AddWalletViewModel()),
@@ -112,6 +111,9 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> PortBannerViewModel()),
           ChangeNotifierProvider(create: (context)=> OnBoardingViewModel()),
           ChangeNotifierProvider(create: (context)=> GoodsTypeViewModel()),
+          ChangeNotifierProvider(create: (context)=> PackerMoverViewModel()),
+          ChangeNotifierProvider(create: (context)=> CouponListViewModel()),
+          ChangeNotifierProvider(create: (context)=> PolicyViewModel()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:port_karo/main.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
-import 'package:port_karo/view_model/privacy_policy_view_model.dart';
+import 'package:port_karo/view_model/policy_view_model.dart';
 import 'package:provider/provider.dart';
 
 class PrivacyPolicy extends StatefulWidget {
@@ -12,17 +14,20 @@ class PrivacyPolicy extends StatefulWidget {
   State<PrivacyPolicy> createState() => _PrivacyPolicyState();
 }
 class _PrivacyPolicyState extends State<PrivacyPolicy> {
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final privacyPolicyViewModel =
-      Provider.of<PrivacyPolicyViewModel>(context, listen: false);
-      privacyPolicyViewModel.privacyPolicyApi();
+      final policyVm =
+      Provider.of<PolicyViewModel>(context, listen: false);
+      policyVm.policyApi("1");
       print("I am the....don");
     });
   }
   @override
   Widget build(BuildContext context) {
+    final privacyPolicy = Provider.of<PolicyViewModel>(context);
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -68,6 +73,37 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
                 ],
               ),
             ),
+            SizedBox(height: 30,),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: privacyPolicy.loading
+                    ? const Center(
+                  child: Center(child: CircularProgressIndicator(color: PortColor.gold
+                    ,),),
+                )
+                    : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: HtmlWidget(
+                    privacyPolicy.policyModel?.data?.description ?? "",
+                    textStyle: TextStyle(
+                      fontFamily: AppFonts.poppinsReg,
+                      fontSize: 14,
+                      color: PortColor.blackLight,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
           ],
         ),
       ),

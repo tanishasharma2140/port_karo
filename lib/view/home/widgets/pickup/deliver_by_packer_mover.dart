@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:port_karo/main.dart';
+import 'package:port_karo/model/packer_mover_model.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
@@ -11,6 +12,8 @@ import 'package:port_karo/res/custom_text_field.dart';
 import 'package:port_karo/view/home/widgets/city_toggle.dart';
 import 'package:port_karo/view/home/widgets/pickup/f_a_q_modal_sheet.dart';
 import 'package:port_karo/view/home/widgets/pickup/schedule_screen.dart';
+import 'package:port_karo/view_model/packer_mover_view_model.dart';
+import 'package:provider/provider.dart';
 
 class DeliverByPackerMover extends StatefulWidget {
   const DeliverByPackerMover({super.key});
@@ -144,7 +147,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
 
   Future<void> pickDate() async {
     DateTime today = DateTime.now();
-    DateTime lastDate = today.add(const Duration(days: 20));
+    DateTime lastDate = today.add(const Duration(days: 90));
 
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -175,6 +178,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
       });
     }
   }
+
 
   void selectDay(String day) {
     DateTime today = DateTime.now();
@@ -1032,8 +1036,10 @@ class DottedLine extends StatelessWidget {
 }
 
 /// Add Items Screen
-/// Add Items Screen - Updated with navigation to Schedule screen
 /// Add Items Screen - Updated with dropdown quantity selection
+
+
+
 
 
 class AddItemsScreen extends StatefulWidget {
@@ -1048,138 +1054,86 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
   String selectedCategory = 'Living Room';
   final ScrollController _scrollController = ScrollController();
 
-  // Add debounce timer to prevent blinking
   Timer? _scrollTimer;
   bool _isScrolling = false;
 
-  // Category keys list for easy access
+  // Dynamic category data
+  Map<String, List<Map<String, dynamic>>> categoryItems = {};
   final List<String> _categories = ['Living Room', 'Bedroom', 'Kitchen', 'Others'];
 
-  // Sample items data with expanded state and quantities
-  Map<String, List<Map<String, dynamic>>> categoryItems = {
-    'Living Room': [
-      {
-        'name': 'Chairs',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Plastic/Folding Chair', 'count': 0},
-          {'name': 'Dining Table Chairs', 'count': 0},
-          {'name': 'Office Chair', 'count': 0},
-          {'name': 'Recliner', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Tables',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Coffee Table', 'count': 0},
-          {'name': 'Dining Table', 'count': 0},
-          {'name': 'Study Table', 'count': 0},
-          {'name': 'Side Table', 'count': 0},
-        ]
-      },
-      {
-        'name': 'TV/Monitor',
-        'expanded': false,
-        'subItems': [
-          {'name': 'LED TV', 'count': 0},
-          {'name': 'LCD TV', 'count': 0},
-          {'name': 'Computer Monitor', 'count': 0},
-          {'name': 'Home Theater', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Cabinet/Storage',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Bookshelf', 'count': 0},
-          {'name': 'Showcase', 'count': 0},
-          {'name': 'Storage Cabinet', 'count': 0},
-          {'name': 'TV Unit', 'count': 0},
-        ]
-      },
-    ],
-    'Bedroom': [
-      {
-        'name': 'Bed',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Single Bed', 'count': 0},
-          {'name': 'Double Bed', 'count': 0},
-          {'name': 'King Size Bed', 'count': 0},
-          {'name': 'Bunk Bed', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Wardrobe',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Single Door', 'count': 0},
-          {'name': 'Double Door', 'count': 0},
-          {'name': 'Sliding Door', 'count': 0},
-          {'name': 'Walk-in Wardrobe', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Dressing Table',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Wooden Dressing', 'count': 0},
-          {'name': 'Modern Dressing', 'count': 0},
-          {'name': 'Wall Mounted', 'count': 0},
-        ]
-      },
-    ],
-    'Kitchen': [
-      {
-        'name': 'Refrigerator',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Single Door', 'count': 0},
-          {'name': 'Double Door', 'count': 0},
-          {'name': 'Side by Side', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Microwave',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Solo Microwave', 'count': 0},
-          {'name': 'Grill Microwave', 'count': 0},
-          {'name': 'Convection Microwave', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Gas Stove',
-        'expanded': false,
-        'subItems': [
-          {'name': '2 Burner', 'count': 0},
-          {'name': '3 Burner', 'count': 0},
-          {'name': '4 Burner', 'count': 0},
-        ]
-      },
-    ],
-    'Others': [
-      {
-        'name': 'Plants',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Small Plants', 'count': 0},
-          {'name': 'Medium Plants', 'count': 0},
-          {'name': 'Large Plants', 'count': 0},
-        ]
-      },
-      {
-        'name': 'Sports Equipment',
-        'expanded': false,
-        'subItems': [
-          {'name': 'Treadmill', 'count': 0},
-          {'name': 'Exercise Bike', 'count': 0},
-          {'name': 'Weights', 'count': 0},
-        ]
-      },
-    ],
+  // Map packer_type to category names
+  final Map<int, String> _packerTypeToCategory = {
+    1: 'Living Room',
+    2: 'Bedroom',
+    3: 'Kitchen',
+    4: 'Others'
   };
+
+  bool _isDataProcessed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    _initializeEmptyData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCategory(selectedCategory);
+      final packerMoverVm = Provider.of<PackerMoverViewModel>(context, listen: false);
+      packerMoverVm.packerMoverApi();
+    });
+  }
+
+  void _initializeEmptyData() {
+    for (var category in _categories) {
+      categoryItems[category] = [];
+    }
+  }
+
+  void _processApiData(PackerMoversModel? apiData) {
+    if (apiData?.data == null || _isDataProcessed) return;
+
+    setState(() {
+      // Clear existing data
+      for (var category in _categories) {
+        categoryItems[category] = [];
+      }
+
+      // Process API data
+      for (var categoryData in apiData!.data!) {
+        final categoryName = _packerTypeToCategory[categoryData.packerType];
+        if (categoryName != null && categoryItems.containsKey(categoryName)) {
+          final packers = categoryData.packers ?? [];
+
+          for (var packer in packers) {
+            final subItems = packer.subItems ?? [];
+            final processedSubItems = subItems.map((subItem) {
+              return {
+                'name': subItem.itemName ?? '',
+                'count': 0,
+                'itemId': subItem.itemId,
+                'amount': subItem.amount,
+                'comment': subItem.comment,
+              };
+            }).toList();
+
+            // Only add if there are sub-items
+            if (processedSubItems.isNotEmpty) {
+              categoryItems[categoryName]!.add({
+                'name': packer.packerName ?? '',
+                'expanded': false,
+                'subItems': processedSubItems,
+                'packerId': packer.packerId,
+                'imageIcon': packer.imageIcon,
+                'comment': packer.comment,
+              });
+            }
+          }
+        }
+      }
+      _isDataProcessed = true;
+    });
+  }
 
   int get selectedItemsCount {
     int count = 0;
@@ -1204,6 +1158,9 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               'mainItem': item['name'],
               'subItem': subItem['name'],
               'count': subItem['count'],
+              'itemId': subItem['itemId'],
+              'amount': subItem['amount'],
+              'comment': subItem['comment'],
             });
           }
         }
@@ -1212,46 +1169,20 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     return selected;
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Add scroll listener to detect which category is visible
-    _scrollController.addListener(_onScroll);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCategory(selectedCategory);
-    });
-  }
-
   void _onScroll() {
-    // Cancel previous timer
     _scrollTimer?.cancel();
-
-    // Set scrolling flag
     _isScrolling = true;
 
-    // Set new timer to delay the category update (debounce)
     _scrollTimer = Timer(const Duration(milliseconds: 50), () {
       if (!_scrollController.hasClients || !mounted) return;
 
       final scrollOffset = _scrollController.offset;
-
-      // Define approximate section heights
-      final Map<String, double> sectionHeights = {
-        'Living Room': _calculateSectionHeight('Living Room'),
-        'Bedroom': _calculateSectionHeight('Bedroom'),
-        'Kitchen': _calculateSectionHeight('Kitchen'),
-        'Others': _calculateSectionHeight('Others'),
-      };
-
       double accumulatedHeight = 0;
       String? newSelectedCategory;
 
       for (final category in _categories) {
-        final sectionHeight = sectionHeights[category] ?? 0;
+        final sectionHeight = _calculateSectionHeight(category);
 
-        // Check if current scroll position is within this category's section
         if (scrollOffset >= accumulatedHeight - 50 &&
             scrollOffset < accumulatedHeight + sectionHeight - 50) {
           newSelectedCategory = category;
@@ -1261,7 +1192,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         accumulatedHeight += sectionHeight;
       }
 
-      // Only update if category actually changed and we're not in the middle of programmatic scroll
       if (newSelectedCategory != null && newSelectedCategory != selectedCategory) {
         setState(() {
           selectedCategory = newSelectedCategory!;
@@ -1273,30 +1203,27 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
   }
 
   double _calculateSectionHeight(String category) {
-    final items = categoryItems[category]!;
-    double height = screenHeight * 0.08; // Category header height
+    final items = categoryItems[category] ?? [];
+    double height = screenHeight * 0.08;
 
     for (var item in items) {
-      height += screenHeight * 0.07; // Main item height
+      height += screenHeight * 0.07;
       if (item['expanded']) {
-        height += (item['subItems'].length * screenHeight * 0.06); // Sub items height
+        height += (item['subItems'].length * screenHeight * 0.06);
       }
     }
 
-    height += screenHeight * 0.03; // Padding
+    height += screenHeight * 0.03;
     return height;
   }
 
   void _scrollToCategory(String category) {
-    // Cancel any ongoing scroll detection
     _scrollTimer?.cancel();
 
     final categoryIndex = _categories.indexOf(category);
     if (categoryIndex == -1) return;
 
     double scrollOffset = 0;
-
-    // Calculate scroll position for the selected category
     for (int i = 0; i < categoryIndex; i++) {
       final cat = _categories[i];
       scrollOffset += _calculateSectionHeight(cat);
@@ -1319,11 +1246,24 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
       return;
     }
 
-    // Navigate to Schedule screen
+    final selectedItems = selectedItemsList;
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ScheduleScreen()),
+      MaterialPageRoute(
+        // builder: (context) => ScheduleScreen(selectedItems: selectedItems),
+        builder: (context) => ScheduleScreen(),
+      ),
     );
+  }
+
+  void _retryLoading() {
+    final packerMoverVm = Provider.of<PackerMoverViewModel>(context, listen: false);
+    packerMoverVm.clearError();
+    packerMoverVm.packerMoverApi();
+    setState(() {
+      _isDataProcessed = false;
+    });
   }
 
   @override
@@ -1336,6 +1276,15 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final packerMoverVm = Provider.of<PackerMoverViewModel>(context);
+
+    // Process API data when it's available
+    if (packerMoverVm.packerMoversData != null && !_isDataProcessed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _processApiData(packerMoverVm.packerMoversData);
+      });
+    }
+
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -1343,6 +1292,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         body: Column(
           children: [
             SizedBox(height: topPadding),
+            // Header Section
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: screenWidth * 0.03,
@@ -1378,9 +1328,14 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                         ),
                       ),
                       SizedBox(width: screenWidth * 0.02),
-                      TextConst(
-                        title: "Packer and Mover",
-                        color: PortColor.black,
+                      Text(
+                        "Packer and Mover",
+                        style: TextStyle(
+                          color: PortColor.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: AppFonts.kanitReg,
+                        ),
                       ),
                     ],
                   ),
@@ -1414,223 +1369,321 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               ),
             ),
 
-            // Search Bar
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04,
-                vertical: screenHeight * 0.02,
-              ),
-              child: Container(
-                height: screenHeight * 0.05,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search item',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 14,
-                      fontFamily: AppFonts.kanitReg,
-                    ),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade500, size: 20),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.03,
-                      vertical: screenHeight * 0.01,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Container(
-                height: screenHeight * 0.04,
-                decoration: BoxDecoration(
-                  color: PortColor.grey,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: _categories
-                      .map(
-                        (category) => GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedCategory = category;
-                        });
-                        _scrollToCategory(category);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.03,
-                        ),
-                        decoration: BoxDecoration(
-                          color: selectedCategory == category
-                              ? PortColor.button
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Center(
-                          child: Text(
-                            category,
-                            style: TextStyle(
-                              color: selectedCategory == category
-                                  ? Colors.black
-                                  : Colors.black,
-                              fontFamily: AppFonts.kanitReg,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                      .toList(),
-                ),
-              ),
-            ),
-
-            SizedBox(height: screenHeight * 0.02),
-
-            // Instruction Text
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-              child: Text(
-                'Add items to get the exact quote, you can edit this later',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 12,
-                  fontFamily: AppFonts.kanitReg,
-                ),
-              ),
-            ),
-
-            SizedBox(height: screenHeight * 0.02),
-
-            Expanded(
-              child: ListView(
-                controller: _scrollController,
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04,
-                  vertical: screenHeight * 0.02,
-                ),
-                children: [
-                  _buildCategorySection('Living Room'),
-                  SizedBox(height: screenHeight * 0.03),
-                  _buildCategorySection('Bedroom'),
-                  SizedBox(height: screenHeight * 0.03),
-                  _buildCategorySection('Kitchen'),
-                  SizedBox(height: screenHeight * 0.03),
-                  _buildCategorySection('Others'),
-                ],
-              ),
-            ),
-
-            // Bottom Summary Bar
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04,
-                vertical: screenHeight * 0.02,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            // Main Content
+            if (packerMoverVm.loading)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      CircularProgressIndicator(color: PortColor.button),
+                      SizedBox(height: screenHeight * 0.02),
                       Text(
-                        '$selectedItemsCount Items added',
+                        'Loading items...',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
                           color: PortColor.black,
+                          fontSize: 16,
+                          fontFamily: AppFonts.kanitReg,
                         ),
                       ),
-                      if (selectedItemsCount > 0)
-                        GestureDetector(
-                          onTap: _showSelectedItems,
-                          child: Text(
-                            'View all',
-                            style: TextStyle(
-                              color: PortColor.button,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: _showSelectedItems,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.06,
-                        vertical: screenHeight * 0.012,
+                ),
+              )
+            else if (packerMoverVm.error != null)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: screenHeight * 0.06,
                       ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: PortColor.button),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'View all',
+                      SizedBox(height: screenHeight * 0.02),
+                      Text(
+                        packerMoverVm.error!,
                         style: TextStyle(
-                          color: PortColor.button,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
+                          color: Colors.red,
+                          fontSize: 16,
+                          fontFamily: AppFonts.kanitReg,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.03),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _confirmItems,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.015,
+                      SizedBox(height: screenHeight * 0.03),
+                      ElevatedButton(
+                        onPressed: _retryLoading,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: PortColor.button,
+                          foregroundColor: PortColor.black,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.06,
+                            vertical: screenHeight * 0.015,
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: PortColor.button,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        alignment: Alignment.center,
                         child: Text(
-                          "Check price",
+                          'Retry',
                           style: TextStyle(
                             fontFamily: AppFonts.kanitReg,
-                            color: PortColor.black,
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              )
+            else if (categoryItems.values.every((items) => items.isEmpty))
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          color: Colors.grey,
+                          size: screenHeight * 0.08,
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        Text(
+                          'No items available',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
+                            fontFamily: AppFonts.kanitReg,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
+                )
+              else
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Search Bar
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.04,
+                          vertical: screenHeight * 0.02,
+                        ),
+                        child: Container(
+                          height: screenHeight * 0.05,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            onChanged: (value) {
+                              // Implement search functionality here
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Search item',
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 14,
+                                fontFamily: AppFonts.kanitReg,
+                              ),
+                              prefixIcon: Icon(Icons.search, color: Colors.grey.shade500, size: 20),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.03,
+                                vertical: screenHeight * 0.01,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Category Tabs
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Container(
+                          height: screenHeight * 0.04,
+                          decoration: BoxDecoration(
+                            color: PortColor.grey,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: _categories
+                                .map(
+                                  (category) => GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedCategory = category;
+                                  });
+                                  _scrollToCategory(category);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.03,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: selectedCategory == category
+                                        ? PortColor.button
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      category,
+                                      style: TextStyle(
+                                        color: PortColor.black,
+                                        fontFamily: AppFonts.kanitReg,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                                .toList(),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: screenHeight * 0.02),
+
+                      // Instruction Text
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                        child: Text(
+                          'Add items to get the exact quote, you can edit this later',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                            fontFamily: AppFonts.kanitReg,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: screenHeight * 0.02),
+
+                      // Items List with ListView.builder
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.04,
+                            vertical: screenHeight * 0.02,
+                          ),
+                          itemCount: _categories.length,
+                          itemBuilder: (context, index) {
+                            final category = _categories[index];
+                            return _buildCategorySection(category, index);
+                          },
+                        ),
+                      ),
+
+                      // Bottom Summary Bar
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.04,
+                          vertical: screenHeight * 0.02,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$selectedItemsCount Items added',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: PortColor.black,
+                                  ),
+                                ),
+                                if (selectedItemsCount > 0)
+                                  GestureDetector(
+                                    onTap: _showSelectedItems,
+                                    child: Text(
+                                      'View all',
+                                      style: TextStyle(
+                                        color: PortColor.button,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: _showSelectedItems,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.06,
+                                  vertical: screenHeight * 0.012,
+                                ),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: PortColor.button),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'View all',
+                                  style: TextStyle(
+                                    color: PortColor.button,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.03),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: _confirmItems,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: screenHeight * 0.015,
+                                    horizontal: screenWidth * 0.01
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: PortColor.button,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "Check price",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: AppFonts.kanitReg,
+                                      color: PortColor.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
           ],
         ),
       ),
@@ -1692,7 +1745,17 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               ),
               SizedBox(height: screenHeight * 0.02),
               Expanded(
-                child: ListView.builder(
+                child: selectedItemsList.isEmpty
+                    ? Center(
+                  child: Text(
+                    "No items selected",
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
                   itemCount: selectedItemsList.length,
                   itemBuilder: (context, index) {
                     final item = selectedItemsList[index];
@@ -1739,6 +1802,15 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                                     color: Colors.grey.shade600,
                                   ),
                                 ),
+                                if (item['comment'] != null && item['comment'].isNotEmpty)
+                                  Text(
+                                    item['comment'],
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
@@ -1790,8 +1862,8 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     );
   }
 
-  Widget _buildCategorySection(String category) {
-    final items = categoryItems[category]!;
+  Widget _buildCategorySection(String category, int categoryIndex) {
+    final items = categoryItems[category] ?? [];
     final totalItemsInCategory = items.fold<int>(0, (sum, item) {
       return sum + (item['subItems'] as List<Map<String, dynamic>>).fold<int>(0, (subSum, subItem) => subSum + (subItem['count'] as int));
     });
@@ -1842,46 +1914,76 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
           ],
         ),
         SizedBox(height: screenHeight * 0.015),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+        if (items.isEmpty)
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                'No items available in this category',
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                  fontFamily: AppFonts.kanitReg,
+                ),
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              for (int i = 0; i < items.length; i++)
-                Column(
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: items.length,
+              itemBuilder: (context, itemIndex) {
+                final item = items[itemIndex];
+                return Column(
                   children: [
-                    _buildExpandableItem(items[i], category),
-                    if (i < items.length - 1)
+                    _buildExpandableItem(item, category, itemIndex),
+                    if (itemIndex < items.length - 1)
                       Divider(
                         height: 1,
                         thickness: 1,
                         color: Colors.grey[200],
                       ),
                   ],
-                ),
-            ],
+                );
+              },
+            ),
           ),
-        ),
+        if (categoryIndex < _categories.length - 1)
+          SizedBox(height: screenHeight * 0.03),
       ],
     );
   }
 
-  Widget _buildExpandableItem(Map<String, dynamic> item, String category) {
+  Widget _buildExpandableItem(Map<String, dynamic> item, String category, int itemIndex) {
     final subItems = item['subItems'] as List<Map<String, dynamic>>;
     final totalSubItems = subItems.fold<int>(0, (sum, subItem) => sum + (subItem['count'] as int));
 
     return Column(
       children: [
-        // Main Item Header
         ListTile(
           contentPadding: EdgeInsets.symmetric(
             horizontal: screenWidth * 0.04,
@@ -1916,6 +2018,16 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               fontFamily: AppFonts.kanitReg,
             ),
           ),
+          subtitle: item['comment'] != null && item['comment'].isNotEmpty
+              ? Text(
+            item['comment'],
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.grey.shade600,
+              fontStyle: FontStyle.italic,
+            ),
+          )
+              : null,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1950,7 +2062,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
           },
         ),
 
-        // Expanded Sub-items
         if (item['expanded'])
           Padding(
             padding: EdgeInsets.only(
@@ -1958,45 +2069,61 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
               right: screenWidth * 0.04,
               bottom: screenHeight * 0.01,
             ),
-            child: Column(
-              children: [
-                for (int i = 0; i < subItems.length; i++)
-                  Column(
-                    children: [
-                      _buildSubItemTile(subItems[i]),
-                      if (i < subItems.length - 1)
-                        Divider(
-                          height: screenHeight * 0.02,
-                          thickness: 0.5,
-                          color: Colors.grey.shade200,
-                        ),
-                    ],
-                  ),
-              ],
+            child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: subItems.length,
+              itemBuilder: (context, subItemIndex) {
+                final subItem = subItems[subItemIndex];
+                return Column(
+                  children: [
+                    _buildSubItemTile(subItem, subItemIndex),
+                    if (subItemIndex < subItems.length - 1)
+                      Divider(
+                        height: screenHeight * 0.02,
+                        thickness: 0.5,
+                        color: Colors.grey.shade200,
+                      ),
+                  ],
+                );
+              },
             ),
           ),
       ],
     );
   }
 
-  Widget _buildSubItemTile(Map<String, dynamic> subItem) {
+  Widget _buildSubItemTile(Map<String, dynamic> subItem, int subItemIndex) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: screenHeight * 0.008),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              subItem['name'],
-              style: TextStyle(
-                fontSize: 13,
-                color: PortColor.black.withOpacity(0.8),
-                fontFamily: AppFonts.kanitReg,
-                fontWeight: FontWeight.w400,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  subItem['name'],
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: PortColor.black.withOpacity(0.8),
+                    fontFamily: AppFonts.kanitReg,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                if (subItem['comment'] != null && subItem['comment'].isNotEmpty)
+                  Text(
+                    subItem['comment'],
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+              ],
             ),
           ),
           SizedBox(width: screenWidth * 0.02),
-          // Quantity Selector
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade300),
@@ -2011,7 +2138,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
             ),
             child: Row(
               children: [
-                // Decrease Button
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -2037,7 +2163,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                     ),
                   ),
                 ),
-                // Count Display
                 Container(
                   width: 40,
                   height: 30,
@@ -2053,7 +2178,6 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                     ),
                   ),
                 ),
-                // Increase Button
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -2086,34 +2210,35 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
   }
 
   IconData _getIconForItem(String itemName) {
-    switch (itemName) {
-      case 'Chairs':
-        return Icons.chair;
-      case 'Tables':
-        return Icons.table_restaurant;
-      case 'TV/Monitor':
-        return Icons.tv;
-      case 'Cabinet/Storage':
-        return Icons.weekend;
-      case 'Bed':
-        return Icons.bed;
-      case 'Wardrobe':
-        return Icons.weekend;
-      case 'Dressing Table':
-        return Icons.table_restaurant;
-      case 'Refrigerator':
-        return Icons.kitchen;
-      case 'Microwave':
-        return Icons.microwave;
-      case 'Gas Stove':
-        return Icons.local_fire_department;
-      case 'Plants':
-        return Icons.local_florist;
-      case 'Sports Equipment':
-        return Icons.sports_basketball;
-      default:
-        return Icons.category;
-    }
+    final name = itemName.toLowerCase();
+
+    if (name.contains('chair')) return Icons.chair;
+    if (name.contains('table')) return Icons.table_restaurant;
+    if (name.contains('tv') || name.contains('monitor')) return Icons.tv;
+    if (name.contains('cabinet') || name.contains('storage')) return Icons.weekend;
+    if (name.contains('bed')) return Icons.bed;
+    if (name.contains('wardrobe') || name.contains('almirah')) return Icons.weekend;
+    if (name.contains('dressing')) return Icons.table_restaurant;
+    if (name.contains('fridge')) return Icons.kitchen;
+    if (name.contains('microwave')) return Icons.microwave;
+    if (name.contains('gas')) return Icons.local_fire_department;
+    if (name.contains('plant')) return Icons.local_florist;
+    if (name.contains('sports') || name.contains('equipment')) return Icons.sports_basketball;
+    if (name.contains('sofa')) return Icons.weekend;
+    if (name.contains('mattress')) return Icons.bed;
+    if (name.contains('ac') || name.contains('fan') || name.contains('cooler')) return Icons.ac_unit;
+    if (name.contains('washing')) return Icons.local_laundry_service;
+    if (name.contains('vehicle') || name.contains('bike') || name.contains('scooter')) return Icons.directions_bike;
+    if (name.contains('carton') || name.contains('box')) return Icons.inventory_2;
+    if (name.contains('gunny') || name.contains('bag')) return Icons.shopping_bag;
+    if (name.contains('bathroom') || name.contains('bucket') || name.contains('tub')) return Icons.bathtub;
+    if (name.contains('utility')) return Icons.home_repair_service;
+    if (name.contains('suitcase') || name.contains('trolley')) return Icons.luggage;
+    if (name.contains('piano') || name.contains('guitar') || name.contains('instrument')) return Icons.music_note;
+    if (name.contains('treadmill') || name.contains('exercise')) return Icons.fitness_center;
+    if (name.contains('pool') || name.contains('snooker')) return Icons.sports;
+
+    return Icons.category;
   }
 }
 
