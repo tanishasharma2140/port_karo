@@ -4,13 +4,15 @@ import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
+import 'package:port_karo/view_model/apply_coupon_view_model.dart';
 import 'package:port_karo/view_model/coupon_list_view_model.dart';
 import 'package:port_karo/view_model/service_type_view_model.dart';
 import 'package:port_karo/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class CouponsAndOffers extends StatefulWidget {
-  const CouponsAndOffers({super.key});
+  final String price;
+  const CouponsAndOffers({super.key, required this.price});
 
   @override
   State<CouponsAndOffers> createState() => _CouponsAndOffersState();
@@ -42,6 +44,7 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
 
   @override
   Widget build(BuildContext context) {
+    final applyCoupon = Provider.of<ApplyCouponViewModel>(context);
     return Scaffold(
       backgroundColor: PortColor.bg,
       body: Column(
@@ -65,15 +68,17 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
               children: [
                 Row(
                   children: [
-                     GestureDetector(
-                         onTap:(){
-                           Navigator.pop(context);
-                         },
-                         child: Container(
-                             width: 30,
-                             height: 30,
-                             color: Colors.transparent,
-                             child: Icon(Icons.arrow_back,size: 16,))),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        color: Colors.transparent,
+                        child: Icon(Icons.arrow_back, size: 16),
+                      ),
+                    ),
                     const SizedBox(width: 15),
                     TextConst(
                       title: "Coupons & Offers",
@@ -107,28 +112,37 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Container(
-                        height: 35,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 13,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: GestureDetector(
-                          onTap: () {
-                            // Entered code apply logic
-                          },
-                          child: Text(
-                            'APPLY',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: AppFonts.kanitReg,
-                              fontSize: 14,
+                      GestureDetector(
+                        onTap: () {
+                          applyCoupon.applyCouponApi(
+                            _couponController.text,
+                            widget.price,
+                            context,
+                          );
+                        },
+                        child: Container(
+                          height: 35,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 13,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Entered code apply logic
+                            },
+                            child: Text(
+                              'APPLY',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: AppFonts.kanitReg,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ),
@@ -253,14 +267,10 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
                               GestureDetector(
                                 onTap: couponListOffer.claimStatus == 1
                                     ? () {
-                                        ScaffoldMessenger.of(
+                                        applyCoupon.applyCouponApi(
+                                          couponListOffer.couponCode,
+                                          widget.price,
                                           context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              "${couponListOffer.couponCode} Applied!",
-                                            ),
-                                          ),
                                         );
                                       }
                                     : null,

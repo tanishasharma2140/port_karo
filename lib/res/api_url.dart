@@ -6,7 +6,7 @@ class ApiUrl{
   static const String loginUrl="${baseUrl}login";
   static const String profileUpdateUrl="${baseUrl}update_profile";
   static const String orderUrl="${baseUrl}order";
-  static const String selectVehiclesUrl="${baseUrl}select_vehicle?";
+  static const String selectVehiclesUrl="${baseUrl}vehicle_details_with_range?";
   static const String serviceTypeUrl="${baseUrl}service_type";
   static const String addAddressUrl="${baseUrl}address";
   static const String addressShowUrl="${baseUrl}view_address/";
@@ -22,6 +22,8 @@ class ApiUrl{
   static const String goodsTypeUrl="${baseUrl}goods_type";
   static const String packerMoverUrl="${baseUrl}packer_and_mover";
   static const String couponListUrl ="${baseUrl}coupon_list?";
+  static const String applyCouponUrl ="${baseUrl}apply_coupon";
+  static const String requirementUrl ="${baseUrl}requirement";
   static const String sendOtpUrl ="https://otp.fctechteam.org/send_otp.php?mode=test&digit=4&mobile=";
   static const String verifyOtpUrl ="https://otp.fctechteam.org/verifyotp.php?mobile=";
 }

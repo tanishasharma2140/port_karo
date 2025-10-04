@@ -20,10 +20,10 @@ class SelectVehiclesViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> selectVehiclesApi(String vehicleId) async {
+  Future<void> selectVehiclesApi(String vehicleId, String range) async {
     setLoading(true);
     try {
-      final response = await _selectVehicleRepo.selectVehicleApi(vehicleId);
+      final response = await _selectVehicleRepo.selectVehicleApi(vehicleId,range);
       if (response.status == 200) {
         setModelData(response);
       }

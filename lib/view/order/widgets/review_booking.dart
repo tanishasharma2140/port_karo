@@ -8,6 +8,7 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/utils/utils.dart';
 import 'package:port_karo/view/home/apply_coupon/coupons_and_offers.dart';
 import 'package:port_karo/view/order/widgets/goods_type_screen.dart';
+import 'package:port_karo/view_model/apply_coupon_view_model.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
 
   @override
   Widget build(BuildContext context) {
+    final applyCouponVm = Provider.of<ApplyCouponViewModel>(context);
     final orderViewModel = Provider.of<OrderViewModel>(context);
     final vehicle = Provider.of<SelectVehiclesViewModel>(
       context,
@@ -100,7 +102,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                     Row(
                       children: [
                         Image.network(
-                          vehicle.bodyTypeImage.toString(),
+                          vehicle.vehicleImage.toString(),
                           height: screenHeight * 0.065,
                           errorBuilder: (context, error, stackTrace) {
                             return Image.asset(
@@ -109,7 +111,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                             );
                           },
                         ),
-
+                         SizedBox(width: screenWidth*0.035,),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -194,7 +196,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
             Navigator.of(context).push(
               PageRouteBuilder(
                 transitionDuration: const Duration(milliseconds: 400),
-                pageBuilder: (context, animation, secondaryAnimation) => CouponsAndOffers(),
+                pageBuilder: (context, animation, secondaryAnimation) => CouponsAndOffers(price: widget.price),
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   const begin = Offset(0.0, 1.0); // bottom se start
                   const end = Offset.zero;        // normal position
@@ -268,7 +270,6 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   horizontal: screenWidth * 0.03,
                   vertical: screenHeight * 0.028,
                 ),
-                height: screenHeight * 0.27,
                 decoration: BoxDecoration(
                   color: PortColor.white,
                   borderRadius: BorderRadius.circular(10),
@@ -307,6 +308,54 @@ class _ReviewBookingState extends State<ReviewBooking> {
                       ],
                     ),
                     SizedBox(height: screenHeight * 0.012),
+
+                    // Discount Row - Show only if discount is available
+                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                      Row(
+                        children: [
+                          TextConst(
+                            title: "Discount 🎉🎉",
+                            color: PortColor.black.withOpacity(0.8),
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 12,
+                          ),
+                          const Spacer(),
+                          TextConst(
+                            title: "-₹${applyCouponVm.discount ?? "0"}",
+                            color: Colors.green,
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 12,
+                          ),
+                        ],
+                      ),
+
+                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                      SizedBox(height: screenHeight * 0.012),
+
+                    // Calculate fare after discount
+                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                      Row(
+                        children: [
+                          TextConst(
+                            title: "Fare After Discount",
+                            color: PortColor.black.withOpacity(0.8),
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 12,
+                          ),
+                          const Spacer(),
+                          TextConst(
+                            title: "₹${(double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())).toStringAsFixed(0)}",
+                            color: PortColor.black,
+                            fontFamily: AppFonts.poppinsReg,
+                            size: 12,
+                          ),
+                        ],
+                      ),
+
+                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                      SizedBox(height: screenHeight * 0.012),
+
+                    // GST Calculation on discounted amount
                     Row(
                       children: [
                         TextConst(
@@ -317,8 +366,9 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ),
                         const Spacer(),
                         TextConst(
-                          title:
-                              "₹${(double.parse(widget.price) * 0.18).toStringAsFixed(0)}",
+                          title: applyCouponVm.discount != null && applyCouponVm.discount != "0"
+                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18).toStringAsFixed(0)}"
+                              : "₹${(double.parse(widget.price) * 0.18).toStringAsFixed(0)}",
                           color: Colors.green,
                           fontFamily: AppFonts.poppinsReg,
                           size: 12,
@@ -329,6 +379,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                     SizedBox(height: screenHeight * 0.01),
                     const Divider(),
                     SizedBox(height: screenHeight * 0.01),
+
+                    // Net Fare Calculation
                     Row(
                       children: [
                         TextConst(
@@ -339,17 +391,21 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ),
                         const Spacer(),
                         TextConst(
-                          title:
-                              "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
+                          title: applyCouponVm.discount != null && applyCouponVm.discount != "0"
+                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount .toString())) * 0.18)).toStringAsFixed(0)}"
+                              : "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
                           color: PortColor.black,
                           fontFamily: AppFonts.poppinsReg,
                           size: 12,
                         ),
                       ],
                     ),
+
                     SizedBox(height: screenHeight * 0.01),
                     const Divider(),
                     SizedBox(height: screenHeight * 0.005),
+
+                    // Amount Payable
                     Row(
                       children: [
                         TextConst(
@@ -366,8 +422,9 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ),
                         const Spacer(),
                         TextConst(
-                          title:
-                              "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
+                          title: applyCouponVm.discount != null && applyCouponVm.discount != "0"
+                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount .toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
+                              : "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
                           color: PortColor.black,
                           fontFamily: AppFonts.poppinsReg,
                           size: 12,
@@ -406,11 +463,11 @@ class _ReviewBookingState extends State<ReviewBooking> {
                 if (result != null) {
                   setState(() {
                     selectedGoodsName =
-                        result["goods_name"]; // UI me name show hoga
+                        result["goods_name"];
                     selectedGoodsType = {
                       "id": result["id"].toString(),
                       "goods_name": result["goods_name"],
-                    }; // API ke liye map
+                    };
                   });
                 }
               },
@@ -602,7 +659,9 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   const Spacer(),
                   TextConst(
                     title:
-                        "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
+                    applyCouponVm.discount != null && applyCouponVm.discount != "0"
+                        ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount .toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
+                        : "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
                     color: PortColor.black,
                   ),
                 ],
@@ -611,7 +670,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
               InkWell(
                 onTap: () {
                   if (selectedGoodsType == null) {
-                    Utils.showErrorMessage(context, "Please select Goods Type");
+                    Utils.showErrorMessage(context, "Please Select Good Type");
                   } else if (PaymentMethod.isEmpty) {
                     Utils.showErrorMessage(context, "Please select PayMode");
                   } else {

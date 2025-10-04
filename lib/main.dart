@@ -12,6 +12,7 @@ import 'package:port_karo/view_model/add_address_view_model.dart';
 import 'package:port_karo/view_model/add_wallet_view_model.dart';
 import 'package:port_karo/view_model/address_delete_view_model.dart';
 import 'package:port_karo/view_model/address_show_view_model.dart';
+import 'package:port_karo/view_model/apply_coupon_view_model.dart';
 import 'package:port_karo/view_model/coupon_list_view_model.dart';
 import 'package:port_karo/view_model/goods_type_view_model.dart';
 import 'package:port_karo/view_model/help_and_support_view_model.dart';
@@ -24,6 +25,7 @@ import 'package:port_karo/view_model/port_banner_view_model.dart';
 import 'package:port_karo/view_model/profile_update_view_model.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
 import 'package:port_karo/view_model/register_view_model.dart';
+import 'package:port_karo/view_model/requirement_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
 import 'package:port_karo/view_model/service_type_view_model.dart';
 import 'package:port_karo/view_model/user_history_view_model.dart';
@@ -114,6 +116,8 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> PackerMoverViewModel()),
           ChangeNotifierProvider(create: (context)=> CouponListViewModel()),
           ChangeNotifierProvider(create: (context)=> PolicyViewModel()),
+          ChangeNotifierProvider(create: (context)=> ApplyCouponViewModel()),
+          ChangeNotifierProvider(create: (context)=> RequirementViewModel()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

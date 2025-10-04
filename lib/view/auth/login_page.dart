@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
@@ -222,6 +221,7 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ],
               ),
+              SizedBox(height: bottomPadding,),
 
               if (_isFocused) loginButton(),
             ],
@@ -281,6 +281,7 @@ class _LoginPageState extends State<LoginPage>
             ],
           ),
         ),
+        SizedBox(height: bottomPadding,),
       ],
     );
   }

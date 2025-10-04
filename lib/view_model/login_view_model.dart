@@ -23,6 +23,7 @@ class AuthViewModel with ChangeNotifier {
       "phone": mobile,
       "fcm":fcmToken
     };
+
     _loginRepo.loginApi(data).then((value) {
       if (value['success'] == true) {
         setLoading(false);

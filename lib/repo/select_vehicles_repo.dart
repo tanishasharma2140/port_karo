@@ -7,8 +7,8 @@ import 'package:port_karo/res/api_url.dart';
 class SelectVehicleRepo {
   final BaseApiServices _apiServices = NetworkApiServices();
 
-  Future<SelectVehicleModel> selectVehicleApi(String vehicleId) async {
-    String? url = "${ApiUrl.selectVehiclesUrl}vehicle_id=$vehicleId";
+  Future<SelectVehicleModel> selectVehicleApi(String vehicleId , String range) async {
+    String? url = "${ApiUrl.selectVehiclesUrl}vehicle_id=$vehicleId&range=$range";
     try {
       dynamic response = await _apiServices.getGetApiResponse(url);
       return SelectVehicleModel.fromJson(response);

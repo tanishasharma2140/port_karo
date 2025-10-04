@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:port_karo/generated/assets.dart';
@@ -10,6 +9,7 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/utils/utils.dart';
 import 'package:port_karo/view/auth/login_page.dart';
 import 'package:port_karo/view_model/register_view_model.dart';
+import 'package:port_karo/view_model/requirement_view_model.dart';
 import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -28,48 +28,21 @@ class _RegisterPageState extends State<RegisterPage>
   dynamic selectedRadioValue;
   String? selectedBusinessUsage; // For dropdown value
 
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
-  final List<Map<String, String>> businessUsageOptions = [
-    {
-      "title": "Personal Needs",
-      "description": "Items like tiffins, furniture, documents etc",
-      "id": "1",
-    },
-    {
-      "title": "Business Needs",
-      "description": "Goods like plywood, marbles, electronics etc",
-      "id": "2",
-    },
-    {
-      "title": "Packers & Movers",
-      "description": "End to End house shifting Solution",
-      "id": "3",
-    },
-  ];
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _animationController =
-  //   AnimationController(vsync: this, duration: const Duration(seconds: 3))
-  //     ..repeat(reverse: true);
-  //
-  //   _animation = Tween<double>(
-  //     begin: -50,
-  //     end: 50,
-  //   ).animate(CurvedAnimation(
-  //     parent: _animationController,
-  //     curve: Curves.easeInOut,
-  //   ));
-  // }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final requirementVm = Provider.of<RequirementViewModel>(context, listen: false);
+      requirementVm.requirementApi();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     Map arguments =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final registerViewModel = Provider.of<RegisterViewModel>(context);
+    final requirementVm = Provider.of<RequirementViewModel>(context);
 
     return Scaffold(
       backgroundColor: PortColor.white,
@@ -222,7 +195,7 @@ class _RegisterPageState extends State<RegisterPage>
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
+                      child:DropdownButton<String>(
                         value: selectedBusinessUsage,
                         isExpanded: true,
                         dropdownColor: Colors.white,
@@ -237,9 +210,9 @@ class _RegisterPageState extends State<RegisterPage>
                             fontFamily: AppFonts.poppinsReg,
                           ),
                         ),
-                        items: businessUsageOptions.map((option) {
+                        items: requirementVm.requirementModel?.data?.map((option) {
                           return DropdownMenuItem<String>(
-                            value: option["id"],
+                            value: option.id.toString(),
                             child: Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: screenWidth * 0.03,
@@ -249,14 +222,14 @@ class _RegisterPageState extends State<RegisterPage>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   TextConst(
-                                    title: option["title"]!,
+                                    title: option.heading ?? "",
                                     color: PortColor.black,
                                     size: 12,
                                     fontWeight: FontWeight.w500,
                                     fontFamily: AppFonts.poppinsReg,
                                   ),
                                   TextConst(
-                                    title: option["description"]!,
+                                    title: option.subheading ?? "",
                                     color: PortColor.gray,
                                     fontFamily: AppFonts.poppinsReg,
                                     size: 10,
@@ -265,12 +238,11 @@ class _RegisterPageState extends State<RegisterPage>
                               ),
                             ),
                           );
-                        }).toList(),
+                        }).toList() ?? [],
                         onChanged: (String? newValue) {
                           setState(() {
                             selectedBusinessUsage = newValue;
-                            selectedRadioValue =
-                                newValue; // Also set radio value for backward compatibility
+                            selectedRadioValue = newValue;
                           });
                         },
                       ),
@@ -313,6 +285,7 @@ class _RegisterPageState extends State<RegisterPage>
               arguments["mobileNumber"],
               selectedBusinessUsage!,
               "111adf",
+              fcmToken.toString(),
               context,
             );
           }

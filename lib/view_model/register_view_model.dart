@@ -14,7 +14,7 @@ class RegisterViewModel with ChangeNotifier {
     notifyListeners();
   }
   Future<void> registerApi(dynamic firstname, dynamic lastname, dynamic email,
-      dynamic mobileNumber, String value,String deviceId, context) async {
+      dynamic mobileNumber, String value,String deviceId,String fcmToken, context) async {
     setLoading(true);
     Map data = {
       "first_name": firstname,
@@ -23,6 +23,7 @@ class RegisterViewModel with ChangeNotifier {
       "type": value,
       "phone": mobileNumber,
       "device_id": deviceId,
+      "fcm": fcmToken,
     };
     print(data);
     _registerRepo.registerApi(data).then((value) async {

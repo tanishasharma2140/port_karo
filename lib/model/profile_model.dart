@@ -27,18 +27,23 @@ class ProfileModel {
 
 class Data {
   int? id;
+  String? deviceId;
   String? firstName;
   String? lastName;
   String? email;
   String? type;
   int? phone;
   int? status;
-  int? wallet;
+  dynamic wallet;
+  String? fcm;
   String? createdAt;
   String? updatedAt;
+  String? gstNumber;
+  String? gstAddress;
 
   Data(
       {this.id,
+        this.deviceId,
         this.firstName,
         this.lastName,
         this.email,
@@ -46,11 +51,15 @@ class Data {
         this.phone,
         this.status,
         this.wallet,
+        this.fcm,
         this.createdAt,
-        this.updatedAt});
+        this.updatedAt,
+        this.gstNumber,
+        this.gstAddress});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    deviceId = json['device_id'];
     firstName = json['first_name'];
     lastName = json['last_name'];
     email = json['email'];
@@ -58,13 +67,17 @@ class Data {
     phone = json['phone'];
     status = json['status'];
     wallet = json['wallet'];
+    fcm = json['fcm'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    gstNumber = json['gst_number'];
+    gstAddress = json['gst_address'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['device_id'] = deviceId;
     data['first_name'] = firstName;
     data['last_name'] = lastName;
     data['email'] = email;
@@ -72,8 +85,11 @@ class Data {
     data['phone'] = phone;
     data['status'] = status;
     data['wallet'] = wallet;
+    data['fcm'] = fcm;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
+    data['gst_number'] = gstNumber;
+    data['gst_address'] = gstAddress;
     return data;
   }
 }
