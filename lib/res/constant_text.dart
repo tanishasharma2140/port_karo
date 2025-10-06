@@ -11,7 +11,7 @@ class TextConst extends StatelessWidget {
   final Color? color;
   final int? maxLines;
   final TextAlign? textAlign;
-  final TextOverflow? overflow; // 👈 Added overflow property
+  final TextOverflow? overflow;
 
   const TextConst({
     super.key,

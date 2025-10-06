@@ -17,11 +17,12 @@ class ReviewBooking extends StatefulWidget {
   final int? index;
   final String price;
   final String distance;
+  final String vehicleBodyDetail;
   const ReviewBooking({
     super.key,
     this.index,
     required this.price,
-    required this.distance,
+    required this.distance, required this.vehicleBodyDetail,
   });
 
   @override
@@ -692,6 +693,11 @@ class _ReviewBookingState extends State<ReviewBooking> {
                       [
                         selectedGoodsType!,
                       ],
+                      orderViewModel.pickupData["order_type"],
+                      orderViewModel.pickupData["pickup_date"],
+                      orderViewModel.pickupData["save_as"],
+                      orderViewModel.dropData["save_as"],
+                      widget.vehicleBodyDetail,
                       context,
                     );
                   }

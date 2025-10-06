@@ -118,7 +118,6 @@ class _OrderPageState extends State<OrderPage> {
   Widget orderListUi() {
     final userHistoryViewModel = Provider.of<UserHistoryViewModel>(context);
     return ListView.builder(
-      physics: const BouncingScrollPhysics(),
       itemCount: userHistoryViewModel.userHistoryModel!.data!.length,
       itemBuilder: (context, index) {
         final history = userHistoryViewModel.userHistoryModel!.data![index];

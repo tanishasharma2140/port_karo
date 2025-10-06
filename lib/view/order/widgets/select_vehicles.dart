@@ -404,7 +404,6 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                             final vehicle = otherVehicles[index];
                             // Check if this vehicle should be selected based on selected_status
                             final shouldBeSelected = vehicle.selectedStatus == 1;
-                            // Use the actual index from main list
                             final mainIndex = selectVehiclesViewModel.selectVehicleModel?.data?.indexOf(vehicle) ?? (recommendedVehicles.length + index);
                             final isSelected = selectedIndex == mainIndex;
 
@@ -468,6 +467,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                 .toInt()
                                 .toString(),
                             distance: distance.toInt().toString(),
+                            vehicleBodyDetail:  selectVehiclesViewModel.selectVehicleModel!.data!.first.bodyDetailId.toString(),
                           ),
                         ),
                       );
@@ -516,7 +516,6 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     // Use the correct property names from your API response
     final vehicleName = vehicle?.vehicleName ?? "";
     final bodyDetails = vehicle?.bodyDetails ?? "";
-    final bodyType = vehicle?.bodyType ?? "";
     final amount = vehicle?.amount ?? 0;
     final vehicleImage = vehicle?.vehicleImage ?? "";
     final selectedStatus = vehicle?.selectedStatus ?? 0;

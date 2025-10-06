@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/view/account/account.dart';
 import 'package:port_karo/view/home/home.dart';
@@ -30,20 +31,63 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     _selectedIndex = widget.initialIndex;
   }
 
+  Future<bool> _onWillPop() async {
+    if (_selectedIndex != 0) {
+      // 🔹 If not on Home, go back to Home
+      setState(() {
+        _selectedIndex = 0;
+      });
+      return false; // Don't exit app
+    } else {
+      // 🔹 Already on Home → show exit dialog
+      return (await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          title: const Text(
+            "Exit App",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: PortColor.blue,
+            ),
+          ),
+          content: const Text(
+            "Are you sure you want to exit this app?",
+            style: TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.black54, fontSize: 14),
+              ),
+            ),
+            TextButton(
+              onPressed: () => SystemNavigator.pop(),
+              child: const Text(
+                "Exit",
+                style: TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ),
+          ],
+        ),
+      )) ??
+          false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        if (_selectedIndex != 0) {
-          setState(() {
-            _selectedIndex = 0;
-          });
-          return false;
-        }
-        return false;
-      },
+      onWillPop: _onWillPop,
       child: SafeArea(
-        top:  false,
+        top: false,
         child: Scaffold(
           backgroundColor: PortColor.bg,
           body: IndexedStack(
@@ -51,7 +95,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
             children: _pages,
           ),
           bottomNavigationBar: Container(
-            height: 65, // Reduced from 80 to 65
+            height: 65,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -95,7 +139,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
               size: 24,
               color: _selectedIndex == index ? PortColor.blackLight : PortColor.gray,
             ),
-            const SizedBox(height: 4), // Reduced spacing
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(

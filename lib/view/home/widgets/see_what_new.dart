@@ -36,10 +36,12 @@ class _SeeWhatNewState extends State<SeeWhatNew> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
-        backgroundColor: PortColor.grey,
+        backgroundColor: PortColor.bg,
         body: Column(
           children: [
+            SizedBox(height: topPadding,),
             Container(
               alignment: Alignment.center,
               height: screenHeight * 0.08,
@@ -75,6 +77,7 @@ class _SeeWhatNewState extends State<SeeWhatNew> {
             ),
             Expanded(
               child: ListView.builder(
+                padding: EdgeInsets.zero,
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
