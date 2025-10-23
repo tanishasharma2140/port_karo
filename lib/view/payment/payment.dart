@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
@@ -101,7 +102,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                     title: "Payment",
                     color: PortColor.black,
                     fontFamily: AppFonts.kanitReg,
-                    size: 14,
+                    size: 17,fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -214,6 +215,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
                               controller: _controller,
                               keyboardType: TextInputType.number,
                               onChanged: (value) => _updateProceedButton(),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
                               decoration: InputDecoration(
                                 hintText: 'Enter Amount',
                                 hintStyle: const TextStyle(

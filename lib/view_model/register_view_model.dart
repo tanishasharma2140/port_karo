@@ -40,9 +40,7 @@ class RegisterViewModel with ChangeNotifier {
       if (kDebugMode) {
         print('error: $error');
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $error')),
-      );
+      Utils.showErrorMessage(context, error.toString());
     });
   }
 }

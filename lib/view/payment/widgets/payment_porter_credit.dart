@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
@@ -266,6 +267,9 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
                       controller: _controller,
                       keyboardType: TextInputType.number,
                       onChanged: (value) => _updateProceedButton(),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                       decoration: InputDecoration(
                         hintText: 'Enter Amount',
                         hintStyle: const TextStyle(color: PortColor.gray),

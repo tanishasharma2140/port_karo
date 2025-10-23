@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:port_karo/generated/assets.dart';
@@ -56,7 +57,8 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
-    if (isLoadingAddress) return;
+    // Only fetch and format address in fullscreen mode
+    if (!isFullscreenMode || isLoadingAddress) return;
 
     setState(() {
       isLoadingAddress = true;
@@ -71,6 +73,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
         setState(() {
+          // Format address only in fullscreen mode
           selectedLocation = _formatAddress(place);
         });
       }
@@ -105,10 +108,6 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
         : "Unknown Location";
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,8 +129,10 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               });
             },
             onCameraIdle: () async {
-              // Fetch address when dragging stops
-              await _getAddressFromLatLng(selectedLatLng);
+              // Fetch address only when in fullscreen mode
+              if (isFullscreenMode) {
+                await _getAddressFromLatLng(selectedLatLng);
+              }
             },
             markers: {
               Marker(
@@ -254,7 +255,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   controller: nameController,
                   height: screenHeight * 0.055,
                   cursorHeight: screenHeight * 0.023,
-                  labelText: "Receiver's Name",
+                  labelText: "Receiver's Name",inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')), // ✅ only alphabets allowed
+                ],
                   suffixIcon: const Icon(
                     Icons.perm_contact_cal_outlined,
                     color: PortColor.blue,
@@ -267,6 +270,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   cursorHeight: screenHeight * 0.023,
                   labelText: "Receiver's Mobile Number",
                   keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // ✅ only numbers allowed
+                  ],
                   maxLength: 10,
                 ),
                 SizedBox(height: screenHeight * 0.02),
@@ -569,11 +575,11 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
   }
 
   Widget buildSaveOption(
-    String label,
-    IconData? icon,
-    String? asset,
-    int index,
-  ) {
+      String label,
+      IconData? icon,
+      String? asset,
+      int index,
+      ) {
     bool isSelected = index == selectedIndex;
 
     return GestureDetector(
@@ -627,7 +633,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
     bool isNameFilled = nameController.text.trim().isNotEmpty;
     bool isMobileValid =
         mobileController.text.length == 10 &&
-        RegExp(r'^[6-9]\d{9}$').hasMatch(mobileController.text);
+            RegExp(r'^[6-9]\d{9}$').hasMatch(mobileController.text);
     bool canProceed = isNameFilled && isMobileValid;
 
     return Container(
@@ -676,8 +682,23 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
             // 🔹 Navigate to next screen
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const SelectVehicles(),
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 400),
+                pageBuilder: (_, __, ___) =>  SelectVehicles(),
+                transitionsBuilder: (_, animation, __, child) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: const Offset(0, 1), // start from bottom
+                    end: Offset.zero,          // end at normal position
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ));
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
               ),
             );
           }
@@ -691,10 +712,10 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               gradient: canProceed
                   ? PortColor.subBtn
                   : const LinearGradient(
-                      colors: [PortColor.grey, PortColor.grey],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                colors: [PortColor.grey, PortColor.grey],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: TextConst(
               fontFamily: AppFonts.kanitReg,

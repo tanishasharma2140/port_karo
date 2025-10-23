@@ -29,43 +29,43 @@ class SelectVehicleModel {
 
 class Data {
   int? vehicleId;
-  String? vehicleName;
-  int? bodyDetailId;
-  String? bodyDetails;
-  String? bodyType;
+  int? vehicleBodyTypesId;
+  int? vehicleBodyDetailsId;
+  String? bodyDetail;
   String? vehicleImage;
-  double? amount;
+  String? measurementsImg;
+  int? amount;
   int? selectedStatus;
 
   Data(
       {this.vehicleId,
-        this.vehicleName,
-        this.bodyDetailId,
-        this.bodyDetails,
-        this.bodyType,
+        this.vehicleBodyTypesId,
+        this.vehicleBodyDetailsId,
+        this.bodyDetail,
         this.vehicleImage,
+        this.measurementsImg,
         this.amount,
         this.selectedStatus});
 
   Data.fromJson(Map<String, dynamic> json) {
     vehicleId = json['vehicle_id'];
-    vehicleName = json['vehicle_name'];
-    bodyDetailId = json['body_detail_id'];
-    bodyDetails = json['body_details'];
-    bodyType = json['body_type'];
+    vehicleBodyTypesId = json['vehicle_body_types_id'];
+    vehicleBodyDetailsId = json['vehicle_body_details_id'];
+    bodyDetail = json['body_detail'];
     vehicleImage = json['vehicle_image'];
-    amount = (json['amount'] as num?)?.toDouble();
+    measurementsImg = json['measurements_img'];
+    amount = json['amount'];
     selectedStatus = json['selected_status'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['vehicle_id'] = vehicleId;
-    data['vehicle_name'] = vehicleName;
-    data['body_detail_id'] = bodyDetailId;
-    data['body_details'] = bodyDetails;
-    data['body_type'] = bodyType;
+    data['vehicle_body_types_id'] = vehicleBodyTypesId;
+    data['vehicle_body_details_id'] = vehicleBodyDetailsId;
+    data['body_detail'] = bodyDetail;
     data['vehicle_image'] = vehicleImage;
+    data['measurements_img'] = measurementsImg;
     data['amount'] = amount;
     data['selected_status'] = selectedStatus;
     return data;

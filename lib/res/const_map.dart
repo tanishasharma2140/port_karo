@@ -9,12 +9,13 @@ class ConstMap extends StatefulWidget {
   final double? height;
   final ValueChanged<String>? onAddressFetched;
   final ValueChanged<LatLng>? onLatLngFetched;
+  final bool backIconAllowed;
 
   const ConstMap({
     super.key,
     this.height,
     this.onAddressFetched,
-    this.onLatLngFetched,
+    this.onLatLngFetched,  this.backIconAllowed = true,
   });
 
   @override
@@ -78,7 +79,7 @@ class _ConstMapState extends State<ConstMap> {
   }
 
   Future<void> _fetchAddress(double latitude, double longitude) async {
-    const String apiKey = 'AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI';
+    const String apiKey = 'AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA';
     final url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
 
@@ -129,6 +130,7 @@ class _ConstMapState extends State<ConstMap> {
                 : {},
           ),
         ),
+        if(widget.backIconAllowed)
         Positioned(
           top: 40.0,
           left: 10.0,

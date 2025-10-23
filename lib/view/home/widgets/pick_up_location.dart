@@ -89,10 +89,10 @@ class _PickUpLocationState extends State<PickUpLocation> {
                               fontFamily: AppFonts.kanitReg,
                               fontSize: 15,
                             ),
-                            suffixIcon: const Icon(
-                              Icons.mic,
-                              color: PortColor.blue,
-                            ),
+                            // suffixIcon: const Icon(
+                            //   Icons.mic,
+                            //   color: PortColor.blue,
+                            // ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(
@@ -116,7 +116,7 @@ class _PickUpLocationState extends State<PickUpLocation> {
             SizedBox(height: screenHeight * 0.02),
             if (searchResults.isNotEmpty)
               Container(
-                height: screenHeight * 0.33,
+                height: screenHeight * 0.3,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
@@ -147,11 +147,26 @@ class _PickUpLocationState extends State<PickUpLocation> {
                         LatLng latLng = await fetchLatLng(placeId);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => SenderAddress(
+                          PageRouteBuilder(
+                            transitionDuration: const Duration(milliseconds: 400),
+                            pageBuilder: (_, __, ___) =>   SenderAddress(
                               selectedLocation: place['description'],
                               selectedLatLng: latLng,
                             ),
+                            transitionsBuilder: (_, animation, __, child) {
+                              final offsetAnimation = Tween<Offset>(
+                                begin: const Offset(0, 1), // start from bottom
+                                end: Offset.zero,          // end at normal position
+                              ).animate(CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutCubic,
+                              ));
+
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
                           ),
                         );
                       },
@@ -232,63 +247,111 @@ class _PickUpLocationState extends State<PickUpLocation> {
             Container(
               height: screenHeight * 0.08,
               color: PortColor.white,
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Icon(
-                    Icons.my_location_outlined,
-                    color: PortColor.blue,
-                    size: 15,
-                  ),
-                  InkWell(
+                  GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => UseCurrentLocation(),
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 400),
+                          pageBuilder: (_, __, ___) => const UseCurrentLocation(),
+                          transitionsBuilder: (_, animation, __, child) {
+                            final offsetAnimation = Tween<Offset>(
+                              begin: const Offset(0, 1), // start from bottom
+                              end: Offset.zero,          // end at normal position
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ));
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
                         ),
                       );
                     },
-                    child: TextConst(
-                      title: " Use current location",
-                      color: PortColor.black,
-                      fontFamily: AppFonts.kanitReg,
-                      size: 12,
+                    child: SizedBox(
+                      height: 45,
+                      width: 160,
+                      child:  Row(
+                        children: [
+                          const Icon(
+                            Icons.my_location_outlined,
+                            color: PortColor.blue,
+                            size: 15,
+                          ),
+                          TextConst(
+                            title: " Use current location",
+                            color: PortColor.black,
+                            fontFamily: AppFonts.kanitReg,
+                            size: 14,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
 
                   // SizedBox(width: screenWidth * 0.04),
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.02,
+                      vertical: screenHeight * 0.01,
                     ),
                     child: VerticalDivider(
                       color: PortColor.gray.withOpacity(0.5),
                       thickness: screenWidth * 0.002,
                     ),
                   ),
-                  const Icon(
-                    Icons.location_on,
-                    color: PortColor.blue,
-                    size: 15,
-                  ),
-                  InkWell(
+                  GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => UseCurrentLocation(),
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 400),
+                          pageBuilder: (_, __, ___) => const UseCurrentLocation(),
+                          transitionsBuilder: (_, animation, __, child) {
+                            final offsetAnimation = Tween<Offset>(
+                              begin: const Offset(0, 1), // start from bottom
+                              end: Offset.zero,          // end at normal position
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ));
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
                         ),
                       );
                     },
-                    child: TextConst(
-                      title: " Locate on the map",
-                      color: PortColor.black,
-                      fontFamily: AppFonts.kanitReg,
-                      size: 12,
+                    child: SizedBox(
+                      height: 45,
+                      width: 160,
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: PortColor.blue,
+                            size: 15,
+                          ),
+                          TextConst(
+                            title: " Locate on the map",
+                            color: PortColor.black,
+                            fontFamily: AppFonts.kanitReg,
+                            size: 14,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
                 ],
               ),
             ),
@@ -302,7 +365,7 @@ class _PickUpLocationState extends State<PickUpLocation> {
     Uri uri =
         Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
           "input": searchCon,
-          "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+          "key": "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA",
           "components": "country:in",
         });
     var response = await http.get(uri);
@@ -323,7 +386,7 @@ class _PickUpLocationState extends State<PickUpLocation> {
   Future<LatLng> fetchLatLng(String placeId) async {
     Uri uri = Uri.https("maps.googleapis.com", 'maps/api/place/details/json', {
       "place_id": placeId,
-      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+      "key": "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA",
     });
 
     var response = await http.get(uri);

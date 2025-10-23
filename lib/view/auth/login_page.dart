@@ -1,3 +1,5 @@
+// lib/view/auth/login_page.dart
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
@@ -9,6 +11,8 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/res/country.dart';
 import 'package:port_karo/res/custom_text_field.dart';
 import 'package:port_karo/utils/utils.dart';
+import 'package:port_karo/view/account/widgets/terms/privacy_policy.dart';
+import 'package:port_karo/view/account/widgets/terms/terms_and_condition.dart';
 import 'package:port_karo/view_model/login_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -32,50 +36,6 @@ class _LoginPageState extends State<LoginPage>
     flagAsset: Assets.assetsIndiaflag,
   );
 
-  // List of supported countries
-  final List<Country> _countries = [
-    Country(
-      name: "India",
-      code: "IND",
-      dialCode: "+91",
-      flagAsset: Assets.assetsIndiaflag,
-    ),
-    Country(
-      name: "United Arab Emirates",
-      code: "UAE",
-      dialCode: "+971",
-      flagAsset: Assets.assetsIndiaflag,
-    ),
-    Country(
-      name: "Bangladesh",
-      code: "BD",
-      dialCode: "+880",
-      flagAsset: Assets.assetsIndiaflag,
-    ),
-    Country(
-      name: "Turkey",
-      code: "TUR",
-      dialCode: "+90",
-      flagAsset: Assets.assetsIndiaflag,
-    ),
-  ];
-
-  void _showCountrySelectionDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => CountrySelectionDialog(
-        countries: _countries,
-        onCountrySelected: (country) {
-          setState(() {
-            _selectedCountry = country;
-          });
-        },
-      ),
-    );
-  }
-
-
-
   @override
   void initState() {
     super.initState();
@@ -86,23 +46,17 @@ class _LoginPageState extends State<LoginPage>
       });
     });
 
-    // _animationController = AnimationController(
-    //   duration: const Duration(seconds: 2),
-    //   vsync: this,
-    // )..repeat(reverse: true);
-    //
-    // _moveAnimation = Tween<double>(begin: -10, end: 10).animate(
-    //   CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-
+    // keep UI updated when text changes so button remains visible if text exists
+    _controller.addListener(() {
+      setState(() {});
+    });
   }
-
 
   @override
   Widget build(BuildContext context) {
     final loginViewModel = Provider.of<AuthViewModel>(context);
     return WillPopScope(
-      onWillPop: () async => false
-      ,
+      onWillPop: () async => false,
       child: Scaffold(
         backgroundColor: Colors.grey[50],
         body: Stack(
@@ -125,10 +79,7 @@ class _LoginPageState extends State<LoginPage>
                 const Image(image: AssetImage(Assets.assetsLoginDriver)),
               ],
             ),
-            if (loginViewModel.loading)
-              const Center(
-                child: ConstLoader(),
-              ),
+            if (loginViewModel.loading) const Center(child: ConstLoader()),
           ],
         ),
         bottomSheet: Container(
@@ -183,13 +134,15 @@ class _LoginPageState extends State<LoginPage>
               Row(
                 children: [
                   GestureDetector(
-                    onTap: _showCountrySelectionDialog,
+                    onTap: () {},
                     child: Container(
                       height: screenHeight * 0.05,
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: Colors.grey, width: screenWidth * 0.002),
+                          color: Colors.grey,
+                          width: screenWidth * 0.002,
+                        ),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Row(
@@ -200,8 +153,14 @@ class _LoginPageState extends State<LoginPage>
                             height: 22,
                           ),
                           const SizedBox(width: 4),
-                          TextConst(title: _selectedCountry.dialCode, color: PortColor.gray),
-                          const Icon(Icons.keyboard_arrow_down, color: PortColor.gray),
+                          TextConst(
+                            title: _selectedCountry.dialCode,
+                            color: PortColor.gray,
+                          ),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: PortColor.gray,
+                          ),
                         ],
                       ),
                     ),
@@ -217,13 +176,21 @@ class _LoginPageState extends State<LoginPage>
                       maxLength: 10,
                       cursorHeight: screenHeight * 0.025,
                       focusNode: _focusNode,
+                      // ensure Done button is handled
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) {
+                        // hide keyboard but keep login button if number exists
+                        FocusScope.of(context).unfocus();
+                        setState(() {});
+                      },
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: bottomPadding,),
+              SizedBox(height: bottomPadding),
 
-              if (_isFocused) loginButton(),
+              // show login button when field is focused OR when there's text in the field
+              if (_isFocused || _controller.text.isNotEmpty) loginButton(),
             ],
           ),
         ),
@@ -242,46 +209,112 @@ class _LoginPageState extends State<LoginPage>
           onTap: () {
             if (_controller.text.length == 10 &&
                 RegExp(r'^\d{10}$').hasMatch(_controller.text)) {
-              final loginViewModel =
-              Provider.of<AuthViewModel>(context, listen: false);
-              loginViewModel.loginApi(_controller.text,fcmToken.toString(), context);
+              final loginViewModel = Provider.of<AuthViewModel>(
+                context,
+                listen: false,
+              );
+              loginViewModel.loginApi(
+                _controller.text,
+                fcmToken.toString(),
+                context,
+              );
             } else {
               Utils.showErrorMessage(
-                  context, "please enter a valid 10 digit number");
+                context,
+                "please enter a valid 10 digit number",
+              );
             }
           },
         ),
         SizedBox(height: screenHeight * 0.02),
         RichText(
           textAlign: TextAlign.center,
-          text: const TextSpan(
+          text: TextSpan(
             text: "By clicking on login you agree to the ",
-            style: TextStyle(color: PortColor.gray, fontSize: 12,fontFamily: AppFonts.poppinsReg),
+            style: const TextStyle(
+              color: PortColor.gray,
+              fontSize: 12,
+              fontFamily: AppFonts.poppinsReg,
+            ),
             children: [
               TextSpan(
-                text: "terms of service",
-                style: TextStyle(
+                text: "Terms of Service",
+                style: const TextStyle(
                   color: PortColor.gold,
                   fontWeight: FontWeight.bold,
-                  fontSize: 12, fontFamily: AppFonts.poppinsReg
+                  fontSize: 12,
+                  fontFamily: AppFonts.poppinsReg,
                 ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 400),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const TermsAndCondition(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(0.0, 1.0);
+                              const end = Offset.zero;
+                              final tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: Curves.easeInOut));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                      ),
+                    );
+                  },
               ),
-              TextSpan(
+              const TextSpan(
                 text: " and ",
-                style: TextStyle(color: PortColor.gray, fontSize: 12,fontFamily: AppFonts.poppinsReg),
+                style: TextStyle(
+                  color: PortColor.gray,
+                  fontSize: 12,
+                  fontFamily: AppFonts.poppinsReg,
+                ),
               ),
               TextSpan(
-                text: "privacy policy",
-                style: TextStyle(
+                text: "Privacy Policy",
+                style: const TextStyle(
                   color: PortColor.gold,
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,fontFamily: AppFonts.poppinsReg
+                  fontSize: 12,
+                  fontFamily: AppFonts.poppinsReg,
                 ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 400),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const PrivacyPolicy(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(0.0, 1.0);
+                              const end = Offset.zero;
+                              final tween = Tween(
+                                begin: begin,
+                                end: end,
+                              ).chain(CurveTween(curve: Curves.easeInOut));
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                      ),
+                    );
+                  },
               ),
             ],
           ),
         ),
-        SizedBox(height: bottomPadding,),
+        SizedBox(height: bottomPadding),
       ],
     );
   }

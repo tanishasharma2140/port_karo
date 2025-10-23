@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:port_karo/generated/assets.dart';
@@ -134,7 +135,12 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
             SizedBox(height: screenHeight * 0.02),
             Expanded(
               child: addressShowViewModel.loading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                child: CupertinoActivityIndicator(
+                  radius: 14, // you can adjust the size (default = 10)
+                  color: PortColor.black, // optional (works on newer Flutter versions)
+                ),
+              )
                   : addressShowViewModel.addressShowModel?.data?.isNotEmpty == true
                       ? ListView.builder(
                           padding: EdgeInsets.symmetric(
@@ -240,28 +246,29 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                       fontFamily: AppFonts.poppinsReg,
                                       size: 12,
                                     ),
-
                                     SizedBox(height: screenHeight * 0.01),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        Container(
-                                          height: screenHeight * 0.046,
-                                          width: screenWidth * 0.35,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(color : PortColor.gold,width: 0.5),
-                                            color:
-                                                PortColor.blue.withOpacity(0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Center(
-                                              child: TextConst(
-                                                  title: 'Edit',
-                                                  color: PortColor.gold,
-                                                  fontFamily: AppFonts.kanitReg,
-                                                fontWeight: FontWeight.w600,
-                                              )),
-                                        ),
+                                        /// edit button
+                                        // Container(
+                                        //   height: screenHeight * 0.046,
+                                        //   width: screenWidth * 0.35,
+                                        //   decoration: BoxDecoration(
+                                        //     border: Border.all(color : PortColor.gold,width: 0.5),
+                                        //     color:
+                                        //         PortColor.blue.withOpacity(0.1),
+                                        //     borderRadius:
+                                        //         BorderRadius.circular(8),
+                                        //   ),
+                                        //   child: Center(
+                                        //       child: TextConst(
+                                        //           title: 'Edit',
+                                        //           color: PortColor.gold,
+                                        //           fontFamily: AppFonts.kanitReg,
+                                        //         fontWeight: FontWeight.w600,
+                                        //       )),
+                                        // ),
                                         SizedBox(width: screenWidth * 0.1),
                                         GestureDetector(
                                           onTap: () {
@@ -279,7 +286,7 @@ class _SaveAddressDetailState extends State<SaveAddressDetail> {
                                             );
                                           },
                                           child: Container(
-                                            height: screenHeight * 0.046,
+                                            height: screenHeight * 0.03,
                                             width: screenWidth * 0.35,
                                             decoration: BoxDecoration(
                                               border: Border.all(color : PortColor.gold,width: 0.5),

@@ -57,7 +57,6 @@ class AccountDetail extends StatelessWidget {
             child: Column(
               children: [
                 buttonLayoutUi(
-                  page: const CoinsPage(),
                   context,
                   color: PortColor.rapidPurple,
                   Icons.star_border_purple500_outlined,

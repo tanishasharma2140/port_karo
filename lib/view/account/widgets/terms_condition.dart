@@ -63,39 +63,50 @@ class _TermsConditionState extends State<TermsCondition> {
             ),
             SizedBox(height: screenHeight*0.036,),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth*0.04,vertical: screenHeight*0.02),
-              height: screenHeight*0.13,
+              padding: EdgeInsets.symmetric(horizontal: screenWidth*0.04),
+              // height: screenHeight*0.13,
               width: screenWidth,
               color: PortColor.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>TermsAndCondition()));
-                          },
-                          child: Container(child: TextConst(title: "Terms and Condition",color: PortColor.black))),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios_rounded,size: screenHeight*0.015,),
-                    ],
+                  GestureDetector(
+                    onTap: (){
+                      print("podpewdj");
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>TermsAndCondition()));
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                      height: 50,
+                      child: Row(
+                        children: [
+                              TextConst(title: "Terms and Condition",color: PortColor.black),
+                          Spacer(),
+                          Icon(Icons.arrow_forward_ios_rounded,size: screenHeight*0.015,),
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(height: screenHeight*0.007,),
+                  SizedBox(height: screenHeight*0.001,),
                   Divider(thickness: screenWidth*0.002,color: PortColor.grey,),
-                  SizedBox(height: screenHeight*0.007,),
+                  SizedBox(height: screenHeight*0.005,),
 
-                  Row(
-                    children: [
-                      GestureDetector(
-                          onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PrivacyPolicy()));
-                          },
-                          child: Container(child: TextConst(title: "Privacy and policy",color: PortColor.black))),
-                      Spacer(),
-                      Icon(Icons.arrow_forward_ios_rounded,size: screenHeight*0.015,),
-                    ],
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> PrivacyPolicy()));
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                      height: 50,
+                      child: Row(
+                        children: [
+                    TextConst(title: "Privacy and policy",color: PortColor.black),
+                          Spacer(),
+                          Icon(Icons.arrow_forward_ios_rounded,size: screenHeight*0.015,),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

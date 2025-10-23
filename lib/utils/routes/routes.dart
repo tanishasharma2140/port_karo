@@ -6,4 +6,5 @@ class RoutesName{
   static const register = "/register";
   static const goodsType = "/goodsType";
   static const ratingFeedback = "/ratingFeedback";
+  static const driverSearching = "/driverSearching";
 }

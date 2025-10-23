@@ -116,24 +116,72 @@ class _CategoryGridState extends State<CategoryGrid> {
     if (index == 0 || index == 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const DeliverByTruck(),
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const DeliverByTruck(),
+          transitionsBuilder: (_, animation, __, child) {
+            final offsetAnimation = Tween<Offset>(
+              begin: const Offset(0, 1), // start from bottom
+              end: Offset.zero,          // end at normal position
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ));
+
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
         ),
       );
+
     } else if (index == 2) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const DeliverByPackerMover(),
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const DeliverByPackerMover(),
+          transitionsBuilder: (_, animation, __, child) {
+            final offsetAnimation = Tween<Offset>(
+              begin: const Offset(0, 1), // start from bottom
+              end: Offset.zero,          // end at normal position
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ));
+
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
         ),
       );
+
     } else if (index == 3) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const DeliverAllIndiaParcel(),
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const DeliverAllIndiaParcel(),
+          transitionsBuilder: (_, animation, __, child) {
+            final offsetAnimation = Tween<Offset>(
+              begin: const Offset(0, 1), // start from bottom
+              end: Offset.zero,          // end at normal position
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ));
+
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
         ),
       );
+
     }
   }
 
@@ -224,15 +272,19 @@ class _CategoryGridState extends State<CategoryGrid> {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.006),
+                        vertical: screenHeight * 0.006,
+                      ),
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: Image.network(
                           services.images ?? "",
-                          height: 75,
+                          height: 100,
+                          width: 130,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ),

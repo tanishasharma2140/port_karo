@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:port_karo/repo/order_repo.dart';
 import 'package:port_karo/utils/utils.dart';
-import 'package:port_karo/view/order/order_successfully.dart';
+import 'package:port_karo/view/driver_searching_screen.dart';
 import 'package:port_karo/view_model/user_view_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,61 +15,66 @@ class OrderViewModel with ChangeNotifier {
 
   int? _locationType;
   int? get locationType => _locationType;
+
+  dynamic _pickupData;
+  dynamic _dropData;
+  dynamic get pickupData => _pickupData;
+  dynamic get dropData => _dropData;
+
+  List<Map<String, dynamic>>? selectedGoodsType;
+
+  Map<String, dynamic>? _currentOrderData;
+  Map<String, dynamic>? get currentOrderData => _currentOrderData;
+
   setLocationType(int value) {
     _locationType = value;
     notifyListeners();
   }
 
-  dynamic _pickupData;
-  dynamic _dropData;
-
-  dynamic get pickupData => _pickupData;
-  dynamic get dropData => _dropData;
-  List<Map<String, dynamic>>? selectedGoodsType;
-
   setLocationData(dynamic data) {
-    print("ddddd $data");
     if (_locationType == 0) {
-      print("pickup");
       _pickupData = data;
     } else {
-      print("drop");
-
       _dropData = data;
     }
     notifyListeners();
   }
 
+  void setCurrentOrderData(Map<String, dynamic> data) {
+    _currentOrderData = data;
+    notifyListeners();
+  }
+
   Future<void> orderApi(
-    dynamic vehicle,
-    dynamic pickupAddress,
-    dynamic dropAddress,
-    dynamic dropLatitude,
-    dynamic dropLongitude,
-    dynamic pickupLatitude,
-    dynamic pickupLongitude,
-    dynamic senderName,
-    dynamic senderPhone,
-    dynamic receiverName,
-    dynamic receiverPhone,
-    dynamic amount,
-    dynamic distance,
-    dynamic payMode,
+      dynamic vehicle,
+      dynamic pickupAddress,
+      dynamic dropAddress,
+      dynamic dropLatitude,
+      dynamic dropLongitude,
+      dynamic pickupLatitude,
+      dynamic pickupLongitude,
+      dynamic senderName,
+      dynamic senderPhone,
+      dynamic receiverName,
+      dynamic receiverPhone,
+      dynamic amount,
+      dynamic distance,
+      dynamic payMode,
       List<Map<String, dynamic>>? goodType,
       dynamic orderType,
       dynamic orderTime,
       dynamic pickUpSaveAs,
       dynamic dropSaveAs,
       dynamic vehicleBodyDetailType,
-
-  context,
-  ) async {
-    print("gjvkhjyu $payMode");
+      dynamic vehicleBodyType,
+      BuildContext context,
+      ) async {
     UserViewModel userViewModel = UserViewModel();
-    String? UserId = await userViewModel.getUser();
+    String? userId = await userViewModel.getUser();
     setLoading(true);
-    Map data = {
-      "userid": UserId,
+
+    Map<String, dynamic> data = {
+      "userid": userId,
       "vehicle_type": vehicle,
       "pickup_address": pickupAddress.toString(),
       "drop_address": dropAddress.toString(),
@@ -88,33 +94,51 @@ class OrderViewModel with ChangeNotifier {
       "order_time": orderTime,
       "pickup_save_as": pickUpSaveAs,
       "drop_save_as": dropSaveAs,
-      "vehicle_body_details_type": vehicleBodyDetailType
+      "vehicle_body_details_type": vehicleBodyDetailType,
+      "vehicle_body_type": vehicleBodyDetailType
     };
-    // print("order${jsonEncode(data)}");
-    print("order Data:${data}");
+
+    setCurrentOrderData(data);
+
     try {
       final response = await _orderRepo.orderApi(data);
       setLoading(false);
 
       if (response["status"] == 200) {
-        if (payMode == "1") {
-          Utils.showSuccessMessage(context, "Order successfully placed!");
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => const OrderSuccessfully()));
-        } else {
-          await launchURL(response["paymentlink"]).then((_) {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => const OrderSuccessfully()));
-          });
-        }
+
+
+        final documentId = response["documentId"] ?? response["id"] ?? "";
+
+        print("📄 Order Document ID: $documentId");
+
+        final updatedOrderData = {
+          ...?_currentOrderData,
+          "document_id": documentId,
+        };
+
+        await FirebaseFirestore.instance
+            .collection('order')
+            .doc(documentId.toString())
+            .update({
+          'accepted_driver_id': null,
+          'ride_started': false,
+        });
+
+        Utils.showSuccessMessage(context, response['message']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DriverSearchingScreen(
+              orderData: updatedOrderData,
+            ),
+          ),
+        );
       } else {
-        print("something went wrong");
+        Utils.showErrorMessage(context, response["message"]);
       }
     } catch (error) {
       setLoading(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $error')),
-      );
+      Utils.showErrorMessage(context, 'An error occurred: $error');
       if (kDebugMode) {
         print('Error: $error');
       }

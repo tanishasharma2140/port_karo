@@ -38,6 +38,8 @@ dependencies:
   dotted_border: ^2.0.0
   flutter_widget_from_html:
   connectivity_plus:
+  flutter_cashfree_pg_sdk:
+  location:
 dev_dependencies:
   flutter_test:
     sdk: flutter

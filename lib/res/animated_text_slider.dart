@@ -13,7 +13,7 @@ class AnimatedTextSlider extends StatefulWidget {
 class _AnimatedTextSliderState extends State<AnimatedTextSlider> {
   final PageController _controller = PageController();
   final List<String> _texts = [
-    "Introducing Porter Enterprise",
+    "Introducing Yoyomiles Enterprise",
     "Safety ki shart Lagi!",
     "Introducing Loading unloading",
   ];

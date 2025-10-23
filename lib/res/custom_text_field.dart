@@ -1,3 +1,4 @@
+// dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:port_karo/main.dart';
@@ -13,7 +14,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? hintText;
   final TextStyle? hintStyle;
-  final TextStyle? textStyle; // ✅ New parameter
+  final TextStyle? textStyle;
   final Color? fillColor;
   final TextInputType? keyboardType;
   final FocusNode? focusNode;
@@ -21,6 +22,12 @@ class CustomTextField extends StatelessWidget {
   final int? maxLength;
   final Color? focusedBorder;
   final ValueChanged<String>? onChanged;
+
+  /// ✅ Added parameter for custom input formatters
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// ✅ Added parameter for submit callback
+  final ValueChanged<String>? onSubmitted;
 
   const CustomTextField({
     super.key,
@@ -33,7 +40,7 @@ class CustomTextField extends StatelessWidget {
     this.textInputAction,
     this.hintText,
     this.hintStyle,
-    this.textStyle, // ✅
+    this.textStyle,
     this.fillColor,
     this.keyboardType,
     this.focusNode,
@@ -41,6 +48,8 @@ class CustomTextField extends StatelessWidget {
     this.maxLength,
     this.focusedBorder = PortColor.gray,
     this.onChanged,
+    this.inputFormatters, // ✅ new parameter
+    this.onSubmitted, // ✅ new parameter
   });
 
   @override
@@ -55,6 +64,7 @@ class CustomTextField extends StatelessWidget {
         focusNode: focusNode,
         controller: controller,
         onChanged: onChanged,
+        onSubmitted: onSubmitted,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 15),
           fillColor: fillColor ?? PortColor.white,
@@ -65,8 +75,8 @@ class CustomTextField extends StatelessWidget {
             fontSize: 12,
           ),
           hintText: hintText,
-          hintStyle: hintStyle ??
-              TextStyle(color: PortColor.black.withOpacity(0.3)),
+          hintStyle:
+          hintStyle ?? TextStyle(color: PortColor.black.withOpacity(0.3)),
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
           border: OutlineInputBorder(
@@ -91,9 +101,11 @@ class CustomTextField extends StatelessWidget {
         cursorHeight: cursorHeight,
         textInputAction: textInputAction,
         keyboardType: keyboardType,
+
+        /// ✅ Combined input formatters
         inputFormatters: [
-          if (maxLength != null)
-            LengthLimitingTextInputFormatter(maxLength),
+          if (maxLength != null) LengthLimitingTextInputFormatter(maxLength),
+          if (inputFormatters != null) ...inputFormatters!,
         ],
       ),
     );

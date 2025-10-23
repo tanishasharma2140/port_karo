@@ -75,7 +75,7 @@ class _AddGstDetailState extends State<AddGstDetail> {
                           context,
                         );
                       },
-                      child: TextConst(title: "Saved", color: PortColor.black),
+                      child: TextConst(title: "Save", color: PortColor.black),
                     ),
                   ],
                 ),
@@ -214,41 +214,61 @@ class _AddGstDetailState extends State<AddGstDetail> {
                       SizedBox(height: screenHeight * 0.04),
                       TextConst(
                         title: "GST Details",
+                        fontWeight: FontWeight.w600,
+                        size: 16,
                         color: PortColor.black.withOpacity(0.7),
                       ),
                       SizedBox(height: screenHeight * 0.01),
-                      Row(
-                        children: [
-                          TextConst(
-                            title: _availability,
-                            color: PortColor.black,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.grey.shade300, // light border
+                            width: 1,
                           ),
-                          const Spacer(),
-                          PopupMenuButton<String>(
-                            color: PortColor.white,
-                            icon: const Icon(
-                              Icons.arrow_drop_down_outlined,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            TextConst(
+                              title: _availability,
                               color: PortColor.black,
                             ),
-                            onSelected: (String value) {
-                              setState(() {
-                                _availability = value;
-                              });
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<String>>[
-                                  const PopupMenuItem<String>(
-                                    value: 'Available',
-                                    child: Text('Available'),
-                                  ),
-                                  const PopupMenuItem<String>(
-                                    value: 'Not available',
-                                    child: Text('Not available'),
-                                  ),
-                                ],
-                          ),
-                        ],
+                            const Spacer(),
+                            PopupMenuButton<String>(
+                              color: PortColor.white,
+                              icon: const Icon(
+                                Icons.arrow_drop_down_outlined,
+                                color: PortColor.black,
+                              ),
+                              onSelected: (String value) {
+                                setState(() {
+                                  _availability = value;
+                                });
+                              },
+                              itemBuilder: (BuildContext context) => const [
+                                PopupMenuItem<String>(
+                                  value: 'Available',
+                                  child: Text('Available'),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'Not available',
+                                  child: Text('Not available'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
+
                       if (_availability == "Available") ...[
                         TextField(
                           controller: gstINController,

@@ -159,6 +159,7 @@ class _RegisterPageState extends State<RegisterPage>
               TextFormField(
                 cursorColor: PortColor.portKaro,
                 controller: emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   hintText: "Email Id",
                   hintStyle: TextStyle(
@@ -173,7 +174,19 @@ class _RegisterPageState extends State<RegisterPage>
                     borderSide: BorderSide(color: PortColor.gray),
                   ),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter email';
+                  }
+                  // Simple email regex
+                  final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                  if (!emailRegex.hasMatch(value)) {
+                    return 'Enter a valid email';
+                  }
+                  return null;
+                },
               ),
+
               SizedBox(height: screenHeight * 0.035),
 
               // 🔹 Business Usage Dropdown - Added this section
@@ -262,7 +275,9 @@ class _RegisterPageState extends State<RegisterPage>
                 ),
               ),
               SizedBox(height: screenHeight * 0.03),
-        AppBtn(title: "Register", onTap: (){
+        AppBtn(title: "Register",
+            loading: registerViewModel.loading,
+            onTap: (){
           if (nameController.text.isEmpty) {
             Utils.showErrorMessage(context, "Please enter First Name");
           } else if (lastnameController.text.isEmpty) {
@@ -290,55 +305,56 @@ class _RegisterPageState extends State<RegisterPage>
             );
           }
         }),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: isSelected,
-                      onChanged: (value) {
-                        setState(() {
-                          isSelected = value!;
-                        });
-                      },
-                      activeColor: PortColor.gold,
-                    ),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Allow Porter to send updates on ",
-                              style: TextStyle(
-                                color: PortColor.black,
-                                fontSize: 12,
-                                fontFamily: AppFonts.kanitReg,
-                              ),
-                            ),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: Image.asset(
-                                Assets.assetsWhatsappIcon,
-                                width: 17,
-                                height: 17,
-                              ),
-                            ),
-                            TextSpan(
-                              text: "WhatsApp ",
-                              style: TextStyle(
-                                color: PortColor.gold,
-                                fontSize: 12,
-                                fontFamily: AppFonts.kanitReg,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Container(
+              //   padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+              //   child: Row(
+              //     children: [
+              //       Checkbox(
+              //         value: isSelected,
+              //         onChanged: (value) {
+              //           setState(() {
+              //             isSelected = value!;
+              //           });
+              //         },
+              //         activeColor: PortColor.gold,
+              //       ),
+              //       Expanded(
+              //         child: RichText(
+              //           text: TextSpan(
+              //             children: [
+              //               TextSpan(
+              //                 text: "Allow Porter to send updates on ",
+              //                 style: TextStyle(
+              //                   color: PortColor.black,
+              //                   fontSize: 12,
+              //                   fontFamily: AppFonts.kanitReg,
+              //                 ),
+              //               ),
+              //               WidgetSpan(
+              //                 alignment: PlaceholderAlignment.middle,
+              //                 child: Image.asset(
+              //                   Assets.assetsWhatsappIcon,
+              //                   width: 17,
+              //                   height: 17,
+              //                 ),
+              //               ),
+              //               TextSpan(
+              //                 text: "WhatsApp ",
+              //                 style: TextStyle(
+              //                   color: PortColor.gold,
+              //                   fontSize: 12,
+              //                   fontFamily: AppFonts.kanitReg,
+              //                   fontWeight: FontWeight.w600,
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              SizedBox(height: 30,),
 
               // 🔹 OTP Message
               TextConst(

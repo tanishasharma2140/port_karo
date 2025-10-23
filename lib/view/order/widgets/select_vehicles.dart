@@ -5,6 +5,7 @@ import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
+import 'package:port_karo/view/bottom_nav_bar.dart';
 import 'package:port_karo/view/order/widgets/review_booking.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
@@ -26,42 +27,73 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context, listen: false);
-      final selectVehiclesViewModel = Provider.of<SelectVehiclesViewModel>(context, listen: false);
-      final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
+      final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(
+        context,
+        listen: false,
+      );
+      final selectVehiclesViewModel = Provider.of<SelectVehiclesViewModel>(
+        context,
+        listen: false,
+      );
+      final orderViewModel = Provider.of<OrderViewModel>(
+        context,
+        listen: false,
+      );
 
-      double pickupLat = double.tryParse(orderViewModel.pickupData["latitude"].toString()) ?? 0.0;
-      double pickupLon = double.tryParse(orderViewModel.pickupData["longitude"].toString()) ?? 0.0;
-      double dropLat = double.tryParse(orderViewModel.dropData["latitude"].toString()) ?? 0.0;
-      double dropLon = double.tryParse(orderViewModel.dropData["longitude"].toString()) ?? 0.0;
+      double pickupLat =
+          double.tryParse(orderViewModel.pickupData["latitude"].toString()) ??
+              0.0;
+      double pickupLon =
+          double.tryParse(orderViewModel.pickupData["longitude"].toString()) ??
+              0.0;
+      double dropLat =
+          double.tryParse(orderViewModel.dropData["latitude"].toString()) ??
+              0.0;
+      double dropLon =
+          double.tryParse(orderViewModel.dropData["longitude"].toString()) ??
+              0.0;
 
-      double distance = calculateDistance(pickupLat, pickupLon, dropLat, dropLon);
+      double distance = calculateDistance(
+        pickupLat,
+        pickupLon,
+        dropLat,
+        dropLon,
+      );
 
       debugPrint("distance $distance");
 
-      selectVehiclesViewModel.selectVehiclesApi(
+      selectVehiclesViewModel.selectVehicleApi(
         serviceTypeViewModel.selectedVehicleId!,
         distance.toString(),
-      ).then((_) {
-        // API call complete hone के बाद selected vehicle को set करें
-        _setDefaultSelectedVehicle(selectVehiclesViewModel);
-      });
+        orderViewModel.pickupData['latitude'],
+        orderViewModel.pickupData['longitude'],
+        context,
+      );
+
+      // selectVehiclesViewModel.selectVehiclesApi(
+      //   serviceTypeViewModel.selectedVehicleId!,
+      //   distance.toString(),
+      // ).then((_) {
+      //   _setDefaultSelectedVehicle(selectVehiclesViewModel);
+      // });
     });
   }
 
-  // Method to set default selected vehicle based on selected_status
-  void _setDefaultSelectedVehicle(SelectVehiclesViewModel viewModel) {
-    if (viewModel.selectVehicleModel?.data != null) {
-      for (int i = 0; i < viewModel.selectVehicleModel!.data!.length; i++) {
-        if (viewModel.selectVehicleModel!.data![i].selectedStatus == 1) {
-          setState(() {
-            selectedIndex = i;
-          });
-          break;
-        }
-      }
+  String getVehicleName(int vehicleId) {
+    switch (vehicleId) {
+      case 1:
+        return "Tata Ace";
+      case 2:
+        return "3 Wheeler";
+      case 3:
+        return "2 Wheeler";
+      default:
+        return "Vehicle $vehicleId";
     }
   }
+
+  // Method to set default selected vehicle based on selected_status
+
 
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     const double earthRadius = 6371.0;
@@ -84,20 +116,22 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     return degree * pi / 180;
   }
 
-  // Helper method to get recommended vehicles
-  List<dynamic> getRecommendedVehicles(SelectVehiclesViewModel viewModel) {
-    return viewModel.selectVehicleModel?.data?.where((vehicle) => vehicle.selectedStatus == 1).toList() ?? [];
-  }
+
 
   // Helper method to get other vehicles
   List<dynamic> getOtherVehicles(SelectVehiclesViewModel viewModel) {
-    return viewModel.selectVehicleModel?.data?.where((vehicle) => vehicle.selectedStatus != 1).toList() ?? [];
+    return viewModel.selectVehicleModel?.data
+        ?.where((vehicle) => vehicle.selectedStatus != 1)
+        .toList() ??
+        [];
   }
 
   @override
   Widget build(BuildContext context) {
     final orderViewModel = Provider.of<OrderViewModel>(context);
-    final selectVehiclesViewModel = Provider.of<SelectVehiclesViewModel>(context);
+    final selectVehiclesViewModel = Provider.of<SelectVehiclesViewModel>(
+      context,
+    );
 
     double pickupLat = orderViewModel.pickupData["latitude"] ?? 0.0;
     double pickupLon = orderViewModel.pickupData["longitude"] ?? 0.0;
@@ -108,7 +142,6 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     print("distance $distance");
 
     // Get recommended and other vehicles
-    final recommendedVehicles = getRecommendedVehicles(selectVehiclesViewModel);
     final otherVehicles = getOtherVehicles(selectVehiclesViewModel);
 
     return SafeArea(
@@ -141,7 +174,12 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                     },
                   ),
                   SizedBox(width: screenWidth * 0.02),
-                  TextConst(title: "Select Vehicles", color: PortColor.black),
+                  TextConst(
+                    title: "Select Vehicles",
+                    color: PortColor.black,
+                    size: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ],
               ),
             ),
@@ -199,14 +237,16 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                           Row(
                             children: [
                               TextConst(
-                                title: orderViewModel.pickupData["name"] ?? "N/A",
+                                title:
+                                orderViewModel.pickupData["name"] ?? "N/A",
                                 color: PortColor.black,
                                 fontFamily: AppFonts.kanitReg,
                                 size: 12,
                               ),
                               SizedBox(width: screenWidth * 0.02),
                               TextConst(
-                                title: orderViewModel.pickupData["phone"] ?? "N/A",
+                                title:
+                                orderViewModel.pickupData["phone"] ?? "N/A",
                                 color: PortColor.gray,
                                 fontFamily: AppFonts.kanitReg,
                                 size: 12,
@@ -214,7 +254,8 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                             ],
                           ),
                           TextConst(
-                            title: orderViewModel.pickupData["address"] ?? "N/A",
+                            title:
+                            orderViewModel.pickupData["address"] ?? "N/A",
                             color: PortColor.gray,
                             fontFamily: AppFonts.poppinsReg,
                             size: 12,
@@ -230,7 +271,8 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                               ),
                               SizedBox(width: screenWidth * 0.01),
                               TextConst(
-                                title: orderViewModel.dropData["phone"] ?? "N/A",
+                                title:
+                                orderViewModel.dropData["phone"] ?? "N/A",
                                 color: PortColor.gray,
                                 fontFamily: AppFonts.kanitReg,
                                 size: 12,
@@ -243,70 +285,42 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                             fontFamily: AppFonts.poppinsReg,
                             size: 12,
                           ),
-                          SizedBox(height: screenHeight * 0.014),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.03,
-                                  vertical: screenHeight * 0.01,
+                          SizedBox(height: screenHeight * 0.017),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BottomNavigationPage(),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: const BoxDecoration(
-                                        color: PortColor.blue,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      padding: EdgeInsets.all(
-                                        screenHeight * 0.001,
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: PortColor.blackLight,
-                                        size: screenHeight * 0.02,
-                                      ),
-                                    ),
-                                    SizedBox(width: screenWidth * 0.02),
-                                    TextConst(
-                                      title: "ADD STOP",
-                                      color: PortColor.black,
-                                      fontFamily: AppFonts.poppinsReg,
-                                    ),
-                                  ],
-                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 40,
+                              // padding: EdgeInsets.symmetric(
+                              //   horizontal: screenWidth * 0.03,
+                              //   vertical: screenHeight * 0.01,
+                              // ),
+                              decoration: BoxDecoration(
+                                // color: Colors.red,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: screenWidth * 0.03,
-                                  vertical: screenHeight * 0.01,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.edit,
-                                      color: PortColor.blue,
-                                      size: screenHeight * 0.025,
-                                    ),
-                                    SizedBox(width: screenWidth * 0.01),
-                                    TextConst(
-                                      title: "EDIT LOCATION",
-                                      color: PortColor.black,
-                                      fontFamily: AppFonts.poppinsReg,
-                                    ),
-                                  ],
-                                ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.edit,
+                                    color: PortColor.blue,
+                                    size: screenHeight * 0.025,
+                                  ),
+                                  SizedBox(width: screenWidth * 0.01),
+                                  TextConst(
+                                    title: "EDIT LOCATION",
+                                    color: PortColor.black,
+                                    fontFamily: AppFonts.poppinsReg,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
@@ -314,6 +328,11 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                   ],
                 ),
               ),
+            ),
+            TextConst(
+              title: "Choose the vehicle for your delivery",
+              fontWeight: FontWeight.w400,
+              size: 15,
             ),
           ],
         ),
@@ -329,108 +348,75 @@ class _SelectVehiclesState extends State<SelectVehicles> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                height: screenHeight * 0.5,
-                padding: EdgeInsets.symmetric(
-                  vertical: screenHeight * 0.02,
-                ),
-                child: selectVehiclesViewModel.loading
-                    ? const Center(
-                  child: CircularProgressIndicator(color: PortColor.blue),
-                )
-                    : selectVehiclesViewModel.selectVehicleModel?.data?.isNotEmpty == true
-                    ? SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Recommended Section - Only show if there are recommended vehicles
-                      if (recommendedVehicles.isNotEmpty) ...[
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                          child: TextConst(
-                            title: "Recommended",
-                            color: PortColor.black,
-                            fontFamily: AppFonts.kanitReg,
-                            size: 16,
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.01),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: recommendedVehicles.length,
-                          itemBuilder: (context, index) {
-                            final vehicle = recommendedVehicles[index];
-                            // Check if this vehicle should be selected based on selected_status
-                            final shouldBeSelected = vehicle.selectedStatus == 1;
-                            // Use the actual index from main list
-                            final mainIndex = selectVehiclesViewModel.selectVehicleModel?.data?.indexOf(vehicle) ?? index;
-                            final isSelected = selectedIndex == mainIndex;
+            Container(
+            height: screenHeight * 0.5,
+            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+            child: selectVehiclesViewModel.loading
+                ? const Center(
+              child: CircularProgressIndicator(color: PortColor.blue),
+            )
+                : Builder(
+              builder: (context) {
+                final vehicles = selectVehiclesViewModel.selectVehicleModel?.data;
 
-                            return _buildVehicleItem(
-                              vehicle: vehicle,
-                              isSelected: isSelected || shouldBeSelected,
-                              index: mainIndex,
-                              distance: distance,
-                              isRecommended: true,
-                              onTap: () {
-                                setState(() {
-                                  selectedIndex = mainIndex;
-                                });
-                              },
-                            );
-                          },
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                      ],
+                // ✅ Handle null or empty list
+                if (vehicles == null) {
+                  return const Center(
+                    child: Text(
+                      "Something went wrong. Please try again later.",
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontFamily: AppFonts.kanitReg,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
 
-                      // Others Section
-                      if (otherVehicles.isNotEmpty) ...[
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                          child: TextConst(
-                            title: "Others",
-                            color: PortColor.black,
-                            fontFamily: AppFonts.kanitReg,
-                            size: 16,
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.01),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: otherVehicles.length,
-                          itemBuilder: (context, index) {
-                            final vehicle = otherVehicles[index];
-                            // Check if this vehicle should be selected based on selected_status
-                            final shouldBeSelected = vehicle.selectedStatus == 1;
-                            final mainIndex = selectVehiclesViewModel.selectVehicleModel?.data?.indexOf(vehicle) ?? (recommendedVehicles.length + index);
-                            final isSelected = selectedIndex == mainIndex;
+                if (vehicles.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No vehicles available.",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontFamily: AppFonts.kanitReg,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
 
-                            return _buildVehicleItem(
-                              vehicle: vehicle,
-                              isSelected: isSelected || shouldBeSelected,
-                              index: mainIndex,
-                              distance: distance,
-                              isRecommended: false,
-                              onTap: () {
-                                setState(() {
-                                  selectedIndex = mainIndex;
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ],
+                // ✅ Safe ListView rendering
+                return SingleChildScrollView(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: vehicles.length,
+                    itemBuilder: (context, index) {
+                      final vehicle = vehicles[index];
+                      final isSelected = selectedIndex == index;
 
-                      if (recommendedVehicles.isEmpty && otherVehicles.isEmpty)
-                        const Center(child: Text("No vehicles Available")),
-                    ],
+                      // Debug log
+                      print("Vehicle index $index => ${vehicle.vehicleBodyDetailsId}");
+
+                      return _buildVehicleItem(
+                        vehicle: vehicle,
+                        isSelected: isSelected,
+                        index: index,
+                        distance: distance,
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                        },
+                      );
+                    },
                   ),
-                )
-                    : const Center(child: Text("No vehicles Available")),
-              ),
-              Container(
+                );
+              },
+            ),
+          ),
+          Container(
                 height: screenHeight * 0.09,
                 decoration: BoxDecoration(
                   color: PortColor.white,
@@ -450,25 +436,56 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                   child: InkWell(
                     onTap: selectedIndex != null
                         ? () {
+                      final selectedVehicle = selectVehiclesViewModel
+                          .selectVehicleModel!.data![selectedIndex!];
+
+                      final price = ((double.tryParse(
+                          selectedVehicle.amount.toString()) ??
+                          0) *
+                          distance)
+                          .toInt()
+                          .toString();
+
+                      final distanceStr = distance.toInt().toString();
+                      final vehicleBodyDetail =
+                      selectedVehicle.vehicleBodyDetailsId.toString();
+                      final vehicleBodyTypeId = selectedVehicle.vehicleBodyTypesId!;
+                      final vehicleId = selectedVehicle.vehicleId ?? 0;
+
+                      // 🧾 Debug prints
+                      print("======== Vehicle Selection Details ========");
+                      print("Selected Index: $selectedIndex");
+                      print("Vehicle ID: $vehicleId");
+                      print("Vehicle Body Detail ID: $vehicleBodyDetail");
+                      print("Vehicle Body Type ID: $vehicleBodyTypeId");
+                      print("Distance: $distanceStr");
+                      print("Price: $price");
+                      print("==========================================");
+
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => ReviewBooking(
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 400),
+                          pageBuilder: (_, __, ___) => ReviewBooking(
                             index: selectedIndex,
-                            price: ((double.tryParse(
-                                selectVehiclesViewModel
-                                    .selectVehicleModel
-                                    ?.data![selectedIndex!]
-                                    .amount
-                                    .toString() ??
-                                    "0") ??
-                                0) *
-                                distance)
-                                .toInt()
-                                .toString(),
-                            distance: distance.toInt().toString(),
-                            vehicleBodyDetail:  selectVehiclesViewModel.selectVehicleModel!.data!.first.bodyDetailId.toString(),
+                            price: price,
+                            distance: distanceStr,
+                            vehicleBodyDetailId: vehicleBodyDetail,
+                            vehicleBodyTypeId: vehicleBodyTypeId,
                           ),
+                          transitionsBuilder: (_, animation, __, child) {
+                            final offsetAnimation = Tween<Offset>(
+                              begin: const Offset(0, 1),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutCubic,
+                            ));
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
                         ),
                       );
                     }
@@ -482,25 +499,30 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                         gradient: selectedIndex != null
                             ? PortColor.subBtn
                             : LinearGradient(
-                          colors: [PortColor.darkPurple, PortColor.darkPurple],
+                          colors: [
+                            PortColor.darkPurple,
+                            PortColor.darkPurple,
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                       ),
                       child: TextConst(
                         title: selectedIndex != null
-                            ? "Proceed with ${selectVehiclesViewModel.selectVehicleModel?.data![selectedIndex!].vehicleName ?? ""}"
+                            ? "Proceed with ${getVehicleName(selectVehiclesViewModel.selectVehicleModel?.data![selectedIndex!].vehicleId ?? 0)}"
                             : "Select a Vehicle",
                         color: PortColor.black,
                         fontFamily: AppFonts.kanitReg,
                       ),
                     ),
                   ),
+
                 ),
               ),
             ],
           ),
         ),
+
       ),
     );
   }
@@ -510,15 +532,30 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     required bool isSelected,
     required int index,
     required double distance,
-    required bool isRecommended,
     required VoidCallback onTap,
   }) {
-    // Use the correct property names from your API response
-    final vehicleName = vehicle?.vehicleName ?? "";
-    final bodyDetails = vehicle?.bodyDetails ?? "";
-    final amount = vehicle?.amount ?? 0;
-    final vehicleImage = vehicle?.vehicleImage ?? "";
-    final selectedStatus = vehicle?.selectedStatus ?? 0;
+    // CORRECTED: Use vehicleId instead of vehicleid
+    final vehicleId = vehicle.vehicleId ?? 0;
+    final bodyDetails = vehicle.bodyDetail ?? "fewrffewr";
+    final amount = vehicle.amount ?? 0;
+    final vehicleImage = vehicle.vehicleImage ?? "frewvgre";
+    final measurementImage = vehicle.measurementsImg ?? "frewvgre";
+    final selectedStatus = vehicle.selectedStatus ?? 0;
+
+    String getVehicleName(int vehicleId) {
+      switch (vehicleId) {
+        case 1:
+          return "Tata Ace";
+        case 2:
+          return "3 Wheeler";
+        case 3:
+          return "2 Wheeler";
+        default:
+          return "Vehicle $vehicleId";
+      }
+    }
+
+    final vehicleName = getVehicleName(vehicleId);
 
     return GestureDetector(
       onTap: onTap,
@@ -530,94 +567,67 @@ class _SelectVehiclesState extends State<SelectVehicles> {
         ),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? PortColor.blue.withOpacity(0.1) : PortColor.white,
+          color: isSelected ? PortColor.blue.withOpacity(0.08) : PortColor.white,
           borderRadius: BorderRadius.circular(10),
-          border: isSelected ? Border.all(color: PortColor.blue, width: 2) : null,
+          border: isSelected
+              ? Border.all(color: PortColor.blue, width: 2)
+              : Border.all(color: Colors.grey.withOpacity(0.2)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
               blurRadius: 3,
-              offset: const Offset(0, 1),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: isSelected
             ? Column(
           children: [
-            // Image centered at top for selected state
+            // Centered image
             Center(
               child: Image.network(
-                vehicleImage,
-                height: screenHeight * 0.08, // Larger image for selected state
+                measurementImage,
+                height: screenHeight * 0.1,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
                     Assets.assetsBike,
-                    height: screenHeight * 0.08,
+                    height: screenHeight * 0.09,
                   );
                 },
               ),
             ),
-            SizedBox(height: screenHeight * 0.01),
+            SizedBox(height: screenHeight * 0.015),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Vehicle info (left side)
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          TextConst(
-                            title: vehicleName,
-                            color: PortColor.black,
-                            fontFamily: AppFonts.kanitReg,
-                            size: 14,
-                          ),
-                        ],
+                      TextConst(
+                        title: vehicleName,
+                        color: PortColor.black,
+                        fontFamily: AppFonts.kanitReg,
+                        size: 14,
                       ),
-                      SizedBox(height: screenHeight * 0.005),
-                      Row(
-                        children: [
-                          TextConst(
-                            title: bodyDetails,
-                            color: PortColor.gray,
-                            fontFamily: AppFonts.poppinsReg,
-                            size: 11,
-                          ),
-                          SizedBox(width: screenWidth * 0.01),
-                        ],
+                      SizedBox(height: screenHeight * 0.004),
+                      TextConst(
+                        title: bodyDetails,
+                        color: PortColor.gray,
+                        fontFamily: AppFonts.poppinsReg,
+                        size: 12,
                       ),
                     ],
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextConst(
-                      title: "₹${(((double.tryParse(amount.toString()) ?? 0) * distance).toInt())}",
-                      color: PortColor.black,
-                      fontFamily: AppFonts.kanitReg,
-                      size: 16,
-                    ),
-                    if (isRecommended)
-                      Container(
-                        margin: EdgeInsets.only(top: screenHeight * 0.005),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.02,
-                          vertical: screenHeight * 0.003,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: TextConst(
-                          title: "Recommended",
-                          color: Colors.green,
-                          size: 10,
-                        ),
-                      ),
-                  ],
+                // Amount (right side)
+                TextConst(
+                  title:
+                  "₹${(((double.tryParse(amount.toString()) ?? 0) * distance).toInt())}",
+                  color: PortColor.black,
+                  fontFamily: AppFonts.kanitReg,
+                  size: 16,
                 ),
               ],
             ),
@@ -626,95 +636,51 @@ class _SelectVehiclesState extends State<SelectVehicles> {
             : Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image first
             Image.network(
               vehicleImage,
-              height: screenHeight * 0.05,
+              height: screenHeight * 0.09,
               errorBuilder: (context, error, stackTrace) {
                 return Image.asset(
                   Assets.assetsBike,
-                  height: screenHeight * 0.06,
+                  height: screenHeight * 0.09,
                 );
               },
             ),
             const SizedBox(width: 12),
+            // Vehicle ID and body details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      TextConst(
-                        title: vehicleName,
-                        color: PortColor.black,
-                        fontFamily: AppFonts.kanitReg,
-                        size: 14,
-                      ),
-                      if (selectedStatus == 1)
-                        Container(
-                          margin: EdgeInsets.only(left: screenWidth * 0.02),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.02,
-                            vertical: screenHeight * 0.003,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: TextConst(
-                            title: "Auto Selected",
-                            color: Colors.orange,
-                            size: 10,
-                          ),
-                        ),
-                    ],
+                  TextConst(
+                    title: vehicleName, // CORRECTED here too
+                    color: PortColor.black,
+                    fontFamily: AppFonts.kanitReg,
+                    size: 14,
                   ),
-                  SizedBox(height: screenHeight * 0.005),
-                  Row(
-                    children: [
-                      TextConst(
-                        title: bodyDetails,
-                        color: PortColor.gray,
-                        fontFamily: AppFonts.poppinsReg,
-                        size: 11,
-                      ),
-                      SizedBox(width: screenWidth * 0.01),
-                    ],
+                  SizedBox(height: screenHeight * 0.004),
+                  TextConst(
+                    title: bodyDetails,
+                    color: PortColor.gray,
+                    fontFamily: AppFonts.poppinsReg,
+                    size: 12,
                   ),
                 ],
               ),
             ),
-            const Spacer(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                TextConst(
-                  title: "₹${(((double.tryParse(amount.toString()) ?? 0) * distance).toInt())}",
-                  color: PortColor.black,
-                  fontFamily: AppFonts.kanitReg,
-                  size: 16,
-                ),
-                if (isRecommended)
-                  Container(
-                    margin: EdgeInsets.only(top: screenHeight * 0.005),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.02,
-                      vertical: screenHeight * 0.003,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: TextConst(
-                      title: "Recommended",
-                      color: Colors.green,
-                      size: 10,
-                    ),
-                  ),
-              ],
+            // Amount at right
+            TextConst(
+              title:
+              "₹${(((double.tryParse(amount.toString()) ?? 0) * distance).toInt())}",
+              color: PortColor.black,
+              fontFamily: AppFonts.kanitReg,
+              size: 16,
             ),
           ],
         ),
       ),
     );
   }
+
 }

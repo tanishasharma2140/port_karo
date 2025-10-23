@@ -4,6 +4,7 @@ import 'package:port_karo/view/auth/login_page.dart';
 import 'package:port_karo/view/auth/otp_page.dart';
 import 'package:port_karo/view/auth/register_page.dart';
 import 'package:port_karo/view/bottom_nav_bar.dart';
+import 'package:port_karo/view/driver_searching_screen.dart';
 import 'package:port_karo/view/home/rating_feedback_screen.dart';
 import 'package:port_karo/view/order/widgets/goods_type_screen.dart';
 import 'package:port_karo/view/splash_screen.dart';
@@ -24,6 +25,8 @@ class Routers {
             return (context) => const GoodsTypeScreen();
          case RoutesName.ratingFeedback:
             return (context) => const RatingsFeedbackScreen();
+         case RoutesName.driverSearching:
+            return (context) => const DriverSearchingScreen();
          default:
             return (context) => const Scaffold(
                body: Center(

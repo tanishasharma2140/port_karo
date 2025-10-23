@@ -66,7 +66,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
     final profileViewModel = Provider.of<ProfileViewModel>(context, listen: false);
     final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
 
-    const String apiKey = 'AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI';
+    const String apiKey = 'AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA';
     final url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$apiKey';
 
@@ -86,6 +86,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
             "phone": profileViewModel.profileModel?.data?.phone.toString() ?? "",
             "latitude": latitude,
             "longitude": longitude,
+            "order_type": 1,
           };
           print('Location Data: $locationData');
           orderViewModel.setLocationType(0);
@@ -106,6 +107,8 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
   Widget build(BuildContext context) {
     final orderViewModel = Provider.of<OrderViewModel>(context);
     final profileViewModel = Provider.of<ProfileViewModel>(context);
+    // final orderType = orderViewModel.pickupData["order_type"] ?? "N/A";
+    // final orderTime = orderViewModel.pickupData["order_time"] ?? "N/A";
 
     return SafeArea(
       top: false,
@@ -183,10 +186,26 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                                 onTap: () {
                                   orderViewModel.setLocationType(0);
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const PickUpLocation()));
+                                    context,
+                                    PageRouteBuilder(
+                                      transitionDuration: const Duration(milliseconds: 400),
+                                      pageBuilder: (_, __, ___) => const PickUpLocation(),
+                                      transitionsBuilder: (_, animation, __, child) {
+                                        final offsetAnimation = Tween<Offset>(
+                                          begin: const Offset(0, 1), // start from bottom
+                                          end: Offset.zero,          // end at normal position
+                                        ).animate(CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.easeOutCubic,
+                                        ));
+
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                     padding: EdgeInsets.symmetric(
@@ -214,8 +233,9 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                                                     fontFamily: AppFonts.kanitReg,
                                                     size: 12,
                                                   ),
+                                                  SizedBox(width: screenWidth*0.03,),
                                                   TextConst(
-                                                    title: profileViewModel.profileModel!.data!.phone.toString()??"",
+                                                    title: ".${profileViewModel.profileModel!.data!.phone ?? ''}",
                                                     color: PortColor.gray,
                                                     fontFamily: AppFonts.kanitReg,
                                                     size: 12,
@@ -250,6 +270,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                                                         color: PortColor.black,
                                                         fontFamily: AppFonts.kanitReg,
                                                       ),
+                                                      SizedBox(width: screenWidth*0.03,),
                                                       TextConst(
                                                         title: orderViewModel
                                                                     .pickupData[
@@ -329,8 +350,8 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                                     color: PortColor.gray.withOpacity(0.5),
                                     fontSize: 15,
                                   ),
-                                  suffixIcon: const Icon(Icons.mic,
-                                      color: PortColor.blue),
+                                  // suffixIcon: const Icon(Icons.mic,
+                                  //     color: PortColor.blue),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide:
@@ -351,25 +372,25 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                       ],
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.024),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: PortColor.blue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: PortColor.white,
-                          size: screenHeight * 0.02,
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.02),
-                      TextConst(title: "ADD STOP", color: PortColor.black),
-                    ],
-                  ),
+                  SizedBox(height: screenHeight * 0.015),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Container(
+                  //       decoration: const BoxDecoration(
+                  //         color: PortColor.blue,
+                  //         shape: BoxShape.circle,
+                  //       ),
+                  //       child: Icon(
+                  //         Icons.add,
+                  //         color: PortColor.white,
+                  //         size: screenHeight * 0.02,
+                  //       ),
+                  //     ),
+                  //     SizedBox(width: screenWidth * 0.02),
+                  //     TextConst(title: "ADD STOP", color: PortColor.black),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
@@ -406,11 +427,26 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                         LatLng latLng = await fetchLatLng(placeId);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => EnterContactDetail(
+                          PageRouteBuilder(
+                            transitionDuration: const Duration(milliseconds: 400),
+                            pageBuilder: (_, __, ___) =>   EnterContactDetail(
                               selectedLocation: place['description'],
                               selectedLatLng: latLng,
                             ),
+                            transitionsBuilder: (_, animation, __, child) {
+                              final offsetAnimation = Tween<Offset>(
+                                begin: const Offset(0, 1), // start from bottom
+                                end: Offset.zero,          // end at normal position
+                              ).animate(CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOutCubic,
+                              ));
+
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
                           ),
                         );
                       },
@@ -493,28 +529,42 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
 
           ],
         ),
-        bottomSheet: Container(
-          height: screenHeight * 0.08,
-          color: PortColor.white,
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.location_on, color: PortColor.blue),
-              GestureDetector(
-                onTap: (){
+        bottomSheet: GestureDetector(
+          onTap: (){
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 400),
+                pageBuilder: (_, __, ___) =>  UseCurrentLocation(),
+                transitionsBuilder: (_, animation, __, child) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: const Offset(0, 1), // start from bottom
+                    end: Offset.zero,          // end at normal position
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ));
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UseCurrentLocation(),
-                    ),
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
                   );
                 },
-                child: TextConst(
-                    title: " Locate on the map", color: PortColor.black),
               ),
-            ],
+            );
+          },
+          child: Container(
+            height: screenHeight * 0.08,
+            color: PortColor.white,
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.location_on, color: PortColor.blue),
+                TextConst(
+                    title: " Locate on the map", color: PortColor.black),
+              ],
+            ),
           ),
         ),
       ),
@@ -525,7 +575,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
     Uri uri =
         Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
       "input": searchCon,
-      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+      "key": "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA",
       "components": "country:in",
     });
     var response = await http.get(uri);
@@ -545,7 +595,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
   Future<LatLng> fetchLatLng(String placeId) async {
     Uri uri = Uri.https("maps.googleapis.com", 'maps/api/place/details/json', {
       "place_id": placeId,
-      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+      "key": "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA",
     });
 
     var response = await http.get(uri);

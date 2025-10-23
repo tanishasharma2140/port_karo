@@ -63,9 +63,7 @@ class _ConstantAppbarState extends State<ConstantAppbar> {
             title: " ${profileViewModel.profileModel?.data!.email?? ""}",
             color: PortColor.gray,
           ),
-          SizedBox(height: screenHeight*0.001),
-          TextConst(title: "Verify Email ID", color: PortColor.blackList),
-          SizedBox(height: screenHeight*0.02,),
+                SizedBox(height: screenHeight*0.025,),
           InkWell(
             onTap: (){
               Navigator.push(

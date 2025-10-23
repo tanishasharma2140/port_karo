@@ -101,7 +101,7 @@ class _OrderPageState extends State<OrderPage> {
           ),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: TextConst(title: "  Orders", color: PortColor.black,fontFamily: AppFonts.kanitReg, size: 14,),
+            child: TextConst(title: "  Orders", color: PortColor.black,fontFamily: AppFonts.kanitReg, size: 17,fontWeight: FontWeight.w600,),
           ),
         ),
         // Expanded to fill remaining screen
@@ -292,14 +292,11 @@ class _OrderPageState extends State<OrderPage> {
                                     title: "Payment Status: ",
                                     color: PortColor.black,fontFamily: AppFonts.kanitReg,size: 12,),
                                 TextConst(
-                                    title: history.paymentStatus == 0
-                                        ? "Pending"
-                                        : history.paymentStatus == 1
-                                        ? "Success"
-                                        : history.paymentStatus == 2
-                                        ? "Failed"
-                                        : '',
-                                    color: PortColor.gray,fontFamily: AppFonts.poppinsReg,size: 12,),
+                                  title: history.rideStatus == 6 ? "Success" : "Failed",
+                                  color: history.rideStatus == 6 ? Colors.green : Colors.red,
+                                  fontFamily: AppFonts.poppinsReg,
+                                  size: 12,
+                                ),
                               ],
                             ),
                           ),
@@ -333,12 +330,50 @@ class _OrderPageState extends State<OrderPage> {
                     child: Row(
                       children: [
                         SizedBox(width: screenWidth * 0.02),
-                        const Image(image: AssetImage(Assets.assetsRedcross)),
-                        TextConst(title: "Cancelled", color: PortColor.red,fontFamily: AppFonts.kanitReg,),
+                        Row(
+                          children: [
+                            Icon(
+                              history.rideStatus == 6
+                                  ? Icons.check_circle      // ✅ Completed
+                                  : history.rideStatus == 7
+                                  ? Icons.cancel         // ❌ Cancel by User
+                                  : history.rideStatus == 8
+                                  ? Icons.warning     // ⚠️ Cancel by Driver
+                                  : Icons.help,       // ❓ Nothing / Unknown
+                              color: history.rideStatus == 6
+                                  ? Colors.green
+                                  : history.rideStatus == 7
+                                  ? Colors.red
+                                  : history.rideStatus == 8
+                                  ? Colors.orange
+                                  : Colors.grey,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            TextConst(
+                              title: history.rideStatus == 6
+                                  ? "Completed"
+                                  : history.rideStatus == 7
+                                  ? "Cancel by User"
+                                  : history.rideStatus == 8
+                                  ? "Cancel by Driver"
+                                  : "Nothing",
+                              color: history.rideStatus == 6
+                                  ? Colors.green
+                                  : history.rideStatus == 7
+                                  ? Colors.red
+                                  : history.rideStatus == 8
+                                  ? Colors.orange
+                                  : Colors.grey,
+                              fontFamily: AppFonts.kanitReg,
+                            ),
+                          ],
+                        ),
+
                         const Spacer(),
                         GestureDetector(
                           onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>CaptainMatchingScreen()));
+                            // Navigator.push(context, MaterialPageRoute(builder: (context)=>CaptainMatchingScreen()));
                           },
                           child: Container(
                             alignment: Alignment.center,

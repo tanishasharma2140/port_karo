@@ -17,12 +17,13 @@ class ReviewBooking extends StatefulWidget {
   final int? index;
   final String price;
   final String distance;
-  final String vehicleBodyDetail;
+  final String vehicleBodyDetailId;
+  final int vehicleBodyTypeId;
   const ReviewBooking({
     super.key,
     this.index,
     required this.price,
-    required this.distance, required this.vehicleBodyDetail,
+    required this.distance, required this.vehicleBodyDetailId,required this.vehicleBodyTypeId,
   });
 
   @override
@@ -64,8 +65,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                 TextConst(
                   title: "Review Booking",
                   color: PortColor.black,
-                  fontFamily: AppFonts.kanitReg,
-                  size: 15,
+                  size: 16,fontWeight: FontWeight.w600,
                 ),
               ],
             ),
@@ -117,7 +117,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextConst(
-                              title: vehicle.vehicleName.toString(),
+                              title: vehicle.vehicleId.toString(),
                               color: PortColor.black,
                               fontFamily: AppFonts.poppinsReg,
                             ),
@@ -241,7 +241,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   ),
                   const SizedBox(width: 6),
                   TextConst(
-                    title: "Apply Coupon",
+                    title: "Coupon Applied",
                     fontFamily: AppFonts.kanitReg,
                     size: 14,
                     color: PortColor.black,
@@ -294,7 +294,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                           size: 12,
                         ),
                         TextConst(
-                          title: " (incl.Toll)",
+                          title: " (Incl.Toll)",
                           color: PortColor.black.withOpacity(0.5),
                           fontFamily: AppFonts.poppinsReg,
                           size: 12,
@@ -416,7 +416,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                           size: 12,
                         ),
                         TextConst(
-                          title: " (rounded)",
+                          title: " (Rounded)",
                           color: PortColor.black.withOpacity(0.5),
                           fontFamily: AppFonts.poppinsReg,
                           size: 12,
@@ -572,7 +572,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.03,
-                  vertical: screenHeight * 0.02,
+                  // vertical: screenHeight * 0.02,
                 ),
                 decoration: BoxDecoration(
                   color: PortColor.white,
@@ -595,43 +595,49 @@ class _ReviewBookingState extends State<ReviewBooking> {
                           PaymentMethod = "1";
                         });
                       },
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextConst(
-                              title: "Pay Via Cash",
-                              color: PortColor.black,
-                              fontFamily: AppFonts.poppinsReg,
-                              size: 13,
+                      child: Container(
+                        height: 40,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextConst(
+                                title: "Pay Via Cash",
+                                color: PortColor.black,
+                                fontFamily: AppFonts.poppinsReg,
+                                size: 13,
+                              ),
                             ),
-                          ),
-                          if (PaymentMethod == "1")
-                            const Icon(Icons.check_circle, color: Colors.green),
-                        ],
+                            if (PaymentMethod == "1")
+                              const Icon(Icons.check_circle, color: Colors.green),
+                          ],
+                        ),
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.01),
+                    // SizedBox(height: screenHeight * 0.01),
                     const Divider(),
-                    SizedBox(height: screenHeight * 0.01),
+                    // SizedBox(height: screenHeight * 0.01),
                     GestureDetector(
                       onTap: () {
                         setState(() {
                           PaymentMethod = "2";
                         });
                       },
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextConst(
-                              title: "Pay Via PG",
-                              color: PortColor.black,
-                              fontFamily: AppFonts.poppinsReg,
-                              size: 13,
+                      child: Container(
+                        height: 40,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextConst(
+                                title: "Pay Via PG",
+                                color: PortColor.black,
+                                fontFamily: AppFonts.poppinsReg,
+                                size: 13,
+                              ),
                             ),
-                          ),
-                          if (PaymentMethod == "2")
-                            const Icon(Icons.check_circle, color: Colors.green),
-                        ],
+                            if (PaymentMethod == "2")
+                              const Icon(Icons.check_circle, color: Colors.green),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -697,7 +703,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                       orderViewModel.pickupData["pickup_date"],
                       orderViewModel.pickupData["save_as"],
                       orderViewModel.dropData["save_as"],
-                      widget.vehicleBodyDetail,
+                      widget.vehicleBodyDetailId,
+                      widget.vehicleBodyTypeId,
                       context,
                     );
                   }
@@ -713,7 +720,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   ),
                   child: !orderViewModel.loading
                       ? TextConst(
-                          title: "Book ${vehicle.vehicleName.toString()}",
+                          title: "Book ${vehicle.vehicleId.toString()}",
                           color: PortColor.black,
                           fontFamily: AppFonts.kanitReg,
                         )
@@ -804,7 +811,7 @@ class GoodsTypeCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onChange,
                   child: TextConst(
-                    title: "Change",
+                    title: "Select",
                     color: PortColor.blue,
                     fontFamily: AppFonts.poppinsReg,
                     size: 14,

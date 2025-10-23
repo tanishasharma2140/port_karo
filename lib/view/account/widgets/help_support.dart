@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
+import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/res/launcher.dart';
@@ -92,89 +93,95 @@ class _HelpSupportState extends State<HelpSupport> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                  child: Container(
-                    width: screenWidth * 0.88,
-                    decoration: BoxDecoration(
-                      color: PortColor.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          contentPadding: const EdgeInsets.symmetric(),
-                          leading: Image.asset(Assets.assetsBiketruck),
-                          title: TextConst(
-                            title: 'Trucks and 2 Wheelers',
-                            color: PortColor.black,
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(),
+                        leading: SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: Image.asset(
+                            Assets.assetsBiketruck,
+                            fit: BoxFit.contain,
                           ),
-                          trailing: GestureDetector(
-                            onTap: () =>
-                                Launcher.launchDialPad(context, '9876543210'),
-                            child: Container(
-                              padding: const EdgeInsets.all(6.0),
-                              decoration: const BoxDecoration(
-                                color: PortColor.grey,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.call_outlined,
-                                color: PortColor.gold,
-                                size: screenHeight * 0.025,
-                              ),
+                        ),
+                        title: TextConst(
+                          title: 'Trucks and 2 Wheelers',
+                          color: PortColor.black,
+                        ),
+                        trailing: GestureDetector(
+                          onTap: () =>
+                              Launcher.launchDialPad(context, '9876543210'),
+                          child: Container(
+                            padding: const EdgeInsets.all(6.0),
+                            decoration: const BoxDecoration(
+                              color: PortColor.gold,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.call_outlined,
+                              color: PortColor.blackLight,
+                              size: screenHeight * 0.025,
                             ),
                           ),
                         ),
-                        ListTile(
-                          contentPadding: const EdgeInsets.symmetric(),
-                          leading: Image.asset(Assets.assetsDeliveryman),
-                          title: TextConst(
-                            title: 'Packers and Movers',
-                            color: PortColor.black,
-                          ),
-                          trailing: GestureDetector(
-                            onTap: () =>
-                                Launcher.launchDialPad(context, '1234567890'),
-                            child: Container(
-                              padding: const EdgeInsets.all(6.0),
-                              decoration: const BoxDecoration(
-                                color: PortColor.grey,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.call_outlined,
-                                color: PortColor.gold,
-                                size: screenHeight * 0.025,
-                              ),
+                      ),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(),
+                        leading: SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: Image.asset(Assets.assetsDeliveryman)),
+                        title: TextConst(
+                          title: 'Packers and Movers',
+                          color: PortColor.black,
+                        ),
+                        trailing: GestureDetector(
+                          onTap: () =>
+                              Launcher.launchDialPad(context, '1234567890'),
+                          child: Container(
+                            padding: const EdgeInsets.all(6.0),
+                            decoration: const BoxDecoration(
+                              color: PortColor.gold,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.call_outlined,
+                              color: PortColor.blackLight,
+                              size: screenHeight * 0.025,
                             ),
                           ),
                         ),
-                        ListTile(
-                          contentPadding: const EdgeInsets.symmetric(),
-                          leading: Image.asset(Assets.assetsMap),
-                          title: TextConst(
-                            title: 'All India Parcel',
-                            color: PortColor.black,
-                          ),
-                          trailing: GestureDetector(
-                            onTap: () =>
-                                Launcher.launchDialPad(context, '1122334455'),
-                            child: Container(
-                              padding: const EdgeInsets.all(6.0),
-                              decoration: const BoxDecoration(
-                                color: PortColor.grey,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.call_outlined,
-                                color: PortColor.gold,
-                                size: screenHeight * 0.025,
-                              ),
+                      ),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(),
+                        leading: SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: Image.asset(Assets.assetsMap)),
+                        title: TextConst(
+                          title: 'All India Parcel',
+                          color: PortColor.black,
+                        ),
+                        trailing: GestureDetector(
+                          onTap: () =>
+                              Launcher.launchDialPad(context, '1122334455'),
+                          child: Container(
+                            padding: const EdgeInsets.all(6.0),
+                            decoration: const BoxDecoration(
+                              color: PortColor.gold,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.call_outlined,
+                              color: PortColor.blackLight,
+                              size: screenHeight * 0.025,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -194,10 +201,36 @@ class _HelpSupportState extends State<HelpSupport> {
                 ),
                 child: Row(
                   children: [
-                    TextConst(
-                      title: "Any Other question?\nCall or Mail us !",
-                      color: PortColor.black,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Any Other question?\n",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: PortColor.black,
+                                  fontFamily: AppFonts.kanitReg,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "Call or Mail us!",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontFamily: AppFonts.kanitReg,
+                                  color: PortColor.black,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
+
                     const Spacer(),
                     GestureDetector(
                       onTap: () => Launcher.launchEmail(
@@ -205,12 +238,12 @@ class _HelpSupportState extends State<HelpSupport> {
                       child: Container(
                         padding: const EdgeInsets.all(6.0),
                         decoration: const BoxDecoration(
-                          color: PortColor.grey,
+                          color: PortColor.gold,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.mail_outline,
-                          color: PortColor.gold,
+                          color: PortColor.blackLight,
                           size: screenHeight * 0.025,
                         ),
                       ),
@@ -222,12 +255,12 @@ class _HelpSupportState extends State<HelpSupport> {
                       child: Container(
                         padding: const EdgeInsets.all(6.0),
                         decoration: const BoxDecoration(
-                          color: PortColor.grey,
+                          color: PortColor.gold,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.call_outlined,
-                          color: PortColor.gold,
+                          color: PortColor.blackLight,
                           size: screenHeight * 0.025,
                         ),
                       ),

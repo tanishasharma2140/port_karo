@@ -8,11 +8,13 @@ import 'package:port_karo/res/app_constant.dart';
 import 'package:port_karo/res/notification_service.dart';
 import 'package:port_karo/utils/routes/routes.dart';
 import 'package:port_karo/utils/routes/routes_name.dart';
+import 'package:port_karo/view_model/active_ride_view_model.dart';
 import 'package:port_karo/view_model/add_address_view_model.dart';
 import 'package:port_karo/view_model/add_wallet_view_model.dart';
 import 'package:port_karo/view_model/address_delete_view_model.dart';
 import 'package:port_karo/view_model/address_show_view_model.dart';
 import 'package:port_karo/view_model/apply_coupon_view_model.dart';
+import 'package:port_karo/view_model/call_back_view_model.dart';
 import 'package:port_karo/view_model/coupon_list_view_model.dart';
 import 'package:port_karo/view_model/goods_type_view_model.dart';
 import 'package:port_karo/view_model/help_and_support_view_model.dart';
@@ -20,6 +22,7 @@ import 'package:port_karo/view_model/login_view_model.dart';
 import 'package:port_karo/view_model/on_boarding_view_model.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
 import 'package:port_karo/view_model/packer_mover_view_model.dart';
+import 'package:port_karo/view_model/payment_view_model.dart';
 import 'package:port_karo/view_model/policy_view_model.dart';
 import 'package:port_karo/view_model/port_banner_view_model.dart';
 import 'package:port_karo/view_model/profile_update_view_model.dart';
@@ -28,6 +31,7 @@ import 'package:port_karo/view_model/register_view_model.dart';
 import 'package:port_karo/view_model/requirement_view_model.dart';
 import 'package:port_karo/view_model/select_vehicles_view_model.dart';
 import 'package:port_karo/view_model/service_type_view_model.dart';
+import 'package:port_karo/view_model/update_ride_status_view_model.dart';
 import 'package:port_karo/view_model/user_history_view_model.dart';
 import 'package:port_karo/view_model/wallet_history_view_model.dart';
 import 'package:provider/provider.dart';
@@ -118,6 +122,10 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> PolicyViewModel()),
           ChangeNotifierProvider(create: (context)=> ApplyCouponViewModel()),
           ChangeNotifierProvider(create: (context)=> RequirementViewModel()),
+          ChangeNotifierProvider(create: (context)=> ActiveRideViewModel()),
+          ChangeNotifierProvider(create: (context)=> UpdateRideStatusViewModel()),
+          ChangeNotifierProvider(create: (context)=> PaymentViewModel()),
+          ChangeNotifierProvider(create: (context)=> CallBackViewModel()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

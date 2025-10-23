@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
@@ -197,7 +198,7 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                   cursorHeight: screenHeight * 0.023,
                   labelText: "Pincode(optional)",
                   keyboardType: TextInputType.number,
-                  maxLength: 10,
+                  maxLength: 6,
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 CustomTextField(
@@ -205,7 +206,9 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                   height: screenHeight * 0.05,
                   cursorHeight: screenHeight * 0.023,
                   labelText: "Name",
-                  suffixIcon: const Icon(
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')), // ✅ only alphabets + space
+                  ],                  suffixIcon: const Icon(
                     Icons.perm_contact_cal_outlined,
                     color: PortColor.gold,
                   ),
@@ -217,6 +220,9 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                   cursorHeight: screenHeight * 0.023,
                   labelText: "Contact Number",
                   keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly, // ✅ only numbers allowed
+                  ],
                   maxLength: 10,
                 ),
                 SizedBox(height: screenHeight * 0.02),
@@ -224,6 +230,15 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                   onTap: () {
                     setState(() {
                       isContactDetailsSelected = !isContactDetailsSelected;
+
+                      if (isContactDetailsSelected) {
+                        // ✅ Fill text field with user's phone number
+                        contactController.text =
+                            profileViewModel.profileModel?.data?.phone?.toString() ?? '';
+                      } else {
+                        // ✅ Optionally clear it if unchecked
+                        contactController.clear();
+                      }
                     });
                   },
                   child: Row(
@@ -243,26 +258,23 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                         ),
                         child: isContactDetailsSelected
                             ? Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: screenHeight * 0.02,
-                              )
+                          Icons.check,
+                          color: Colors.white,
+                          size: screenHeight * 0.02,
+                        )
                             : null,
                       ),
                       SizedBox(width: screenWidth * 0.028),
                       Row(
                         children: [
                           TextConst(
-                            title: "Use My Mobile Number:",
+                            title: "Use My Mobile Number: ",
                             color: PortColor.black,
                             fontFamily: AppFonts.poppinsReg,
                             size: 13,
                           ),
                           TextConst(
-                            title:
-                                profileViewModel.profileModel!.data!.phone
-                                    .toString() ??
-                                "",
+                            title: profileViewModel.profileModel?.data?.phone?.toString() ?? "",
                             color: PortColor.black,
                           ),
                         ],
@@ -270,6 +282,7 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
                     ],
                   ),
                 ),
+
                 SizedBox(height: screenHeight * 0.03),
                 TextConst(title: "Save as (optional):", color: PortColor.gray),
                 SizedBox(height: screenHeight * 0.02),
@@ -388,20 +401,25 @@ class _SavePickUpAddressDetailState extends State<SavePickUpAddressDetail> {
           ],
         ),
         const Spacer(),
-        Container(
-          height: screenHeight * 0.038,
-          width: screenWidth * 0.14,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: PortColor.gray),
-          ),
-          child: Center(
-            child: TextConst(
-              title: "Change",
-              color: PortColor.gold,
-              fontFamily: AppFonts.poppinsReg,
-              fontWeight: FontWeight.w600,
-              size: 12,
+        GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+          },
+          child: Container(
+            height: screenHeight * 0.038,
+            width: screenWidth * 0.14,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: PortColor.gray),
+            ),
+            child: Center(
+              child: TextConst(
+                title: "Change",
+                color: PortColor.gold,
+                fontFamily: AppFonts.poppinsReg,
+                fontWeight: FontWeight.w600,
+                size: 11,
+              ),
             ),
           ),
         ),

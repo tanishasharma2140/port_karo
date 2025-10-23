@@ -44,7 +44,7 @@ class Launcher {
   static shareApk(String urlData, context) async {
     if (urlData.isNotEmpty) {
       await Share.share(
-        "Hi, I recommend Courier for mini trucks requirement. It's convenient & cost effective. Download app ${Uri.parse(urlData)} & get up to Rs 50 cashback on first ride.",
+        "Hi, I recommend Yoyomiles for mini trucks requirement. It's convenient & cost effective. Download app ${Uri.parse(urlData)} & get up to Rs 50 cashback on first ride.",
       );
     } else {
       if (kDebugMode) {

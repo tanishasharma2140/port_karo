@@ -8,7 +8,7 @@ import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/home/widgets/pickup/all_india_enter_pickup_detail.dart';
 
 /// Replace with your Google Maps API Key
-const String googleApiKey = "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI";
+const String googleApiKey = "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA";
 
 class AllIndiaPickUp extends StatefulWidget {
   const AllIndiaPickUp({super.key});

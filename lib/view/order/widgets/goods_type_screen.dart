@@ -41,7 +41,7 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
           title: "Select your goods type",
           size: 16,
           color: PortColor.black,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
       ),
       body: Column(

@@ -87,7 +87,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                               fontFamily: AppFonts.kanitReg,
                               fontSize: 15,
                             ),
-                            suffixIcon: const Icon(Icons.mic, color: PortColor.gold),
+                            // suffixIcon: const Icon(Icons.mic, color: PortColor.gold),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(color: PortColor.gray),
@@ -239,7 +239,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const Icon(Icons.my_location_outlined, color: PortColor.gold,size: 15,),
+                  const Icon(Icons.my_location_outlined, color: PortColor.gold,size: 16,),
                   InkWell(
                       onTap: (){
                         Navigator.push(
@@ -249,7 +249,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                           ),
                         );
                       },
-                      child: TextConst(title: " Use current location", color: PortColor.black, fontFamily: AppFonts.poppinsReg,size: 12,),),
+                      child: TextConst(title: " Use current location", color: PortColor.black, fontFamily: AppFonts.poppinsReg,size: 13,),),
                   // SizedBox(width: screenWidth * 0.04),
 
                   Padding(
@@ -260,7 +260,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                     ),
                   ),
 
-                  const Icon(Icons.location_on, color: PortColor.gold,size: 15,),
+                  const Icon(Icons.location_on, color: PortColor.gold,size: 16,),
                   InkWell(
                       onTap: (){
 
@@ -271,7 +271,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
                           ),
                         );
                       },
-                      child: TextConst(title: " Locate on the map", color: PortColor.black, fontFamily: AppFonts.poppinsReg,size: 10,)),
+                      child: TextConst(title: " Locate on the map", color: PortColor.black, fontFamily: AppFonts.poppinsReg,size: 13,)),
                 ],
               ),
             )
@@ -281,7 +281,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
   Future<void> placeSearchApi(String searchCon) async {
     Uri uri = Uri.https("maps.googleapis.com", 'maps/api/place/autocomplete/json', {
       "input": searchCon,
-      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+      "key": "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA",
       "components": "country:in",
     });
     var response = await http.get(uri);
@@ -301,7 +301,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
   Future<LatLng> fetchLatLng(String placeId) async {
     Uri uri = Uri.https("maps.googleapis.com", 'maps/api/place/details/json', {
       "place_id": placeId,
-      "key": "AIzaSyCOqfJTgg1Blp1GIeh7o8W8PC1w5dDyhWI",
+      "key": "AIzaSyANhzkw-SjvdzDvyPsUBDFmvEHfI9b8QqA",
     });
 
     var response = await http.get(uri);
