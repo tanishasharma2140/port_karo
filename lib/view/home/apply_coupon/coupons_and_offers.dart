@@ -169,7 +169,7 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
             child: Consumer<CouponListViewModel>(
               builder: (context, couponList, _) {
                 if (couponList.loading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: PortColor.gold,));
                 }
 
                 if (couponList.couponListModel == null ||

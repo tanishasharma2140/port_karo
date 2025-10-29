@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/res/app_fonts.dart';
-import 'package:port_karo/res/const_map.dart';
+import 'package:port_karo/res/const_with_polyline_map.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/bottom_nav_bar.dart' show BottomNavigationPage;
@@ -26,7 +26,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
 
   // 🔥 FLAGS FOR DIALOGS
   bool _showRideCompletedDialog = false;
-  bool _showRideCancelledDialog = false; // NEW: Cancelled dialog flag
+  bool _showRideCancelledDialog = false;
 
   @override
   void didChangeDependencies() {
@@ -40,6 +40,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     super.initState();
     print("🟢 Received orderData: ${widget.orderData}");
   }
+
   int? _selectedIndex;
   final TextEditingController _commentController = TextEditingController();
   final List<String> _reasons = [
@@ -53,6 +54,39 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     "Driver asking for extra money",
     "Driver not moving"
   ];
+
+  // ✅ SAFE CONVERSION METHODS ADD KAREIN
+  double? _safeToDouble(dynamic value) {
+    if (value == null) return null;
+
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      try {
+        return double.tryParse(value);
+      } catch (e) {
+        print("❌ Error converting string to double: $value");
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int? _safeToInt(dynamic value) {
+    if (value == null) return null;
+
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) {
+      try {
+        return int.tryParse(value);
+      } catch (e) {
+        print("❌ Error converting string to int: $value");
+        return null;
+      }
+    }
+    return null;
+  }
 
   void _showCancelBottomSheet() {
     final updateRideStatusVm = Provider.of<UpdateRideStatusViewModel>(context, listen: false);
@@ -419,6 +453,40 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     }
   }
 
+  // ✅ NEW METHOD: Real-time data ke saath map build karein
+  Widget _buildMapContainerWithData(Map<String, dynamic>? orderData) {
+    return SizedBox(
+      height: screenHeight * 0.4,
+      child: ConstWithPolylineMap(
+        data: orderData != null
+            ? [
+          {
+            'id': orderData['document_id'] ?? 'unknown',
+            'pickup_address': orderData['pickup_address'],
+            'pickup_latitute': orderData['pickup_latitute'],
+            'pick_longitude': orderData['pick_longitude'],
+            'drop_address': orderData['drop_address'],
+            'drop_latitute': orderData['drop_latitute'],
+            'drop_logitute': orderData['drop_logitute'],
+            'ride_status': _safeToInt(orderData['ride_status']) ?? 0, // ✅ SAFE CONVERSION
+          }
+        ]
+            : null,
+        rideStatus: _safeToInt(orderData?['ride_status']) ?? 0, // ✅ SAFE CONVERSION
+        backIconAllowed: false,
+        onAddressFetched: (address) {
+          if (_currentAddress != address) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              setState(() {
+                _currentAddress = address;
+              });
+            });
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final orderId = widget.orderData?['document_id']?.toString();
@@ -461,16 +529,28 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
           final orderData =
               orderSnapshot.data!.data() as Map<String, dynamic>? ?? {};
 
-          final rideStatus = orderData['ride_status'];
-          final rideStarted = orderData['ride_started'];
+          // ✅ SAFE CONVERSIONS FOR ALL NUMERIC FIELDS
+          final rideStatus = _safeToInt(orderData['ride_status']) ?? 0;
           final driverId = orderData['accepted_driver_id'];
-          final payMode = orderData['paymode'] ?? 1; // 1 = Cash, 2 = Online
-          final amount =
-              double.tryParse(orderData['amount']?.toString() ?? '0') ?? 0;
-          final distance =
-              double.tryParse(orderData['distance']?.toString() ?? '0') ?? 0;
-          final firebaseOrderId = widget.orderData?['document_id'];
-          print("${orderData['document_id']}");
+          final payMode = _safeToInt(orderData['paymode']) ?? 1;
+          final amount = _safeToDouble(orderData['amount']) ?? 0.0;
+          final distance = _safeToDouble(orderData['distance']) ?? 0.0;
+          final firebaseOrderId = orderId;
+
+          // ✅ REAL-TIME ORDER DATA UPDATE WITH SAFE CONVERSIONS
+          final updatedOrderData = {
+            ...widget.orderData ?? {},
+            'document_id': orderId,
+            'ride_status': rideStatus, // ✅ Already converted to int
+            'pickup_latitute': orderData['pickup_latitute'],
+            'pick_longitude': orderData['pick_longitude'],
+            'drop_latitute': orderData['drop_latitute'],
+            'drop_logitute': orderData['drop_logitute'],
+            'pickup_address': orderData['pickup_address'],
+            'drop_address': orderData['drop_address'],
+          };
+
+          print("🔄 Updated Order Data - Ride Status: $rideStatus, Type: ${rideStatus.runtimeType}");
 
           // 🔥 CONDITION 1: Online payment - navigate to PaymentSummaryScreen
           if (rideStatus == 5 && payMode == 2) {
@@ -506,7 +586,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
 
           if (driverId == null) {
             // No driver assigned
-            return _buildSearchingSection(orderData);
+            return _buildSearchingSection(updatedOrderData);
           }
 
           // Driver assigned, show driver info + OTP for ride_status 1-5
@@ -519,7 +599,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
               if (driverSnapshot.connectionState == ConnectionState.waiting) {
                 return _buildMainLayout(
                   middleSection: _buildSearchingStatus(),
-                  orderData: orderData,
+                  orderData: updatedOrderData,
                   driverData: null,
                 );
               }
@@ -527,7 +607,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
               if (!driverSnapshot.hasData || !driverSnapshot.data!.exists) {
                 return _buildMainLayout(
                   middleSection: _buildSearchingStatus(),
-                  orderData: orderData,
+                  orderData: updatedOrderData,
                   driverData: null,
                 );
               }
@@ -537,7 +617,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
 
               return _buildMainLayout(
                 middleSection: _buildDriverInfo(driverData),
-                orderData: orderData,
+                orderData: updatedOrderData,
                 driverData: driverData,
               );
             },
@@ -548,14 +628,15 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
   }
 
   // Main Layout
+// Main Layout - ISE UPDATE KAREIN
   Widget _buildMainLayout({
     required Widget middleSection,
     Map<String, dynamic>? orderData,
     Map<String, dynamic>? driverData,
   }) {
     String rideStatusText = "";
-    final rideStatus = orderData?['ride_status'];
-    final payMode = orderData?['paymode'] ?? 1;
+    final rideStatus = _safeToInt(orderData?['ride_status']) ?? 0; // ✅ SAFE CONVERSION
+    final payMode = _safeToInt(orderData?['paymode']) ?? 1; // ✅ SAFE CONVERSION
 
     if (orderData != null) {
       if (rideStatus == 1) {
@@ -572,18 +653,18 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     }
 
     // Check if we should show OTP and Cancel Ride
-    bool showOtpAndCancel = rideStatus != 4 && rideStatus != 8;
+    bool showOtpAndCancel = rideStatus != 4 && rideStatus != 8 && rideStatus != 5 && rideStatus != 6;
 
     return Stack(
       children: [
-        // ⚠️ Map stays fixed in the background
-        _buildMapContainer(),
+        // ⚠️ Map stays fixed in the background - WITH REAL-TIME DATA
+        _buildMapContainerWithData(orderData),
 
         // Draggable bottom sheet
         DraggableScrollableSheet(
-          initialChildSize: 0.6, // initial height as % of screen
-          minChildSize: 0.6, // minimum height
-          maxChildSize: 0.8, // max height (almost full screen)
+          initialChildSize: 0.6,
+          minChildSize: 0.6,
+          maxChildSize: 0.8,
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
@@ -630,7 +711,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
 
                     middleSection,
 
-                    // OTP Section - Only show if ride status is not 5 or 8
+                    // ✅ OTP Section - FIXED CONDITION
                     if (driverData != null &&
                         orderData != null &&
                         showOtpAndCancel &&
@@ -641,14 +722,14 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                     buildAddressCard(),
 
                     // Payment container
-                    buildPaymentContainer(orderData?['paymode'] ?? 1),
+                    buildPaymentContainer(payMode), // ✅ Already converted
 
                     // Cancel Ride Button - Only show if ride status is not 5 or 8
                     if (showOtpAndCancel)
                       GestureDetector(
                         onTap: _showCancelBottomSheet,
                         child: Container(
-                          width: double.infinity, // Full width
+                          width: double.infinity,
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -719,7 +800,11 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
   }
 
   // OTP Section
+// OTP Section mein debugging add karein
   Widget _buildOtpSection(String otp) {
+    // ✅ DEBUGGING: Check OTP value
+    print("🔑 OTP Section Called - OTP Value: $otp");
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(12),
@@ -768,7 +853,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
               border: Border.all(color: PortColor.gold.withOpacity(0.3)),
             ),
             child: Text(
-              otp,
+              otp == "N/A" ? "Waiting..." : otp, // ✅ Better handling for N/A case
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -779,25 +864,6 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // Map Container
-  Widget _buildMapContainer() {
-    return SizedBox(
-      height: screenHeight * 0.4,
-      child: ConstMap(
-        backIconAllowed: false,
-        onAddressFetched: (address) {
-          if (_currentAddress != address) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              setState(() {
-                _currentAddress = address;
-              });
-            });
-          }
-        },
       ),
     );
   }

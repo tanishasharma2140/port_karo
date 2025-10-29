@@ -869,7 +869,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                     ],
                   ),
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ?  Center(child: CircularProgressIndicator(color: PortColor.gold,))
                       : ListView.builder(
                     itemCount: searchResults.length,
                     itemBuilder: (context, index) {
@@ -1376,7 +1376,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(color: PortColor.button),
+                      CircularProgressIndicator(color: PortColor.gold),
                       SizedBox(height: screenHeight * 0.02),
                       Text(
                         'Loading items...',

@@ -287,7 +287,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                                     colors: [
                                       PortColor.grey,
                                       PortColor
-                                          .grey, // same grey rakha jab disabled ho
+                                          .grey,
                                     ],
                                   ),
                             borderRadius: BorderRadius.circular(20),
@@ -302,7 +302,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                                         : PortColor.gray,
                                   )
                                 : const CircularProgressIndicator(
-                                    color: PortColor.white,
+                                    color: PortColor.gold,
                                   ),
                           ),
                         ),

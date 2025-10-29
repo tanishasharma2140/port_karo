@@ -9,6 +9,7 @@ import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/view/home/captain._matching_screen.dart';
+import 'package:port_karo/view_model/driver_rating_view_model.dart';
 import 'package:port_karo/view_model/user_history_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -163,18 +164,29 @@ class _OrderPageState extends State<OrderPage> {
                       TextConst(
                           title: ("₹ ${history.amount?.toString() ?? ""}"),
                           color: PortColor.black),
-                      SizedBox(width: 5,),
-                      IconButton(
-                        icon: Icon(Icons.download, color: PortColor.blue),
-                        onPressed: () {
-                          generatePdf(context, history);
-                        },
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: PortColor.gray,
-                        size: screenHeight * 0.02,
+                      SizedBox(width: 8,),
+                      Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.yellow.shade50,
+                        ),
+                        child: Center(
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(15), // half of height/width
+                            onTap: () {
+                              generatePdf(context, history);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(4), // adjust if needed
+                              child: Icon(Icons.download, color: PortColor.blue, size: 18),
+                            ),
+                          ),
+                        ),
                       )
+
+
                     ],
                   ),
                   Padding(
@@ -372,18 +384,30 @@ class _OrderPageState extends State<OrderPage> {
 
                         const Spacer(),
                         GestureDetector(
-                          onTap: (){
-                            // Navigator.push(context, MaterialPageRoute(builder: (context)=>CaptainMatchingScreen()));
+                          onTap: () {
+                            _showRatingDialog(context,history.driverId.toString());
                           },
                           child: Container(
                             alignment: Alignment.center,
                             height: screenHeight * 0.04,
                             width: screenWidth * 0.42,
                             decoration: BoxDecoration(
-                              color: PortColor.blue,
+                              color: Colors.amber,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: TextConst(title: 'Book Again',color: PortColor.blackLight,fontFamily: AppFonts.kanitReg,),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.star, color: Colors.white, size: 16),
+                                SizedBox(width: 6),
+                                TextConst(
+                                  title: 'Rate Ride',
+                                  color: Colors.white,
+                                  fontFamily: AppFonts.kanitReg,
+                                  size: 14,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -397,6 +421,150 @@ class _OrderPageState extends State<OrderPage> {
       },
     );
   }
+
+  void _showRatingDialog(BuildContext context, String driverId) {
+    final driverRating = Provider.of<DriverRatingViewModel>(context, listen: false);
+
+    double _rating = 0.0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+              backgroundColor: Colors.white,
+              child: Container(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title
+                    Text(
+                      'Rate Your Ride',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    // Stars
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _rating = (index + 1).toDouble();
+                            });
+                          },
+                          child: Icon(
+                            index < _rating ? Icons.star : Icons.star_border,
+                            color: Colors.amber,
+                            size: 40,
+                          ),
+                        );
+                      }),
+                    ),
+
+                    SizedBox(height: 12),
+
+                    // Rating Text
+                    Text(
+                      _rating == 0
+                          ? 'Tap to rate your experience'
+                          : '${_rating.toInt()}.0 Star Rating',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+
+                    SizedBox(height: 24),
+
+                    // Buttons Container
+                    Container(
+                      height: 50,
+                      child: Row(
+                        children: [
+                          // Cancel Button
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.grey[700],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(width: 12),
+
+                          // Submit Button
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: _rating > 0
+                                  ? () {
+                                driverRating.driverRatingApi(context, driverId, _rating.toString());
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Thanks for your rating! ⭐'),
+                                    backgroundColor: Colors.green,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                                  : null,
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: _rating > 0 ? Colors.amber : Colors.amber.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   Widget noOrderFoundUi() {
     return SingleChildScrollView(

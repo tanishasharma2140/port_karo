@@ -60,7 +60,8 @@ class _SelectVehiclesState extends State<SelectVehicles> {
         dropLon,
       );
 
-      debugPrint("distance $distance");
+      debugPrint("sadefdwr4tg $distance");
+
 
       selectVehiclesViewModel.selectVehicleApi(
         serviceTypeViewModel.selectedVehicleId!,
@@ -87,6 +88,8 @@ class _SelectVehiclesState extends State<SelectVehicles> {
         return "3 Wheeler";
       case 3:
         return "2 Wheeler";
+      case 4:
+        return "Taxi";
       default:
         return "Vehicle $vehicleId";
     }
@@ -439,24 +442,25 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                       final selectedVehicle = selectVehiclesViewModel
                           .selectVehicleModel!.data![selectedIndex!];
 
+                      final vehicleName = selectedVehicle.vehicleName ?? "Unknown Vehicle";
+                      final vehicleId = selectedVehicle.vehicleId ?? 0;
+                      final vehicleBodyDetailId =
+                      selectedVehicle.vehicleBodyDetailsId.toString();
+                      final vehicleBodyTypeId =
+                          selectedVehicle.vehicleBodyTypesId?.toString() ?? "0";
+
+                      final distanceStr = distance.toInt().toString();
                       final price = ((double.tryParse(
-                          selectedVehicle.amount.toString()) ??
-                          0) *
+                          selectedVehicle.amount.toString()) ?? 0) *
                           distance)
                           .toInt()
                           .toString();
 
-                      final distanceStr = distance.toInt().toString();
-                      final vehicleBodyDetail =
-                      selectedVehicle.vehicleBodyDetailsId.toString();
-                      final vehicleBodyTypeId = selectedVehicle.vehicleBodyTypesId!;
-                      final vehicleId = selectedVehicle.vehicleId ?? 0;
-
-                      // 🧾 Debug prints
+                      // 🧾 Debug Prints
                       print("======== Vehicle Selection Details ========");
-                      print("Selected Index: $selectedIndex");
+                      print("Vehicle Name: $vehicleName");
                       print("Vehicle ID: $vehicleId");
-                      print("Vehicle Body Detail ID: $vehicleBodyDetail");
+                      print("Vehicle Body Detail ID: $vehicleBodyDetailId");
                       print("Vehicle Body Type ID: $vehicleBodyTypeId");
                       print("Distance: $distanceStr");
                       print("Price: $price");
@@ -467,10 +471,11 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                         PageRouteBuilder(
                           transitionDuration: const Duration(milliseconds: 400),
                           pageBuilder: (_, __, ___) => ReviewBooking(
+                            vehicleName: vehicleName, // ✅ send vehicle name
                             index: selectedIndex,
                             price: price,
                             distance: distanceStr,
-                            vehicleBodyDetailId: vehicleBodyDetail,
+                            vehicleBodyDetailId: vehicleBodyDetailId,
                             vehicleBodyTypeId: vehicleBodyTypeId,
                           ),
                           transitionsBuilder: (_, animation, __, child) {
@@ -498,7 +503,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                         borderRadius: BorderRadius.circular(10),
                         gradient: selectedIndex != null
                             ? PortColor.subBtn
-                            : LinearGradient(
+                            : const LinearGradient(
                           colors: [
                             PortColor.darkPurple,
                             PortColor.darkPurple,
@@ -509,16 +514,17 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                       ),
                       child: TextConst(
                         title: selectedIndex != null
-                            ? "Proceed with ${getVehicleName(selectVehiclesViewModel.selectVehicleModel?.data![selectedIndex!].vehicleId ?? 0)}"
+                            ? "Proceed with ${selectVehiclesViewModel.selectVehicleModel?.data![selectedIndex!].vehicleName ?? 'Vehicle'}"
                             : "Select a Vehicle",
                         color: PortColor.black,
                         fontFamily: AppFonts.kanitReg,
                       ),
                     ),
                   ),
-
                 ),
-              ),
+
+
+          ),
             ],
           ),
         ),
@@ -535,27 +541,14 @@ class _SelectVehiclesState extends State<SelectVehicles> {
     required VoidCallback onTap,
   }) {
     // CORRECTED: Use vehicleId instead of vehicleid
-    final vehicleId = vehicle.vehicleId ?? 0;
+    final vehicleName = vehicle.vehicleName ?? "n/a";
     final bodyDetails = vehicle.bodyDetail ?? "fewrffewr";
     final amount = vehicle.amount ?? 0;
     final vehicleImage = vehicle.vehicleImage ?? "frewvgre";
     final measurementImage = vehicle.measurementsImg ?? "frewvgre";
     final selectedStatus = vehicle.selectedStatus ?? 0;
 
-    String getVehicleName(int vehicleId) {
-      switch (vehicleId) {
-        case 1:
-          return "Tata Ace";
-        case 2:
-          return "3 Wheeler";
-        case 3:
-          return "2 Wheeler";
-        default:
-          return "Vehicle $vehicleId";
-      }
-    }
 
-    final vehicleName = getVehicleName(vehicleId);
 
     return GestureDetector(
       onTap: onTap,

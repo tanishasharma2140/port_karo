@@ -15,15 +15,18 @@ import 'package:provider/provider.dart';
 
 class ReviewBooking extends StatefulWidget {
   final int? index;
+  final String vehicleName;
   final String price;
   final String distance;
   final String vehicleBodyDetailId;
-  final int vehicleBodyTypeId;
+  final String vehicleBodyTypeId;
   const ReviewBooking({
     super.key,
     this.index,
     required this.price,
-    required this.distance, required this.vehicleBodyDetailId,required this.vehicleBodyTypeId,
+    required this.distance,
+    required this.vehicleBodyDetailId,
+    required this.vehicleBodyTypeId, required this.vehicleName,
   });
 
   @override
@@ -37,6 +40,9 @@ class _ReviewBookingState extends State<ReviewBooking> {
 
   @override
   Widget build(BuildContext context) {
+    print("tanishaaa");
+    print(widget.vehicleBodyDetailId);
+    print(widget.vehicleBodyTypeId);
     final applyCouponVm = Provider.of<ApplyCouponViewModel>(context);
     final orderViewModel = Provider.of<OrderViewModel>(context);
     final vehicle = Provider.of<SelectVehiclesViewModel>(
@@ -65,7 +71,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                 TextConst(
                   title: "Review Booking",
                   color: PortColor.black,
-                  size: 16,fontWeight: FontWeight.w600,
+                  size: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ],
             ),
@@ -112,19 +119,25 @@ class _ReviewBookingState extends State<ReviewBooking> {
                             );
                           },
                         ),
-                         SizedBox(width: screenWidth*0.035,),
+                        SizedBox(width: screenWidth * 0.035),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextConst(
-                              title: vehicle.vehicleId.toString(),
+                              title: vehicle.vehicleName.toString(),
                               color: PortColor.black,
                               fontFamily: AppFonts.poppinsReg,
                             ),
-                            TextConst(
-                              title: "View Address detail",
-                              color: PortColor.gold,
-                              fontFamily: AppFonts.poppinsReg,
+
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: TextConst(
+                                title: "View Address detail",
+                                color: PortColor.gold,
+                                fontFamily: AppFonts.poppinsReg,
+                              ),
                             ),
                           ],
                         ),
@@ -192,68 +205,75 @@ class _ReviewBookingState extends State<ReviewBooking> {
               ),
             ),
             SizedBox(height: screenHeight * 0.02),
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-              PageRouteBuilder(
-                transitionDuration: const Duration(milliseconds: 400),
-                pageBuilder: (context, animation, secondaryAnimation) => CouponsAndOffers(price: widget.price),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(0.0, 1.0); // bottom se start
-                  const end = Offset.zero;        // normal position
-                  const curve = Curves.easeInOut;
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 400),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        CouponsAndOffers(price: widget.price),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(0.0, 1.0); // bottom se start
+                          const end = Offset.zero; // normal position
+                          const curve = Curves.easeInOut;
 
-                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          var tween = Tween(
+                            begin: begin,
+                            end: end,
+                          ).chain(CurveTween(curve: curve));
 
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                  ),
+                );
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 0.5,
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        Assets.assetsApplyCoupon,
+                        height: 30,
+                        width: 30,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 6),
+                      TextConst(
+                        title: "Coupon Applied",
+                        fontFamily: AppFonts.kanitReg,
+                        size: 14,
+                        color: PortColor.black,
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: PortColor.black,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.035,
             ),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 0.5,
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    Assets.assetsApplyCoupon,
-                    height: 30,
-                    width: 30,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(width: 6),
-                  TextConst(
-                    title: "Coupon Applied",
-                    fontFamily: AppFonts.kanitReg,
-                    size: 14,
-                    color: PortColor.black,
-                  ),
-                  const Spacer(),
-                  Icon(Icons.arrow_forward_ios, size: 15, color: PortColor.black),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 20),
+            SizedBox(height: 20),
             Container(),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.035),
@@ -311,7 +331,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                     SizedBox(height: screenHeight * 0.012),
 
                     // Discount Row - Show only if discount is available
-                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                    if (applyCouponVm.discount != null &&
+                        applyCouponVm.discount != "0")
                       Row(
                         children: [
                           TextConst(
@@ -330,11 +351,13 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ],
                       ),
 
-                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                    if (applyCouponVm.discount != null &&
+                        applyCouponVm.discount != "0")
                       SizedBox(height: screenHeight * 0.012),
 
                     // Calculate fare after discount
-                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                    if (applyCouponVm.discount != null &&
+                        applyCouponVm.discount != "0")
                       Row(
                         children: [
                           TextConst(
@@ -345,7 +368,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                           ),
                           const Spacer(),
                           TextConst(
-                            title: "₹${(double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())).toStringAsFixed(0)}",
+                            title:
+                                "₹${(double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())).toStringAsFixed(0)}",
                             color: PortColor.black,
                             fontFamily: AppFonts.poppinsReg,
                             size: 12,
@@ -353,7 +377,8 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ],
                       ),
 
-                    if (applyCouponVm.discount != null && applyCouponVm.discount != "0")
+                    if (applyCouponVm.discount != null &&
+                        applyCouponVm.discount != "0")
                       SizedBox(height: screenHeight * 0.012),
 
                     // GST Calculation on discounted amount
@@ -367,7 +392,9 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ),
                         const Spacer(),
                         TextConst(
-                          title: applyCouponVm.discount != null && applyCouponVm.discount != "0"
+                          title:
+                              applyCouponVm.discount != null &&
+                                  applyCouponVm.discount != "0"
                               ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18).toStringAsFixed(0)}"
                               : "₹${(double.parse(widget.price) * 0.18).toStringAsFixed(0)}",
                           color: Colors.green,
@@ -392,8 +419,10 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ),
                         const Spacer(),
                         TextConst(
-                          title: applyCouponVm.discount != null && applyCouponVm.discount != "0"
-                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount .toString())) * 0.18)).toStringAsFixed(0)}"
+                          title:
+                              applyCouponVm.discount != null &&
+                                  applyCouponVm.discount != "0"
+                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
                               : "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
                           color: PortColor.black,
                           fontFamily: AppFonts.poppinsReg,
@@ -423,8 +452,10 @@ class _ReviewBookingState extends State<ReviewBooking> {
                         ),
                         const Spacer(),
                         TextConst(
-                          title: applyCouponVm.discount != null && applyCouponVm.discount != "0"
-                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount .toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
+                          title:
+                              applyCouponVm.discount != null &&
+                                  applyCouponVm.discount != "0"
+                              ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
                               : "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
                           color: PortColor.black,
                           fontFamily: AppFonts.poppinsReg,
@@ -463,8 +494,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
 
                 if (result != null) {
                   setState(() {
-                    selectedGoodsName =
-                        result["goods_name"];
+                    selectedGoodsName = result["goods_name"];
                     selectedGoodsType = {
                       "id": result["id"].toString(),
                       "goods_name": result["goods_name"],
@@ -608,7 +638,10 @@ class _ReviewBookingState extends State<ReviewBooking> {
                               ),
                             ),
                             if (PaymentMethod == "1")
-                              const Icon(Icons.check_circle, color: Colors.green),
+                              const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                              ),
                           ],
                         ),
                       ),
@@ -635,7 +668,10 @@ class _ReviewBookingState extends State<ReviewBooking> {
                               ),
                             ),
                             if (PaymentMethod == "2")
-                              const Icon(Icons.check_circle, color: Colors.green),
+                              const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                              ),
                           ],
                         ),
                       ),
@@ -666,8 +702,9 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   const Spacer(),
                   TextConst(
                     title:
-                    applyCouponVm.discount != null && applyCouponVm.discount != "0"
-                        ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount .toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
+                        applyCouponVm.discount != null &&
+                            applyCouponVm.discount != "0"
+                        ? "₹${((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) + ((double.parse(widget.price) - double.parse(applyCouponVm.discount.toString())) * 0.18)).toStringAsFixed(0)}"
                         : "₹${(double.parse(widget.price) + (double.parse(widget.price) * 0.18)).toStringAsFixed(0)}",
                     color: PortColor.black,
                   ),
@@ -676,39 +713,65 @@ class _ReviewBookingState extends State<ReviewBooking> {
               SizedBox(height: screenHeight * 0.014),
               InkWell(
                 onTap: () {
+                  print("Booking button tapped ✅");
+
                   if (selectedGoodsType == null) {
-                    Utils.showErrorMessage(context, "Please Select Good Type");
-                  } else if (PaymentMethod.isEmpty) {
-                    Utils.showErrorMessage(context, "Please select PayMode");
-                  } else {
-                    orderViewModel.orderApi(
-                      vehicle.vehicleId.toString(),
-                      orderViewModel.pickupData["address"],
-                      orderViewModel.dropData["address"],
-                      orderViewModel.dropData["latitude"],
-                      orderViewModel.dropData["longitude"],
-                      orderViewModel.pickupData["latitude"],
-                      orderViewModel.pickupData["longitude"],
-                      orderViewModel.pickupData["name"],
-                      orderViewModel.pickupData["phone"],
-                      orderViewModel.dropData["name"],
-                      orderViewModel.dropData["phone"],
-                      widget.price,
-                      widget.distance,
-                      PaymentMethod,
-                      [
-                        selectedGoodsType!,
-                      ],
-                      orderViewModel.pickupData["order_type"],
-                      orderViewModel.pickupData["pickup_date"],
-                      orderViewModel.pickupData["save_as"],
-                      orderViewModel.dropData["save_as"],
-                      widget.vehicleBodyDetailId,
-                      widget.vehicleBodyTypeId,
-                      context,
-                    );
+                    Utils.showErrorMessage(context, "Please Select Goods Type");
+                    return;
                   }
+
+                  if (PaymentMethod.isEmpty) {
+                    Utils.showErrorMessage(context, "Please select Pay Mode");
+                    return;
+                  }
+
+                  final applyCouponVm = Provider.of<ApplyCouponViewModel>(context, listen: false);
+                  final orderViewModel = Provider.of<OrderViewModel>(context, listen: false);
+                  final vehicle = Provider.of<SelectVehiclesViewModel>(context, listen: false)
+                      .selectVehicleModel!
+                      .data![widget.index!];
+
+                  // ✅ Step 1: Calculate Final Amount (Discount + GST)
+                  double finalAmount;
+                  if (applyCouponVm.discount != null && applyCouponVm.discount != "0") {
+                    final double base = double.parse(widget.price);
+                    final double discount = double.parse(applyCouponVm.discount.toString());
+                    final double discountedPrice = base - discount;
+                    finalAmount = discountedPrice + (discountedPrice * 0.18);
+                  } else {
+                    final double base = double.parse(widget.price);
+                    finalAmount = base + (base * 0.18);
+                  }
+
+                  print("✅ Final Amount to send in API: ₹${finalAmount.toStringAsFixed(0)}");
+
+                  // ✅ Step 2: Call order API with computed amount
+                  orderViewModel.orderApi(
+                    vehicle.vehicleId.toString(),
+                    orderViewModel.pickupData["address"],
+                    orderViewModel.dropData["address"],
+                    orderViewModel.dropData["latitude"],
+                    orderViewModel.dropData["longitude"],
+                    orderViewModel.pickupData["latitude"],
+                    orderViewModel.pickupData["longitude"],
+                    orderViewModel.pickupData["name"],
+                    orderViewModel.pickupData["phone"],
+                    orderViewModel.dropData["name"],
+                    orderViewModel.dropData["phone"],
+                    finalAmount.toStringAsFixed(0), // ✅ send calculated amount
+                    widget.distance,
+                    PaymentMethod,
+                    [selectedGoodsType!],
+                    orderViewModel.pickupData["order_type"],
+                    orderViewModel.pickupData["pickup_date"],
+                    orderViewModel.pickupData["save_as"],
+                    orderViewModel.dropData["save_as"],
+                    widget.vehicleBodyDetailId,
+                    widget.vehicleBodyTypeId,
+                    context,
+                  );
                 },
+
 
                 child: Container(
                   alignment: Alignment.center,
@@ -720,7 +783,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
                   ),
                   child: !orderViewModel.loading
                       ? TextConst(
-                          title: "Book ${vehicle.vehicleId.toString()}",
+                          title: vehicle.vehicleName.toString(),
                           color: PortColor.black,
                           fontFamily: AppFonts.kanitReg,
                         )
@@ -761,6 +824,9 @@ class GoodsTypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
+    // ✅ Condition to check if a type is selected
+    bool isTypeSelected = selectedType != "Select Goods Type";
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: screenWidth * 0.035,
@@ -797,7 +863,6 @@ class GoodsTypeCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            // Bottom Row: Selected Value + Change Button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -811,7 +876,7 @@ class GoodsTypeCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onChange,
                   child: TextConst(
-                    title: "Select",
+                    title: isTypeSelected ? "Change" : "Select",
                     color: PortColor.blue,
                     fontFamily: AppFonts.poppinsReg,
                     size: 14,

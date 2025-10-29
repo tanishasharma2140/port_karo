@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:port_karo/view/driver_searching_screen.dart';
 import 'package:port_karo/view/home/home.dart';
 
 class NotificationService {
@@ -177,7 +178,7 @@ class NotificationService {
   Future<void> handleMassage(RemoteMessage massage) async {
     navigatorKey.currentState?.push(
       MaterialPageRoute(
-        builder: (context) => HomePage(),
+        builder: (context) => DriverSearchingScreen(),
       ),
     );
   }

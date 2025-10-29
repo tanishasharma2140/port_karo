@@ -1,3 +1,5 @@
+// dart
+// lib/view/order/widgets/enter_contact_detail.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +31,8 @@ class EnterContactDetail extends StatefulWidget {
   State<EnterContactDetail> createState() => _EnterContactDetailState();
 }
 
-class _EnterContactDetailState extends State<EnterContactDetail> {
+class _EnterContactDetailState extends State<EnterContactDetail>
+    with SingleTickerProviderStateMixin {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   late String selectedLocation;
@@ -43,10 +46,33 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
   LatLng selectedLatLng = defaultPosition;
   int selectedIndex = -1;
 
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+  bool _showGoodsLabel = false;
+  Timer? _labelTimer;
+
   @override
   void initState() {
     super.initState();
     fetchLatLngForLocation();
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.85, end: 1.2).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _labelTimer?.cancel();
+    nameController.dispose();
+    mobileController.dispose();
+    super.dispose();
   }
 
   void fetchLatLngForLocation() {
@@ -108,6 +134,20 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
         : "Unknown Location";
   }
 
+  void _showGoodsLabelTemporarily() {
+    _labelTimer?.cancel();
+    setState(() {
+      _showGoodsLabel = true;
+    });
+    _labelTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _showGoodsLabel = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,24 +174,113 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                 await _getAddressFromLatLng(selectedLatLng);
               }
             },
-            markers: {
-              Marker(
-                markerId: const MarkerId('selected_location'),
-                position: selectedLatLng,
-                draggable: false,
-                infoWindow: InfoWindow(
-                  title: "Selected Location",
-                  snippet: selectedLocation,
-                ),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueRed,
-                ),
-              ),
-            },
+            // Remove map markers and use overlay pin instead (so we can position it top/center)
+            markers: const <Marker>{},
             myLocationEnabled: false,
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
           ),
+
+          // Overlay pin: top when not fullscreen, center when fullscreen.
+          // Outer IgnorePointer lets map gestures pass; inner IgnorePointer(false)
+          // around the marker enables tap detection only on the marker area.
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: true,
+              child: Align(
+                alignment:
+                isFullscreenMode ? Alignment.center : const Alignment(0, -0.65),
+                child: IgnorePointer(
+                  ignoring: false,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () {
+                      _showGoodsLabelTemporarily();
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Pulsing circle under the marker
+                            ScaleTransition(
+                              scale: _pulseAnimation,
+                              child: Container(
+                                width: isFullscreenMode ? screenHeight * 0.14 : screenHeight * 0.09,
+                                height: isFullscreenMode ? screenHeight * 0.14 : screenHeight * 0.09,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.amber.withOpacity(0.18),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.amber.withOpacity(0.18),
+                                      blurRadius: 18,
+                                      spreadRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Marker image with stronger shadow/highlight
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                // boxShadow: [
+                                //   BoxShadow(
+                                //     color: Colors.black38,
+                                //     blurRadius: 10,
+                                //     offset: const Offset(0, 6),
+                                //   ),
+                                // ],
+                              ),
+                              child: Image(
+                                image: const AssetImage(Assets.assetsRedlocation),
+                                height: isFullscreenMode ? screenHeight * 0.095 : screenHeight * 0.065,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // Popup label shown on tap
+                        if (_showGoodsLabel)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.035,
+                              vertical: screenHeight * 0.009,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black87,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "Your goods will be here",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: isFullscreenMode ? 14 : 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // Back Button
           Positioned(
             top: screenHeight * 0.05,
@@ -255,9 +384,12 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   controller: nameController,
                   height: screenHeight * 0.055,
                   cursorHeight: screenHeight * 0.023,
-                  labelText: "Receiver's Name",inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')), // ✅ only alphabets allowed
-                ],
+                  labelText: "Receiver's Name",
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'[a-zA-Z]'),
+                    ),
+                  ],
                   suffixIcon: const Icon(
                     Icons.perm_contact_cal_outlined,
                     color: PortColor.blue,
@@ -271,7 +403,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                   labelText: "Receiver's Mobile Number",
                   keyboardType: TextInputType.number,
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly, // ✅ only numbers allowed
+                    FilteringTextInputFormatter.digitsOnly,
                   ],
                   maxLength: 10,
                 ),
@@ -282,12 +414,20 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                       isContactDetailsSelected = !isContactDetailsSelected;
                       if (isContactDetailsSelected) {
                         // Fill mobile number
-                        mobileController.text = profileViewModel.profileModel!.data!.phone.toString();
+                        mobileController.text = profileViewModel
+                            .profileModel!
+                            .data!
+                            .phone
+                            .toString();
 
                         // Fill full name (first + last)
-                        final firstName = profileViewModel.profileModel!.data!.firstName ?? '';
-                        final lastName = profileViewModel.profileModel!.data!.lastName ?? '';
-                        nameController.text = "$firstName $lastName".trim(); // Concatenate with a space
+                        final firstName =
+                            profileViewModel.profileModel!.data!.firstName ??
+                                '';
+                        final lastName =
+                            profileViewModel.profileModel!.data!.lastName ?? '';
+                        nameController.text = "$firstName $lastName"
+                            .trim(); // Concatenate with a space
                       } else {
                         mobileController.clear();
                         nameController.clear(); // Clear name when unchecked
@@ -305,7 +445,9 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                             width: screenWidth * 0.004,
                           ),
                           borderRadius: BorderRadius.circular(4),
-                          color: isContactDetailsSelected ? PortColor.blue : Colors.transparent,
+                          color: isContactDetailsSelected
+                              ? PortColor.blue
+                              : Colors.transparent,
                         ),
                         child: isContactDetailsSelected
                             ? Icon(
@@ -326,7 +468,8 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                           ),
                           SizedBox(width: screenWidth * 0.01),
                           TextConst(
-                            title: profileViewModel.profileModel!.data!.phone.toString(),
+                            title: profileViewModel.profileModel!.data!.phone
+                                .toString(),
                             color: PortColor.blue,
                             fontFamily: AppFonts.poppinsReg,
                             size: 12,
@@ -336,7 +479,6 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
                     ],
                   ),
                 ),
-
 
                 SizedBox(height: screenHeight * 0.03),
                 TextConst(
@@ -550,9 +692,7 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
         ),
         SizedBox(width: screenWidth * 0.02),
         GestureDetector(
-          onTap: (){
-
-          },
+          onTap: () {},
           child: Container(
             height: screenHeight * 0.036,
             width: screenWidth * 0.14,
@@ -684,15 +824,18 @@ class _EnterContactDetailState extends State<EnterContactDetail> {
               context,
               PageRouteBuilder(
                 transitionDuration: const Duration(milliseconds: 400),
-                pageBuilder: (_, __, ___) =>  SelectVehicles(),
+                pageBuilder: (_, __, ___) => SelectVehicles(),
                 transitionsBuilder: (_, animation, __, child) {
-                  final offsetAnimation = Tween<Offset>(
+                  final offsetAnimation =
+                  Tween<Offset>(
                     begin: const Offset(0, 1), // start from bottom
-                    end: Offset.zero,          // end at normal position
-                  ).animate(CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  ));
+                    end: Offset.zero, // end at normal position
+                  ).animate(
+                    CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutCubic,
+                    ),
+                  );
 
                   return SlideTransition(
                     position: offsetAnimation,

@@ -16,6 +16,7 @@ import 'package:port_karo/view_model/address_show_view_model.dart';
 import 'package:port_karo/view_model/apply_coupon_view_model.dart';
 import 'package:port_karo/view_model/call_back_view_model.dart';
 import 'package:port_karo/view_model/coupon_list_view_model.dart';
+import 'package:port_karo/view_model/driver_rating_view_model.dart';
 import 'package:port_karo/view_model/goods_type_view_model.dart';
 import 'package:port_karo/view_model/help_and_support_view_model.dart';
 import 'package:port_karo/view_model/login_view_model.dart';
@@ -126,6 +127,7 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> UpdateRideStatusViewModel()),
           ChangeNotifierProvider(create: (context)=> PaymentViewModel()),
           ChangeNotifierProvider(create: (context)=> CallBackViewModel()),
+          ChangeNotifierProvider(create: (context)=> DriverRatingViewModel()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

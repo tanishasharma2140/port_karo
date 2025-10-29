@@ -51,7 +51,7 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
               builder: (_) {
                 if (goodType.loading) {
                   return const Center(
-                    child: CircularProgressIndicator(color: PortColor.blue),
+                    child: CircularProgressIndicator(color: PortColor.gold),
                   );
                 } else if (goodType.goodsTypeModel == null ||
                     goodType.goodsTypeModel!.data == null ||

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:port_karo/repo/call_back_repo.dart';
+import 'package:port_karo/utils/utils.dart';
 import 'package:port_karo/view/bottom_nav_bar.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
 import 'package:port_karo/view_model/update_ride_status_view_model.dart';
@@ -38,9 +39,6 @@ class CallBackViewModel with ChangeNotifier {
       if (response['success'] == true) {
         print("Callback success: ${response['message']}");
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(response['message'].toString())));
 
         // 🔥 Use the firebase_order_id returned from API
         final firebaseOrderId = response['firebase_order_id'].toString();
@@ -64,16 +62,11 @@ class CallBackViewModel with ChangeNotifier {
         });
       } else {
         print("Callback failed: ${response['message']}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed: ${response['message']}')),
-        );
       }
     } catch (e) {
       print("Error caught ❌ $e");
       setLoading(false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('An error occurred: $e')));
+      Utils.showErrorMessage(context, 'An error occurred: $e');
     }
   }
 

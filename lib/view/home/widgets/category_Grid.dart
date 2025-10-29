@@ -3,7 +3,6 @@ import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/shimmer_loader.dart';
-import 'package:port_karo/view/home/widgets/pickup/deliver_all_india_parcel.dart';
 import 'package:port_karo/view/home/widgets/pickup/deliver_by_packer_mover.dart';
 import 'package:port_karo/view/home/widgets/pickup/deliver_by_truck.dart';
 import 'package:port_karo/view_model/service_type_view_model.dart';
@@ -17,7 +16,6 @@ class CategoryGrid extends StatefulWidget {
 }
 
 class _CategoryGridState extends State<CategoryGrid> {
-  // Store selected vehicle IDs locally
   String? _selectedVehicleId;
   String? _selectedAnotherId;
 
@@ -106,14 +104,14 @@ class _CategoryGridState extends State<CategoryGrid> {
       _selectedAnotherId = "another_id_${index + 1}";
     });
 
-    // ✅ ServiceTypeViewModel mein ID store karo
+    // ✅ServiceTypeViewModel mein ID store karo
     serviceTypeViewModel.setSelectedVehicleId(_selectedVehicleId!);
 
     print("Vehicle ID Set: $_selectedVehicleId");
     print("Another ID Set: $_selectedAnotherId");
 
     // Your existing navigation logic
-    if (index == 0 || index == 1) {
+    if (index == 0 || index == 1 || index == 3) {
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -135,7 +133,6 @@ class _CategoryGridState extends State<CategoryGrid> {
           },
         ),
       );
-
     } else if (index == 2) {
       Navigator.push(
         context,
@@ -144,8 +141,8 @@ class _CategoryGridState extends State<CategoryGrid> {
           pageBuilder: (_, __, ___) => const DeliverByPackerMover(),
           transitionsBuilder: (_, animation, __, child) {
             final offsetAnimation = Tween<Offset>(
-              begin: const Offset(0, 1), // start from bottom
-              end: Offset.zero,          // end at normal position
+              begin: const Offset(0, 1),
+              end: Offset.zero,
             ).animate(CurvedAnimation(
               parent: animation,
               curve: Curves.easeOutCubic,
@@ -158,31 +155,8 @@ class _CategoryGridState extends State<CategoryGrid> {
           },
         ),
       );
-
-    } else if (index == 3) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 400),
-          pageBuilder: (_, __, ___) => const DeliverAllIndiaParcel(),
-          transitionsBuilder: (_, animation, __, child) {
-            final offsetAnimation = Tween<Offset>(
-              begin: const Offset(0, 1), // start from bottom
-              end: Offset.zero,          // end at normal position
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ));
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-        ),
-      );
-
     }
+
   }
 
   @override

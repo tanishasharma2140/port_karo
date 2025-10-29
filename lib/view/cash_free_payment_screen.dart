@@ -4,6 +4,7 @@ import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayser
 import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:port_karo/model/cash_free_gateway_model.dart';
+import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/view_model/call_back_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -91,6 +92,6 @@ class _CashfreePaymentScreenState extends State<CashfreePaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: const Center(child: CircularProgressIndicator()));
+    return Scaffold(body: const Center(child: CircularProgressIndicator(color: PortColor.gold,)));
   }
 }

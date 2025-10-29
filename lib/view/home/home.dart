@@ -12,8 +12,6 @@ import 'package:port_karo/services/internet_checker_service.dart';
 import 'package:port_karo/utils/routes/routes.dart';
 import 'package:port_karo/view/home/widgets/category_Grid.dart';
 import 'package:port_karo/view/home/widgets/pick_up_location.dart';
-import 'package:port_karo/view/home/widgets/see_what_new.dart';
-import 'package:port_karo/view/order/driver_pickup_screen.dart';
 import 'package:port_karo/view_model/active_ride_view_model.dart';
 import 'package:port_karo/view_model/port_banner_view_model.dart';
 import 'package:port_karo/view_model/user_view_model.dart';
@@ -74,10 +72,9 @@ class _HomePageState extends State<HomePage> {
 
     });
 
-    // 🔹 Get current location
+    // 🔹 Get current
     _getCurrentLocation();
 
-    // 🔹 Auto slide every 3 seconds
     _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
       final bannerVm = Provider.of<PortBannerViewModel>(context, listen: false);
       final bannerLength = bannerVm.portBannerModel?.data?.length ?? 0;
@@ -228,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                                 if (loadingProgress == null) return child;
                                 return Center(
                                   child: CircularProgressIndicator(
-                                    color: PortColor.white,
+                                    color: PortColor.gold,
                                   ),
                                 );
                               },

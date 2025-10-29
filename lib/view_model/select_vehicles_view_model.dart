@@ -39,6 +39,8 @@ class SelectVehiclesViewModel with ChangeNotifier {
       "pickup_longitude": pickupLongitude,
     };
 
+    print("dataceadfdwsw:${data}");
+
     setLoading(true);
     _selectVehicleRepo.selectVehicleApi(data).then((value) {
       setLoading(false);

@@ -276,7 +276,7 @@ class _PackerMoverState extends State<PackerMover> {
                     ],
                   ),
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ?  Center(child: CircularProgressIndicator(color: PortColor.gold,))
                       : ListView.builder(
                     itemCount: searchResults.length,
                     itemBuilder: (context, index) {

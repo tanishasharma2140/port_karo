@@ -29,6 +29,7 @@ class SelectVehicleModel {
 
 class Data {
   int? vehicleId;
+  String? vehicleName;
   int? vehicleBodyTypesId;
   int? vehicleBodyDetailsId;
   String? bodyDetail;
@@ -39,6 +40,7 @@ class Data {
 
   Data(
       {this.vehicleId,
+        this.vehicleName,
         this.vehicleBodyTypesId,
         this.vehicleBodyDetailsId,
         this.bodyDetail,
@@ -49,6 +51,7 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     vehicleId = json['vehicle_id'];
+    vehicleName = json['vehicle_name'];
     vehicleBodyTypesId = json['vehicle_body_types_id'];
     vehicleBodyDetailsId = json['vehicle_body_details_id'];
     bodyDetail = json['body_detail'];
@@ -61,6 +64,7 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['vehicle_id'] = vehicleId;
+    data['vehicle_name'] = vehicleName;
     data['vehicle_body_types_id'] = vehicleBodyTypesId;
     data['vehicle_body_details_id'] = vehicleBodyDetailsId;
     data['body_detail'] = bodyDetail;

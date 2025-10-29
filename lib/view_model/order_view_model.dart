@@ -6,7 +6,6 @@ import 'package:port_karo/repo/order_repo.dart';
 import 'package:port_karo/utils/utils.dart';
 import 'package:port_karo/view/driver_searching_screen.dart';
 import 'package:port_karo/view_model/user_view_model.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OrderViewModel with ChangeNotifier {
   final _orderRepo = OrderRepository();
@@ -69,6 +68,8 @@ class OrderViewModel with ChangeNotifier {
       dynamic vehicleBodyType,
       BuildContext context,
       ) async {
+    print("🚀 [OrderViewModel] orderApi() called");
+
     UserViewModel userViewModel = UserViewModel();
     String? userId = await userViewModel.getUser();
     setLoading(true);
@@ -95,11 +96,15 @@ class OrderViewModel with ChangeNotifier {
       "pickup_save_as": pickUpSaveAs,
       "drop_save_as": dropSaveAs,
       "vehicle_body_details_type": vehicleBodyDetailType,
-      "vehicle_body_type": vehicleBodyDetailType
+      "vehicle_body_type": vehicleBodyType
     };
 
     setCurrentOrderData(data);
-
+    // 🟢 Pretty print order data for debugging
+    print("📦 ---------------- ORDER DATA START ----------------");
+    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    print(encoder.convert(data));
+    print("📦 ---------------- ORDER DATA END ----------------");
     try {
       final response = await _orderRepo.orderApi(data);
       setLoading(false);
@@ -125,6 +130,7 @@ class OrderViewModel with ChangeNotifier {
         });
 
         Utils.showSuccessMessage(context, response['message']);
+        print("oiuioiu{$response['message']}");
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -140,6 +146,7 @@ class OrderViewModel with ChangeNotifier {
       setLoading(false);
       Utils.showErrorMessage(context, 'An error occurred: $error');
       if (kDebugMode) {
+        Utils.showErrorMessage(context, 'An error occurred: $error');
         print('Error: $error');
       }
     }
@@ -150,12 +157,12 @@ class OrderViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  // Future<void> launchURL(String url) async {
+  //   final Uri uri = Uri.parse(url);
+  //   if (await canLaunchUrl(uri)) {
+  //     await launchUrl(uri);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 }

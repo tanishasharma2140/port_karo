@@ -435,8 +435,8 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                             ),
                             transitionsBuilder: (_, animation, __, child) {
                               final offsetAnimation = Tween<Offset>(
-                                begin: const Offset(0, 1), // start from bottom
-                                end: Offset.zero,          // end at normal position
+                                begin: const Offset(0, 1),
+                                end: Offset.zero,
                               ).animate(CurvedAnimation(
                                 parent: animation,
                                 curve: Curves.easeOutCubic,

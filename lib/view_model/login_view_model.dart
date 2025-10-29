@@ -61,6 +61,7 @@ class AuthViewModel with ChangeNotifier {
     }).onError((error, stackTrace) {
       setLoading(false);
       if (kDebugMode) {
+        Utils.showErrorMessage(context, 'error: $error');
         print('error: $error');
       }
     });

@@ -168,7 +168,7 @@ class _PaymentPorterCreditState extends State<PaymentPorterCredit> {
           Expanded(
             child: walletHistoryViewModel.loading
                 ? const Center(
-              child: CircularProgressIndicator(color: Colors.blueAccent),
+              child: CircularProgressIndicator(color: PortColor.gold),
             )
                 : (walletHistoryViewModel.walletHistoryModel?.data?.isNotEmpty ?? false)
                 ? Container(

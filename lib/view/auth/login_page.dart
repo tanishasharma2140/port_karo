@@ -1,6 +1,7 @@
 // lib/view/auth/login_page.dart
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/main.dart';
 import 'package:port_karo/res/app_btn.dart';
@@ -176,6 +177,9 @@ class _LoginPageState extends State<LoginPage>
                       maxLength: 10,
                       cursorHeight: screenHeight * 0.025,
                       focusNode: _focusNode,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly, // ✅ only numbers
+                      ],
                       // ensure Done button is handled
                       textInputAction: TextInputAction.done,
                       onSubmitted: (_) {
