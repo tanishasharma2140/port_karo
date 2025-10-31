@@ -88,6 +88,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
       onWillPop: _onWillPop,
       child: SafeArea(
         top: false,
+        bottom: true,
         child: Scaffold(
           backgroundColor: PortColor.bg,
           body: IndexedStack(

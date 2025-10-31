@@ -7,6 +7,7 @@ class Assets {
   static const String assetsAuto = 'assets/auto.png';
   static const String assetsBankaccount = 'assets/bankaccount.png';
   static const String assetsBike = 'assets/bike.png';
+  static const String assetsBikerYoyo = 'assets/biker_yoyo.png';
   static const String assetsBiketruck = 'assets/biketruck.png';
   static const String assetsBluelocation = 'assets/bluelocation.png';
   static const String assetsBluetwolocation = 'assets/bluetwolocation.png';
@@ -23,11 +24,14 @@ class Assets {
   static const String assetsDeliveryman = 'assets/deliveryman.png';
   static const String assetsDrivebusiness = 'assets/drivebusiness.png';
   static const String assetsDrop = 'assets/drop.png';
+  static const String assetsDropYoyo = 'assets/drop_yoyo.png';
   static const String assetsEloaders = 'assets/eloaders.png';
   static const String assetsHandcoin = 'assets/handcoin.png';
   static const String assetsHandcoinremove = 'assets/handcoinremove.png';
   static const String assetsHello = 'assets/hello.png';
+  static const String assetsHueCurrent = 'assets/hue_current.png';
   static const String assetsIconbelow = 'assets/iconbelow.png';
+  static const String assetsIcons8Location72 = 'assets/icons8-location-72.png';
   static const String assetsIconssend = 'assets/iconssend.png';
   static const String assetsIndiaflag = 'assets/indiaflag.png';
   static const String assetsIndiaflagsquare = 'assets/indiaflagsquare.png';
@@ -50,6 +54,7 @@ class Assets {
   static const String assetsPackerandmover = 'assets/packerandmover.jpg';
   static const String assetsPakingmoving = 'assets/pakingmoving.png';
   static const String assetsPickup = 'assets/pickup.png';
+  static const String assetsPicupYoyo = 'assets/picup_yoyo.png';
   static const String assetsPop = 'assets/pop.png';
   static const String assetsPortKaroLogo = 'assets/port_karo_logo.png';
   static const String assetsPorter = 'assets/porter.png';

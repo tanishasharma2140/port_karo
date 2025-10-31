@@ -20,6 +20,9 @@ class ApplyCouponViewModel with ChangeNotifier {
   double? _discount;
   double? get discount => _discount;
 
+  int? _applyStatus; // 🟢 New field
+  int? get applyStatus => _applyStatus;
+
   setLoading(bool value) {
     _loading = value;
     notifyListeners();
@@ -32,6 +35,11 @@ class ApplyCouponViewModel with ChangeNotifier {
 
   void setDiscount(double value) {
     _discount = value;
+    notifyListeners();
+  }
+
+  void setApplyStatus(int? status) {
+    _applyStatus = status;
     notifyListeners();
   }
 
@@ -54,6 +62,12 @@ class ApplyCouponViewModel with ChangeNotifier {
 
       if (value['status'] == 200) {
         debugPrint("Coupon Applied Successfully!!");
+
+        // 🟢 Check and store apply_status
+        if (value["data"] != null && value["data"]["apply_status"] != null) {
+          setApplyStatus(int.tryParse(value["data"]["apply_status"].toString()));
+          debugPrint("Apply Status: $_applyStatus");
+        }
 
         // ✅ Set Final Amount
         if (value["data"] != null && value["data"]["final_amount"] != null) {

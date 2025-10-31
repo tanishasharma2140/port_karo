@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:port_karo/generated/assets.dart';
 import 'package:port_karo/res/constant_color.dart';
 
 class ConstWithPolylineMap extends StatefulWidget {
@@ -29,6 +34,7 @@ class ConstWithPolylineMap extends StatefulWidget {
 
 class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
   GoogleMapController? mapController;
+  final Completer<GoogleMapController> completer = Completer();
   final LatLng _initialPosition = LatLng(26.8467, 80.9462);
   LatLng? _currentPosition;
   Marker? _currentLocationMarker;
@@ -47,6 +53,8 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
     _previousRideStatus = widget.rideStatus;
   }
 
+
+
   @override
   void didUpdateWidget(ConstWithPolylineMap oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -56,6 +64,42 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
       print("🔄 Status changed from $_previousRideStatus to ${widget.rideStatus}");
       _previousRideStatus = widget.rideStatus;
       _updatePolylinesBasedOnStatus();
+    }
+  }
+
+
+
+  /// Move camera to fit polyline with bounds
+  Future<void> moveCameraOnPolyline(List<LatLng> points) async {
+    if (points.isEmpty) return;
+
+    final GoogleMapController controller = await completer.future;
+
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+
+    for (var p in points) {
+      if (p.latitude < minLat) minLat = p.latitude;
+      if (p.latitude > maxLat) maxLat = p.latitude;
+      if (p.longitude < minLng) minLng = p.longitude;
+      if (p.longitude > maxLng) maxLng = p.longitude;
+    }
+
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+
+    try {
+      await controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 30));
+    } catch (e) {
+      debugPrint("Error moving camera: $e");
+      // fallback
+      await controller.animateCamera(
+        CameraUpdate.newLatLngZoom(points.first, 14),
+      );
     }
   }
 
@@ -78,11 +122,13 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
     Position position = await Geolocator.getCurrentPosition();
     _currentPosition = LatLng(position.latitude, position.longitude);
 
+    final currentIcon = await resizeMarkerIcon(Assets.assetsHueCurrent, 85);
+
     _currentLocationMarker = Marker(
-      markerId: MarkerId("currentLocation"),
+      markerId: const MarkerId("currentLocation"),
       position: _currentPosition!,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      infoWindow: InfoWindow(title: "You are here"),
+      icon: currentIcon,
+      infoWindow: const InfoWindow(title: "You are here"),
     );
 
     setState(() {
@@ -297,16 +343,13 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
           _polylines.add(Polyline(
             polylineId: PolylineId("pickup_to_drop_status_4"),
             points: routeToDrop,
-            color: Colors.purple, // Different color for status 4
-            width: 6,
+            color: PortColor.buttonBlue, // Different color for status 4
+            width: 3,
           ));
         });
 
-        // Camera position update karo - pickup aur drop dikhaye
-        if (mapController != null) {
-          final bounds = _createBounds([pickupLatLng, dropLatLng]);
-          mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100.0));
-        }
+        // ✅ USE moveCameraOnPolyline FUNCTION HERE
+        await moveCameraOnPolyline(routeToDrop);
 
         print("✅ Status 4 Polyline drawn successfully!");
         return; // Early return - status 4 has highest priority
@@ -323,15 +366,12 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
             polylineId: PolylineId("driver_to_pickup"),
             points: routeToPickup,
             color: PortColor.gold,
-            width: 5,
+            width: 3,
           ));
         });
 
-        // Camera position update karo - driver aur pickup dikhaye
-        if (mapController != null) {
-          final bounds = _createBounds([_currentPosition!, pickupLatLng]);
-          mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100.0));
-        }
+        // ✅ USE moveCameraOnPolyline FUNCTION HERE
+        await moveCameraOnPolyline(routeToPickup);
       }
     }
 
@@ -345,15 +385,12 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
             polylineId: PolylineId("pickup_to_drop"),
             points: routeToDrop,
             color: Colors.green,
-            width: 5,
+            width: 3,
           ));
         });
 
-        // Camera position update karo - pickup aur drop dikhaye
-        if (mapController != null) {
-          final bounds = _createBounds([pickupLatLng, dropLatLng]);
-          mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100.0));
-        }
+        // ✅ USE moveCameraOnPolyline FUNCTION HERE
+        await moveCameraOnPolyline(routeToDrop);
       }
     }
   }
@@ -374,6 +411,25 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
       northeast: LatLng(north ?? 0, east ?? 0),
     );
   }
+
+  Future<BitmapDescriptor> resizeMarkerIcon(String assetPath, int targetWidth) async {
+    final ByteData data = await rootBundle.load(assetPath);
+    final Uint8List bytes = data.buffer.asUint8List();
+
+    final ui.Codec codec = await ui.instantiateImageCodec(
+      bytes,
+      targetWidth: targetWidth,
+    );
+    final ui.FrameInfo fi = await codec.getNextFrame();
+
+    final ByteData? byteData =
+    await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
+
+    return BitmapDescriptor.fromBytes(resizedBytes);
+  }
+
+
 
   /// Sirf markers add karo, polyline alag se banega
   Future<void> _addBookingMarkers() async {
@@ -403,27 +459,35 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
         dropLatLng = await _getLatLngFromAddress(booking['drop_address'].toString());
       }
 
-      // Add pickup marker
+      // Add pickup marker - BADA SIZE (64x64)
       if (pickupLatLng != null) {
+        final pickupIcon = await resizeMarkerIcon(Assets.assetsPicupYoyo, 65);
+
         setState(() {
-          _markers.add(Marker(
-            markerId: MarkerId("pickup_${booking['id']}"),
-            position: pickupLatLng!,
-            infoWindow: InfoWindow(title: "Pickup Location"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          ));
+          _markers.add(
+            Marker(
+              markerId: MarkerId("pickup_${booking['id']}"),
+              position: pickupLatLng!,
+              infoWindow: const InfoWindow(title: "Pickup Location"),
+              icon: pickupIcon, // 🔹 custom image icon
+            ),
+          );
         });
       }
 
-      // Add drop marker
+      // Add drop marker - BADA SIZE (64x64)
       if (dropLatLng != null) {
+        final dropIcon = await resizeMarkerIcon(Assets.assetsDropYoyo, 65);
+
         setState(() {
-          _markers.add(Marker(
-            markerId: MarkerId("drop_${booking['id']}"),
-            position: dropLatLng!,
-            infoWindow: InfoWindow(title: "Drop Location"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          ));
+          _markers.add(
+            Marker(
+              markerId: MarkerId("drop_${booking['id']}"),
+              position: dropLatLng!,
+              infoWindow: const InfoWindow(title: "Drop Location"),
+              icon: dropIcon, // 👈 custom image icon
+            ),
+          );
         });
       }
     }
@@ -442,6 +506,8 @@ class _ConstWithPolylineMapState extends State<ConstWithPolylineMap> {
           child: GoogleMap(
             onMapCreated: (GoogleMapController controller) {
               mapController = controller;
+              completer.complete(controller); // ✅ Completer ko complete karo
+
               if (_currentPosition != null) {
                 mapController!.animateCamera(CameraUpdate.newCameraPosition(
                   CameraPosition(target: _currentPosition!, zoom: 12),

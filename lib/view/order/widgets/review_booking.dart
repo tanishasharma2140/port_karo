@@ -50,6 +50,7 @@ class _ReviewBookingState extends State<ReviewBooking> {
     ).selectVehicleModel!.data![widget.index!];
     return SafeArea(
       top: false,
+      bottom: true,
       child: Scaffold(
         backgroundColor: PortColor.bg,
         appBar: PreferredSize(

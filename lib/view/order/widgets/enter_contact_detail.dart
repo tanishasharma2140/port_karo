@@ -692,7 +692,9 @@ class _EnterContactDetailState extends State<EnterContactDetail>
         ),
         SizedBox(width: screenWidth * 0.02),
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            Navigator.pop(context);
+          },
           child: Container(
             height: screenHeight * 0.036,
             width: screenWidth * 0.14,

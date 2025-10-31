@@ -27,6 +27,8 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
   // 🔥 FLAGS FOR DIALOGS
   bool _showRideCompletedDialog = false;
   bool _showRideCancelledDialog = false;
+  bool _showOtpVerifiedDialog = false;
+  bool _showCollectPaymentDialog = false;
 
   @override
   void didChangeDependencies() {
@@ -52,13 +54,12 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     "Unable to contact driver",
     "Expected a shorter arrival time",
     "Driver asking for extra money",
-    "Driver not moving"
+    "Driver not moving",
   ];
 
-  // ✅ SAFE CONVERSION METHODS ADD KAREIN
+  // ✅ SAFE CONVERSION METHODS
   double? _safeToDouble(dynamic value) {
     if (value == null) return null;
-
     if (value is double) return value;
     if (value is int) return value.toDouble();
     if (value is String) {
@@ -74,7 +75,6 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
 
   int? _safeToInt(dynamic value) {
     if (value == null) return null;
-
     if (value is int) return value;
     if (value is double) return value.toInt();
     if (value is String) {
@@ -89,7 +89,10 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
   }
 
   void _showCancelBottomSheet() {
-    final updateRideStatusVm = Provider.of<UpdateRideStatusViewModel>(context, listen: false);
+    final updateRideStatusVm = Provider.of<UpdateRideStatusViewModel>(
+      context,
+      listen: false,
+    );
 
     showModalBottomSheet(
       context: context,
@@ -102,9 +105,14 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,9 +132,10 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
 
                     // Title
                     TextConst(
-                      title: "Drive on the way to pickup",
+                      title: "Cancel Ride",
                       color: PortColor.black,
                       fontWeight: FontWeight.w600,
+                      size: 18,
                     ),
                     const SizedBox(height: 4),
                     TextConst(
@@ -207,16 +216,19 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                             onTap: _selectedIndex == null
                                 ? null
                                 : () {
-                              updateRideStatusVm.updateRideApi(
-                                context,
-                                widget.orderData?['document_id'],
-                                "7",
-                              );
-                            },
+                                    updateRideStatusVm.updateRideApi(
+                                      context,
+                                      widget.orderData?['document_id'],
+                                      "7",
+                                    );
+                                    Navigator.of(context).pop();
+                                  },
                             child: Container(
                               height: 40,
                               decoration: BoxDecoration(
-                                color: _selectedIndex == null ? Colors.red[200] : Colors.red,
+                                color: _selectedIndex == null
+                                    ? Colors.red[200]
+                                    : Colors.red,
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   if (_selectedIndex != null)
@@ -277,7 +289,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     });
   }
 
-  // 🔥 NEW: RIDE CANCELLED DIALOG (Driver side cancellation - status 8)
+  // 🔥 RIDE CANCELLED DIALOG (Driver side cancellation - status 8)
   void _showRideCancelledDialogMethod(String orderId) {
     if (_showRideCancelledDialog) {
       print("⚠️ Ride cancelled dialog already showing");
@@ -309,20 +321,14 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.check_circle,
-                color: PortColor.rapidGreen,
-                size: 50,
-              ),
+              Icon(Icons.check_circle, color: PortColor.rapidGreen, size: 50),
               const SizedBox(height: 15),
               Text(
                 "Ride Completed!🎉🎉",
@@ -350,10 +356,11 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                 onPressed: () {
                   print("🏠 OK pressed from ride completed");
                   Navigator.pop(context);
-                  Provider.of<UpdateRideStatusViewModel>(context,listen: false).updateRideApi(context,  widget.orderData?['document_id'], "6");
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => BottomNavigationPage()),
-                        (route) => false,
+                    MaterialPageRoute(
+                      builder: (context) => BottomNavigationPage(),
+                    ),
+                    (route) => false,
                   );
                 },
                 child: const Text(
@@ -368,25 +375,19 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     );
   }
 
-  // 🔥 NEW: RIDE CANCELLED DIALOG WIDGET (Driver side cancellation)
+  // 🔥 RIDE CANCELLED DIALOG WIDGET (Driver side cancellation)
   Widget _buildRideCancelledDialog(String orderId) {
     return WillPopScope(
       onWillPop: () async => false,
       child: Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.cancel,
-                color: Colors.red,
-                size: 50,
-              ),
+              Icon(Icons.cancel, color: Colors.red, size: 50),
               const SizedBox(height: 15),
               Text(
                 "Ride Cancelled!",
@@ -425,8 +426,10 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                   print("🏠 OK pressed from cancelled - Navigating to Home");
                   Navigator.pop(context);
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => BottomNavigationPage()),
-                        (route) => false,
+                    MaterialPageRoute(
+                      builder: (context) => BottomNavigationPage(),
+                    ),
+                    (route) => false,
                   );
                 },
                 child: const Text(
@@ -453,26 +456,52 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     }
   }
 
-  // ✅ NEW METHOD: Real-time data ke saath map build karein
+  // Helper method to get ride status text
+  String _getRideStatusText(int rideStatus) {
+    switch (rideStatus) {
+      case 0:
+        return "Waiting for driver";
+      case 1:
+        return "Accepted by driver";
+      case 2:
+        return "On the way to pickup";
+      case 3:
+        return "Arrived at Pickup Point";
+      case 4:
+        return "OTP Verified - Ride Started";
+      case 5:
+        return "Ride Completed";
+      case 6:
+        return "Ride Completed Successfully";
+      case 7:
+        return "Cancelled by User";
+      case 8:
+        return "Cancelled by Driver";
+      default:
+        return "Waiting for driver";
+    }
+  }
+
+  // ✅ METHOD: Real-time data ke saath map build karein
   Widget _buildMapContainerWithData(Map<String, dynamic>? orderData) {
     return SizedBox(
-      height: screenHeight * 0.4,
+      // height: screenHeight * 0.5,
       child: ConstWithPolylineMap(
         data: orderData != null
             ? [
-          {
-            'id': orderData['document_id'] ?? 'unknown',
-            'pickup_address': orderData['pickup_address'],
-            'pickup_latitute': orderData['pickup_latitute'],
-            'pick_longitude': orderData['pick_longitude'],
-            'drop_address': orderData['drop_address'],
-            'drop_latitute': orderData['drop_latitute'],
-            'drop_logitute': orderData['drop_logitute'],
-            'ride_status': _safeToInt(orderData['ride_status']) ?? 0, // ✅ SAFE CONVERSION
-          }
-        ]
+                {
+                  'id': orderData['document_id'] ?? 'unknown',
+                  'pickup_address': orderData['pickup_address'],
+                  'pickup_latitute': orderData['pickup_latitute'],
+                  'pick_longitude': orderData['pick_longitude'],
+                  'drop_address': orderData['drop_address'],
+                  'drop_latitute': orderData['drop_latitute'],
+                  'drop_logitute': orderData['drop_logitute'],
+                  'ride_status': _safeToInt(orderData['ride_status']) ?? 0,
+                },
+              ]
             : null,
-        rideStatus: _safeToInt(orderData?['ride_status']) ?? 0, // ✅ SAFE CONVERSION
+        rideStatus: _safeToInt(orderData?['ride_status']) ?? 0,
         backIconAllowed: false,
         onAddressFetched: (address) {
           if (_currentAddress != address) {
@@ -536,25 +565,36 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
           final amount = _safeToDouble(orderData['amount']) ?? 0.0;
           final distance = _safeToDouble(orderData['distance']) ?? 0.0;
           final firebaseOrderId = orderId;
+          final otp = orderData['otp']?.toString() ?? "N/A";
+
+          // ✅ DEBUG PRINT
+          print("""
+🔍 ORDER STATUS UPDATE:
+   - Ride Status: $rideStatus (${_getRideStatusText(rideStatus)})
+   - Driver ID: $driverId
+   - Payment Mode: $payMode (${_getPaymentMethodText(payMode)})
+   - OTP: $otp
+   - Amount: $amount
+""");
 
           // ✅ REAL-TIME ORDER DATA UPDATE WITH SAFE CONVERSIONS
           final updatedOrderData = {
             ...widget.orderData ?? {},
             'document_id': orderId,
-            'ride_status': rideStatus, // ✅ Already converted to int
+            'ride_status': rideStatus,
             'pickup_latitute': orderData['pickup_latitute'],
             'pick_longitude': orderData['pick_longitude'],
             'drop_latitute': orderData['drop_latitute'],
             'drop_logitute': orderData['drop_logitute'],
             'pickup_address': orderData['pickup_address'],
             'drop_address': orderData['drop_address'],
+            'otp': otp,
           };
-
-          print("🔄 Updated Order Data - Ride Status: $rideStatus, Type: ${rideStatus.runtimeType}");
 
           // 🔥 CONDITION 1: Online payment - navigate to PaymentSummaryScreen
           if (rideStatus == 5 && payMode == 2) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              print("💳 Navigating to Payment Summary (Online Payment)");
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -569,14 +609,26 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
           }
 
           // 🔥 CONDITION 2: Cash payment completed - show ride completed dialog
+          if (rideStatus == 5 && payMode == 1 && !_showCollectPaymentDialog) {
+            print("💵 STREAMBUILDER: Reached destination with cash payment - show collect payment dialog!");
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showCollectPaymentDialogMethod();
+            });
+          }
+
           if (rideStatus == 6 && payMode == 1 && !_showRideCompletedDialog) {
             print("💵 STREAMBUILDER: Ride completed with cash payment!");
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _showRideCompletedDialogMethod();
             });
           }
+          // 🔥 CONDITION 3: OTP Verified (Status 4) - show OTP verified dialog
+          if (rideStatus == 4 && !_showOtpVerifiedDialog) {
+            print("✅ STREAMBUILDER: OTP Verified - Ride Started!");
+            WidgetsBinding.instance.addPostFrameCallback((_) {});
+          }
 
-          // 🔥 NEW CONDITION 3: Ride cancelled by driver (status 8) - show cancelled dialog
+          // 🔥 CONDITION 4: Ride cancelled by driver (status 8) - show cancelled dialog
           if (rideStatus == 8 && !_showRideCancelledDialog) {
             print("❌ STREAMBUILDER: Ride cancelled by driver detected!");
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -589,7 +641,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
             return _buildSearchingSection(updatedOrderData);
           }
 
-          // Driver assigned, show driver info + OTP for ride_status 1-5
+          // Driver assigned, show driver info + OTP for appropriate status
           return StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('driver')
@@ -613,7 +665,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
               }
 
               final driverData =
-              driverSnapshot.data!.data() as Map<String, dynamic>;
+                  driverSnapshot.data!.data() as Map<String, dynamic>;
 
               return _buildMainLayout(
                 middleSection: _buildDriverInfo(driverData),
@@ -627,51 +679,115 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     );
   }
 
-  // Main Layout
-// Main Layout - ISE UPDATE KAREIN
+  void _showCollectPaymentDialogMethod() {
+    if (_showCollectPaymentDialog) return;
+    _showCollectPaymentDialog = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: PortColor.gold, width: 2),
+          ),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          elevation: 8,
+          shadowColor: Colors.black26,
+          title: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green[100]!, width: 1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.location_on, color: Colors.white, size: 18),
+                ),
+                SizedBox(width: 10),
+                TextConst(
+                  title: "Reached Destination",
+                  size: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green[800],
+                ),
+              ],
+            ),
+          ),
+          content: Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!, width: 1),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.payment, color: PortColor.grey, size: 14),
+                    SizedBox(width: 6),
+                    TextConst(
+                      title: "Make Payment of Trip",
+                      color: PortColor.blackLight,
+                      size: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).then((value) {
+      _showCollectPaymentDialog = false;
+    });
+  }
+
+  // Main Layout - UPDATED WITH PROPER OTP HANDLING
   Widget _buildMainLayout({
     required Widget middleSection,
     Map<String, dynamic>? orderData,
     Map<String, dynamic>? driverData,
   }) {
-    String rideStatusText = "";
-    final rideStatus = _safeToInt(orderData?['ride_status']) ?? 0; // ✅ SAFE CONVERSION
-    final payMode = _safeToInt(orderData?['paymode']) ?? 1; // ✅ SAFE CONVERSION
+    final rideStatus = _safeToInt(orderData?['ride_status']) ?? 0;
+    final payMode = _safeToInt(orderData?['paymode']) ?? 1;
+    final otp = orderData?['otp']?.toString() ?? "N/A";
 
-    if (orderData != null) {
-      if (rideStatus == 1) {
-        rideStatusText = "Accepted by driver";
-      } else if (rideStatus == 2) {
-        rideStatusText = "On the way / Reached soon";
-      } else if (rideStatus == 3) {
-        rideStatusText = "Arrived at Pickup Point";
-      } else if (rideStatus == 4) {
-        rideStatusText = "OTP Verified / Ride Begun";
-      } else if (rideStatus == 8) {
-        rideStatusText = "Ride Cancelled by Driver";
-      }
-    }
+    String rideStatusText = _getRideStatusText(rideStatus);
 
-    // Check if we should show OTP and Cancel Ride
-    bool showOtpAndCancel = rideStatus != 4 && rideStatus != 8 && rideStatus != 5 && rideStatus != 6;
+    // ✅ UPDATED: Check if we should show OTP and Cancel Ride
+    bool showOtpAndCancel = rideStatus >= 1 && rideStatus <= 3;
+    bool showOtpSection = showOtpAndCancel && otp != "N/A" && otp.isNotEmpty;
 
     return Stack(
       children: [
-        // ⚠️ Map stays fixed in the background - WITH REAL-TIME DATA
+        // Map stays fixed in the background - WITH REAL-TIME DATA
         _buildMapContainerWithData(orderData),
 
         // Draggable bottom sheet
         DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.6,
+          initialChildSize: 0.4,
+          minChildSize: 0.4,
           maxChildSize: 0.8,
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(24),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
@@ -690,6 +806,7 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                       child: Container(
                         width: 40,
                         height: 5,
+                        margin: const EdgeInsets.only(top: 8),
                         decoration: BoxDecoration(
                           color: Colors.grey[400],
                           borderRadius: BorderRadius.circular(10),
@@ -698,39 +815,66 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Ride status
-                    if (rideStatusText.isNotEmpty)
-                      Center(
-                        child: TextConst(
-                          title: rideStatusText,
-                          fontFamily: AppFonts.kanitReg,
-                          fontWeight: FontWeight.bold,
-                          size: 16,
+                    // ✅ UPDATED: Ride status with icons
+                    Column(
+                      children: [
+                        if (rideStatus == 4) // OTP Verified
+                          Icon(Icons.verified, color: Colors.green, size: 40),
+                        if (rideStatus == 5 || rideStatus == 6) // Completed
+                          Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 40,
+                          ),
+                        if (rideStatus == 7 || rideStatus == 8) // Cancelled
+                          Icon(Icons.cancel, color: Colors.red, size: 40),
+
+                        Center(
+                          child: TextConst(
+                            title: rideStatusText,
+                            fontFamily: AppFonts.kanitReg,
+                            fontWeight: FontWeight.bold,
+                            size: 16,
+                            color: _getStatusColor(rideStatus),
+                          ),
                         ),
-                      ),
+
+                        if (rideStatus == 6 && payMode == 1)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              "Payment completed with cash",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.green[700],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
 
                     middleSection,
 
-                    // ✅ OTP Section - FIXED CONDITION
-                    if (driverData != null &&
-                        orderData != null &&
-                        showOtpAndCancel &&
-                        (rideStatus == 1 || rideStatus == 2 || rideStatus == 3))
-                      _buildOtpSection(orderData['otp']?.toString() ?? "N/A"),
+                    if (showOtpSection) _buildOtpSection(otp),
 
                     // Address card
                     buildAddressCard(),
 
                     // Payment container
-                    buildPaymentContainer(payMode), // ✅ Already converted
+                    buildPaymentContainer(payMode),
 
-                    // Cancel Ride Button - Only show if ride status is not 5 or 8
                     if (showOtpAndCancel)
                       GestureDetector(
                         onTap: _showCancelBottomSheet,
                         child: Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: PortColor.white,
@@ -753,7 +897,45 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                           ),
                         ),
                       ),
-                    const SizedBox(height: 10)
+
+                    // ✅ COMPLETION MESSAGE for status 4,5,6
+                    if (rideStatus >= 4 && rideStatus <= 6)
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(rideStatus).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _getStatusColor(rideStatus),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              _getCompletionMessage(rideStatus),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: _getStatusColor(rideStatus),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _getCompletionSubtitle(rideStatus, payMode),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: _getStatusColor(rideStatus),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -762,6 +944,55 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
         ),
       ],
     );
+  }
+
+  // Helper method to get status color
+  Color _getStatusColor(int rideStatus) {
+    switch (rideStatus) {
+      case 4: // OTP Verified
+        return Colors.green;
+      case 5: // Completed
+      case 6: // Completed Successfully
+        return Colors.green;
+      case 7: // Cancelled by User
+      case 8: // Cancelled by Driver
+        return Colors.red;
+      case 1: // Accepted
+      case 2: // On the way
+      case 3: // Arrived
+        return PortColor.gold;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  // Helper method to get completion message
+  String _getCompletionMessage(int rideStatus) {
+    switch (rideStatus) {
+      case 4:
+        return "🚗 Ride Started!";
+      case 5:
+      case 6:
+        return "🎉 Trip Completed!";
+      default:
+        return "";
+    }
+  }
+
+  // Helper method to get completion subtitle
+  String _getCompletionSubtitle(int rideStatus, int payMode) {
+    switch (rideStatus) {
+      case 4:
+        return "Your ride has started. Have a safe journey!";
+      case 5:
+        return payMode == 1
+            ? "Payment completed with cash"
+            : "Please complete the payment";
+      case 6:
+        return "Thank you for choosing our service";
+      default:
+        return "";
+    }
   }
 
   // Searching Section
@@ -799,69 +1030,77 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     );
   }
 
-  // OTP Section
-// OTP Section mein debugging add karein
+  // OTP Section - ENHANCED WITH BETTER UI
   Widget _buildOtpSection(String otp) {
-    // ✅ DEBUGGING: Check OTP value
     print("🔑 OTP Section Called - OTP Value: $otp");
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: PortColor.white,
-        border: Border.all(color: PortColor.grey),
+        color: Colors.blue[50],
+        border: Border.all(color: Colors.blue),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.blue.withOpacity(0.2),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          // Lock Icon with background
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: PortColor.gold.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.lock, color: PortColor.gold, size: 18),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Lock Icon with background
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.lock, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+
+              // OTP Label
+              TextConst(
+                title: "Your Trip OTP",
+                color: Colors.blue[800],
+                fontWeight: FontWeight.w600,
+                size: 16,
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
+          const SizedBox(height: 12),
 
-          // OTP Label
-          TextConst(
-            title: "Your Trip OTP :",
-            color: Colors.grey[700],
-            fontWeight: FontWeight.w600,
-            size: 16,
-          ),
-
-          const Spacer(),
-
-          // Info Icon
+          // OTP Display
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              color: PortColor.gold.withOpacity(0.1),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: PortColor.gold.withOpacity(0.3)),
+              border: Border.all(color: Colors.blue),
             ),
             child: Text(
-              otp == "N/A" ? "Waiting..." : otp, // ✅ Better handling for N/A case
+              otp,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: PortColor.gold,
+                color: Colors.blue[800],
                 fontFamily: AppFonts.kanitReg,
-                letterSpacing: 2,
+                letterSpacing: 4,
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+
+          Text(
+            "Share this OTP with driver at pickup time",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.blue[700], fontSize: 12),
           ),
         ],
       ),
@@ -876,13 +1115,23 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
     final vehicleType = driverData['vehicle_type_name'] ?? "Vehicle";
     final driverImage =
         driverData['owner_selfie'] ??
-            driverData['vehicle_type_image'] ??
-            'assets/images/driver_avatar.png';
+        driverData['vehicle_type_image'] ??
+        'assets/images/driver_avatar.png';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: PortColor.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           CircleAvatar(
@@ -993,23 +1242,23 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
                   children: [
                     _singleAddressDetail(
                       name:
-                      widget.orderData?['sender_name'] ?? "Tanisha Sharma",
+                          widget.orderData?['sender_name'] ?? "Tanisha Sharma",
                       phone:
-                      widget.orderData?['sender_phone']?.toString() ??
+                          widget.orderData?['sender_phone']?.toString() ??
                           "7235947667",
                       address:
-                      widget.orderData?['pickup_address'] ??
+                          widget.orderData?['pickup_address'] ??
                           "Naya Khera, Jankipuram Extension,...",
                     ),
                     const SizedBox(height: 12),
                     _singleAddressDetail(
                       name:
-                      widget.orderData?['reciver_name'] ?? "Tanisha Sharma",
+                          widget.orderData?['reciver_name'] ?? "Tanisha Sharma",
                       phone:
-                      widget.orderData?['reciver_phone']?.toString() ??
+                          widget.orderData?['reciver_phone']?.toString() ??
                           "7235947667",
                       address:
-                      widget.orderData?['drop_address'] ??
+                          widget.orderData?['drop_address'] ??
                           "Tedhi Pulia, Sector H, Jankipuram, ...",
                     ),
                   ],
@@ -1018,20 +1267,6 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
             ],
           ),
           SizedBox(height: screenHeight * 0.02),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.menu_open, color: PortColor.gold),
-              SizedBox(width: screenWidth * 0.02),
-              const TextConst(
-                title: "View Details",
-                color: PortColor.gold,
-                fontWeight: FontWeight.w600,
-                size: 16,
-              ),
-            ],
-          ),
-          SizedBox(height: screenHeight * 0.01),
         ],
       ),
     );
@@ -1108,7 +1343,11 @@ class _DriverSearchingScreenState extends State<DriverSearchingScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextConst(title: paymentMethod, size: 16, fontWeight: FontWeight.w600),
+              TextConst(
+                title: paymentMethod,
+                size: 16,
+                fontWeight: FontWeight.w600,
+              ),
               const SizedBox(height: 4),
               Text(
                 "Payment method",

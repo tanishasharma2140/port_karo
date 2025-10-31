@@ -1,28 +1,28 @@
 class UserHistoryModel {
-  List<Data>? data;
   bool? success;
   String? message;
+  List<Data>? data;
 
-  UserHistoryModel({this.data, this.success, this.message});
+  UserHistoryModel({this.success, this.message, this.data});
 
   UserHistoryModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
         data!.add(Data.fromJson(v));
       });
     }
-    success = json['success'];
-    message = json['message'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['success'] = success;
-    data['message'] = message;
     return data;
   }
 }
@@ -37,11 +37,17 @@ class Data {
   int? phone;
   int? status;
   dynamic wallet;
-  dynamic fcm;
+  String? fcm;
   String? createdAt;
   String? updatedAt;
+  dynamic gstNumber;
+  dynamic gstAddress;
   int? userid;
   String? vehicleType;
+  int? vehicleBodyDetailsType;
+  int? vehicleBodyType;
+  String? availableDriverId;
+  int? driverId;
   String? pickupAddress;
   String? pickupLatitute;
   String? pickLongitude;
@@ -53,18 +59,23 @@ class Data {
   String? reciverName;
   int? reciverPhone;
   int? rideStatus;
-  dynamic driverId;
   int? amount;
-  int? distance;
-  String? datetime;
-  int? paymentStatus;
   int? paymode;
-  dynamic txnId;
+  int? paymentStatus;
+  int? distance;
+  String? pickupSaveAs;
+  String? dropSaveAs;
+  dynamic orderTime;
+  int? orderType;
+  int? otp;
   String? goodsType;
+  String? datetime;
+  dynamic txnId;
   String? dbVehicleName;
   String? vehicleImage;
-  String? amountPrKm;
   String? vehicleName;
+  int? userRating;
+  String? ratingDate;
 
   Data(
       {this.id,
@@ -79,8 +90,14 @@ class Data {
         this.fcm,
         this.createdAt,
         this.updatedAt,
+        this.gstNumber,
+        this.gstAddress,
         this.userid,
         this.vehicleType,
+        this.vehicleBodyDetailsType,
+        this.vehicleBodyType,
+        this.availableDriverId,
+        this.driverId,
         this.pickupAddress,
         this.pickupLatitute,
         this.pickLongitude,
@@ -92,18 +109,23 @@ class Data {
         this.reciverName,
         this.reciverPhone,
         this.rideStatus,
-        this.driverId,
         this.amount,
-        this.distance,
-        this.datetime,
-        this.paymentStatus,
         this.paymode,
-        this.txnId,
+        this.paymentStatus,
+        this.distance,
+        this.pickupSaveAs,
+        this.dropSaveAs,
+        this.orderTime,
+        this.orderType,
+        this.otp,
         this.goodsType,
+        this.datetime,
+        this.txnId,
         this.dbVehicleName,
         this.vehicleImage,
-        this.amountPrKm,
-        this.vehicleName});
+        this.vehicleName,
+        this.userRating,
+        this.ratingDate});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -118,8 +140,14 @@ class Data {
     fcm = json['fcm'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    gstNumber = json['gst_number'];
+    gstAddress = json['gst_address'];
     userid = json['userid'];
     vehicleType = json['vehicle_type'];
+    vehicleBodyDetailsType = json['vehicle_body_details_type'];
+    vehicleBodyType = json['vehicle_body_type'];
+    availableDriverId = json['available_driver_id'];
+    driverId = json['driver_id'];
     pickupAddress = json['pickup_address'];
     pickupLatitute = json['pickup_latitute'];
     pickLongitude = json['pick_longitude'];
@@ -131,18 +159,23 @@ class Data {
     reciverName = json['reciver_name'];
     reciverPhone = json['reciver_phone'];
     rideStatus = json['ride_status'];
-    driverId = json['driver_id'];
     amount = json['amount'];
-    distance = json['distance'];
-    datetime = json['datetime'];
-    paymentStatus = json['payment_status'];
     paymode = json['paymode'];
-    txnId = json['txn_id'];
+    paymentStatus = json['payment_status'];
+    distance = json['distance'];
+    pickupSaveAs = json['pickup_save_as'];
+    dropSaveAs = json['drop_save_as'];
+    orderTime = json['order_time'];
+    orderType = json['order_type'];
+    otp = json['otp'];
     goodsType = json['goods_type'];
+    datetime = json['datetime'];
+    txnId = json['txn_id'];
     dbVehicleName = json['db_vehicle_name'];
     vehicleImage = json['vehicle_image'];
-    amountPrKm = json['amount_pr_km'];
     vehicleName = json['vehicle_name'];
+    userRating = json['user_rating'];
+    ratingDate = json['rating_date'];
   }
 
   Map<String, dynamic> toJson() {
@@ -159,8 +192,14 @@ class Data {
     data['fcm'] = fcm;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
+    data['gst_number'] = gstNumber;
+    data['gst_address'] = gstAddress;
     data['userid'] = userid;
     data['vehicle_type'] = vehicleType;
+    data['vehicle_body_details_type'] = vehicleBodyDetailsType;
+    data['vehicle_body_type'] = vehicleBodyType;
+    data['available_driver_id'] = availableDriverId;
+    data['driver_id'] = driverId;
     data['pickup_address'] = pickupAddress;
     data['pickup_latitute'] = pickupLatitute;
     data['pick_longitude'] = pickLongitude;
@@ -172,18 +211,23 @@ class Data {
     data['reciver_name'] = reciverName;
     data['reciver_phone'] = reciverPhone;
     data['ride_status'] = rideStatus;
-    data['driver_id'] = driverId;
     data['amount'] = amount;
-    data['distance'] = distance;
-    data['datetime'] = datetime;
-    data['payment_status'] = paymentStatus;
     data['paymode'] = paymode;
-    data['txn_id'] = txnId;
+    data['payment_status'] = paymentStatus;
+    data['distance'] = distance;
+    data['pickup_save_as'] = pickupSaveAs;
+    data['drop_save_as'] = dropSaveAs;
+    data['order_time'] = orderTime;
+    data['order_type'] = orderType;
+    data['otp'] = otp;
     data['goods_type'] = goodsType;
+    data['datetime'] = datetime;
+    data['txn_id'] = txnId;
     data['db_vehicle_name'] = dbVehicleName;
     data['vehicle_image'] = vehicleImage;
-    data['amount_pr_km'] = amountPrKm;
     data['vehicle_name'] = vehicleName;
+    data['user_rating'] = userRating;
+    data['rating_date'] = ratingDate;
     return data;
   }
 }

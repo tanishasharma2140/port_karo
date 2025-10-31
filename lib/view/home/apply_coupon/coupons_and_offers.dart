@@ -47,12 +47,38 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
     final applyCoupon = Provider.of<ApplyCouponViewModel>(context);
     return Scaffold(
       backgroundColor: PortColor.bg,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(screenHeight * 0.06),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back, size: screenHeight * 0.025),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                color: PortColor.black,
+              ),
+              SizedBox(width: screenWidth * 0.02),
+              TextConst(
+                title: "Coupons & Offers",
+                color: PortColor.black,
+                size: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: topPadding),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -64,94 +90,67 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
                 ),
               ],
             ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        color: Colors.transparent,
-                        child: Icon(Icons.arrow_back, size: 16),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20,right: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.only(left: 10),
+                      height: 35,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey.shade300),
                       ),
-                    ),
-                    const SizedBox(width: 15),
-                    TextConst(
-                      title: "Coupons & Offers",
-                      color: PortColor.black,
-                      fontFamily: AppFonts.kanitReg,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.only(left: 36),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.only(left: 10),
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: TextField(
-                            controller: _couponController,
-                            decoration: const InputDecoration(
-                              hintText: 'Enter code here',
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(color: Colors.grey),
-                            ),
-                          ),
+                      child: TextField(
+                        controller: _couponController,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter code here',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(color: Colors.grey),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      GestureDetector(
-                        onTap: () {
-                          applyCoupon.applyCouponApi(
-                            _couponController.text,
-                            widget.price,
-                            context,
-                          );
-                        },
-                        child: Container(
-                          height: 35,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 13,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              // Entered code apply logic
-                            },
-                            child: Text(
-                              'APPLY',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: AppFonts.kanitReg,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-              ],
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () {
+                      applyCoupon.applyCouponApi(
+                        _couponController.text,
+                        widget.price,
+                        context,
+                      );
+                    },
+                    child: Container(
+                      height: 35,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 13,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Entered code apply logic
+                        },
+                        child: Text(
+                          'APPLY',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: AppFonts.kanitReg,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -280,23 +279,33 @@ class _CouponsAndOffersState extends State<CouponsAndOffers> {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: couponListOffer.claimStatus == 1
-                                        ? PortColor.gold
-                                        : Colors.grey.shade300,
+                                    color: applyCoupon.applyStatus == 2
+                                        ? Colors.green.withOpacity(0.15)
+                                        : (couponListOffer.claimStatus == 1
+                                        ? PortColor.gold // normal apply color
+                                        : Colors.grey.shade300), // disabled
                                     borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: applyCoupon.applyStatus == 2
+                                          ? Colors.green
+                                          : Colors.transparent,
+                                    ),
                                   ),
                                   child: Text(
-                                    "APPLY",
+                                    applyCoupon.applyStatus == 2 ? "APPLIED" : "APPLY",
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
-                                      color: couponListOffer.claimStatus == 1
+                                      color: applyCoupon.applyStatus == 2
+                                          ? Colors.green.shade800
+                                          : (couponListOffer.claimStatus == 1
                                           ? Colors.black
-                                          : Colors.black38,
+                                          : Colors.black38),
                                       fontFamily: AppFonts.kanitReg,
                                     ),
                                   ),
                                 ),
+
                               ),
                             ],
                           ),

@@ -149,6 +149,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
 
     return SafeArea(
       top: false,
+      bottom: true,
       child: Scaffold(
         backgroundColor: PortColor.bg,
         body: Column(
@@ -220,7 +221,7 @@ class _SelectVehiclesState extends State<SelectVehicles> {
                                 (index) => Container(
                               width: screenWidth * 0.003,
                               height: screenHeight * 0.0025,
-                              margin: const EdgeInsets.symmetric(vertical: 2),
+                              margin: const EdgeInsets.symmetric(vertical: 1),
                               color: PortColor.gray,
                             ),
                           ),
