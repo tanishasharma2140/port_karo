@@ -1,7 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:port_karo/main.dart';
+import 'package:port_karo/model/daily_slot_model.dart';
+import 'package:port_karo/model/final_summary_model.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_text.dart';
+import 'package:port_karo/view_model/daily_slot_view_model.dart';
+import 'package:port_karo/view_model/final_summary_view_model.dart';
+import 'package:provider/provider.dart';
 import '../../../../res/constant_color.dart' show PortColor;
 
 class ScheduleScreen extends StatefulWidget {
@@ -12,270 +18,707 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
-  bool _installationSelected = false;
-  bool _singleLayerPacking = false;
-  bool _multiLayerPacking = false;
-  bool _coverSelected = false;
+  bool _singleLayer = false;
+  bool _multiLayer = false;
+  bool _unpacking = false;
+  bool _dismantle = false;
   String? _selectedTimeSlot;
   String? _selectedSession = "Morning";
   bool _slotConfirmed = false;
+  int selectedDateIndex = 0;
+  String? selectedDate;
+  int selectedSingle = 0;
+  int selectedMulti = 0;
+  int selectedUnpack = 0;
+  int selectedDismantle = 0;
 
-  final List<Map<String, dynamic>> _dateItems = [
-    {'day': '19', 'weekDay': 'Today', 'price': '₹1,564', 'selected': true},
-    {'day': '20', 'weekDay': 'Sat', 'price': '₹1,864', 'selected': false},
-    {'day': '21', 'weekDay': 'Sun', 'price': '₹1,864', 'selected': false},
-    {'day': '22', 'weekDay': 'Mon', 'price': '₹1,564', 'selected': false},
-  ];
+  @override
+  void initState() {
+    super.initState();
 
-  List<String> _getTimeSlotsForSession() {
-    switch (_selectedSession) {
-      case "Morning":
-        return [
-          "8:00 AM - 9:00 AM",
-          "9:00 AM - 10:00 AM",
-          "10:00 AM - 11:00 AM",
-          "11:00 AM - 12:00 PM",
-        ];
-      case "Afternoon":
-        return [
-          "12:00 PM - 1:00 PM",
-          "1:00 PM - 2:00 PM",
-          "2:00 PM - 3:00 PM",
-          "3:00 PM - 4:00 PM",
-        ];
-      case "Evening":
-        return [
-          "4:00 PM - 5:00 PM",
-          "5:00 PM - 6:00 PM",
-          "6:00 PM - 7:00 PM",
-        ];
-      default:
-        return [];
-    }
+    // Final summary data load hone ka wait karo
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final summaryVm = Provider.of<FinalSummaryViewModel>(context, listen: false);
+
+      if (summaryVm.finalSummaryModel != null) {
+        // Set selected date from final summary
+        selectedDate ??= summaryVm.finalSummaryModel!.dateBaseAddAmount!.first.date
+            ?? DateTime.now().add(Duration(days: 1)).toString().split(" ")[0];
+
+        // Load slots for selected date
+        final dailySlotVm = Provider.of<DailySlotViewModel>(context, listen: false);
+        dailySlotVm.dailySlotApi(selectedDate!);
+      }
+    });
   }
 
+
   void _showPickupSlotModal() {
+    final dailySlotVm = Provider.of<DailySlotViewModel>(context, listen: false);
+    final summaryVm = Provider.of<FinalSummaryViewModel>(context, listen: false);
+
+    // Final summary se selected date le rahe hain
+    final availableDates = summaryVm.finalSummaryModel?.dateBaseAddAmount ?? [];
+
+    // Current selected date from main screen - YEH IMPORTANT HAI
+    String currentSelectedDate = selectedDate ?? availableDates.first.date ?? '';
+
+    // Ensure slots are loaded for the selected date before opening modal
+    if (currentSelectedDate.isNotEmpty) {
+      dailySlotVm.dailySlotApi(currentSelectedDate);
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            decoration: BoxDecoration(
-              color: PortColor.bg,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Column(
-              children: [
-                // Header
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.05,
-                    vertical: screenHeight * 0.02,
-                  ),
-                  decoration: BoxDecoration(
-                    color: PortColor.white,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          Icons.close,
-                          color: PortColor.black,
-                          size: screenHeight * 0.025,
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.03),
-                      TextConst(
-                        title: "Select Pickup Slot",
-                        color: PortColor.black,
-                        fontFamily: AppFonts.kanitReg,
-                        fontWeight: FontWeight.w600,
-                        size: 16,
-                      ),
-                    ],
+      builder: (context) => Consumer<DailySlotViewModel>(
+        builder: (context, dailySlotVm, child) {
+          final dailySlots = dailySlotVm.dailySlotModel;
+
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+
+              // Format date for display
+              String formatDateForDisplay(String dateString) {
+                if (dateString.isEmpty) return 'Date not available';
+                try {
+                  DateTime date = DateTime.parse(dateString);
+                  String day = date.day.toString().padLeft(2, '0');
+                  String month = _getMonthName(date.month);
+                  String year = date.year.toString();
+                  return '$day $month $year';
+                } catch (e) {
+                  return dateString;
+                }
+              }
+
+              // Debug print - check if correct date is being used
+              print('Modal - Selected Date: $currentSelectedDate');
+              print('Modal - DailySlots Date: ${dailySlots?.date}');
+              print('Modal - Loading: ${dailySlotVm.loading}');
+
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.8,
+                decoration: BoxDecoration(
+                  color: PortColor.bg,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                 ),
+                child: Column(
+                  children: [
+                    // Header
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.05,
+                        vertical: screenHeight * 0.02,
+                      ),
+                      decoration: BoxDecoration(
+                        color: PortColor.white,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Icon(
+                              Icons.close,
+                              color: PortColor.black,
+                              size: screenHeight * 0.025,
+                            ),
+                          ),
+                          SizedBox(width: screenWidth * 0.03),
+                          TextConst(
+                            title: "Select Pickup Slot",
+                            color: PortColor.black,
+                            fontFamily: AppFonts.kanitReg,
+                            fontWeight: FontWeight.w600,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
 
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(screenWidth * 0.05),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Date Section
-                        Center(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.04,
-                              vertical: screenHeight * 0.01,
+                    // Loading State
+                    if (dailySlotVm.loading) ...[
+                      Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CupertinoActivityIndicator(
+                                radius: 18,
+                                color: PortColor.button,
+                              ),
+                              SizedBox(height: screenHeight * 0.02),
+                              TextConst(
+                                title: "Loading slots for ${formatDateForDisplay(currentSelectedDate)}...",
+                                color: Colors.grey,
+                                fontFamily: AppFonts.kanitReg,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ]
+                    // Data Loaded Successfully
+                    else if (dailySlots != null) ...[
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.all(screenWidth * 0.05),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Date Section - Only show selected date from main screen
+                              Center(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.04,
+                                    vertical: screenHeight * 0.015,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: PortColor.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: PortColor.button),
+                                  ),
+                                  child: TextConst(
+                                    title: formatDateForDisplay(currentSelectedDate),
+                                    fontFamily: AppFonts.poppinsReg,
+                                    color: PortColor.button,
+                                    fontWeight: FontWeight.w600,
+                                    size: 14,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: screenHeight * 0.03),
+
+                              // Check if slots data matches the selected date
+                              if (dailySlots.date != currentSelectedDate) ...[
+                                Center(
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.error_outline,
+                                        color: Colors.orange,
+                                        size: screenHeight * 0.06,
+                                      ),
+                                      SizedBox(height: screenHeight * 0.02),
+                                      TextConst(
+                                        title: "Loading slots for selected date...",
+                                        fontFamily: AppFonts.kanitReg,
+                                        color: Colors.orange,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]
+                              else ...[
+                                // Time Slot Sections in Row - ONLY SHOW IF DATE MATCHES
+                                Row(
+                                  children: [
+                                    // Morning Section
+                                    if (dailySlots.slots?.morning != null)
+                                      Expanded(
+                                        child: _buildTimeSlotCardFromApi(
+                                          "Morning",
+                                          dailySlots.slots!.morning!,
+                                          Icons.wb_sunny_outlined,
+                                          _selectedSession == "Morning",
+                                              () {
+                                            setModalState(() {
+                                              _selectedSession = "Morning";
+                                              _selectedTimeSlot = null;
+                                            });
+                                          },
+                                        ),
+                                      ),
+
+                                    if (dailySlots.slots?.morning != null)
+                                      SizedBox(width: screenWidth * 0.02),
+
+                                    // Afternoon Section
+                                    if (dailySlots.slots?.afternoon != null)
+                                      Expanded(
+                                        child: _buildTimeSlotCardFromApi(
+                                          "Afternoon",
+                                          dailySlots.slots!.afternoon!,
+                                          Icons.light_mode_outlined,
+                                          _selectedSession == "Afternoon",
+                                              () {
+                                            setModalState(() {
+                                              _selectedSession = "Afternoon";
+                                              _selectedTimeSlot = null;
+                                            });
+                                          },
+                                        ),
+                                      ),
+
+                                    if (dailySlots.slots?.afternoon != null)
+                                      SizedBox(width: screenWidth * 0.02),
+
+                                    // Evening Section
+                                    if (dailySlots.slots?.evening != null)
+                                      Expanded(
+                                        child: _buildTimeSlotCardFromApi(
+                                          "Evening",
+                                          dailySlots.slots!.evening!,
+                                          Icons.nights_stay_outlined,
+                                          _selectedSession == "Evening",
+                                              () {
+                                            setModalState(() {
+                                              _selectedSession = "Evening";
+                                              _selectedTimeSlot = null;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                  ],
+                                ),
+
+                                SizedBox(height: screenHeight * 0.03),
+
+                                // Individual Time Slots based on selected session
+                                if (_selectedSession != null && _getSelectedSessionSlots() != null) ...[
+                                  TextConst(
+                                    title: "Available Time Slots",
+                                    fontFamily: AppFonts.kanitReg,
+                                    fontWeight: FontWeight.w600,
+                                    size: 16,
+                                    color: PortColor.black,
+                                  ),
+                                  SizedBox(height: screenHeight * 0.02),
+
+                                  _buildAvailableSlotsList(setModalState),
+                                ],
+
+                                // No slots available message
+                                if (_selectedSession != null && _getSelectedSessionSlots() == null) ...[
+                                  Center(
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.schedule,
+                                          color: Colors.grey,
+                                          size: screenHeight * 0.06,
+                                        ),
+                                        SizedBox(height: screenHeight * 0.02),
+                                        TextConst(
+                                          title: "No slots available for $_selectedSession",
+                                          fontFamily: AppFonts.kanitReg,
+                                          color: Colors.grey,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ],
+
+                              SizedBox(height: screenHeight * 0.05),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ]
+
+                    // No Data State
+                    else ...[
+                        Expanded(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.schedule,
+                                  color: Colors.grey,
+                                  size: screenHeight * 0.06,
+                                ),
+                                SizedBox(height: screenHeight * 0.02),
+                                TextConst(
+                                  title: "No slot data available for ${formatDateForDisplay(currentSelectedDate)}",
+                                  color: Colors.grey,
+                                  fontFamily: AppFonts.kanitReg,
+                                ),
+                                SizedBox(height: screenHeight * 0.02),
+                                GestureDetector(
+                                  onTap: () {
+                                    dailySlotVm.dailySlotApi(currentSelectedDate);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.04,
+                                      vertical: screenHeight * 0.01,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: PortColor.button,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: TextConst(
+                                      title: "Load Slots",
+                                      color: PortColor.black,
+                                      fontFamily: AppFonts.kanitReg,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            decoration: BoxDecoration(
-                              color: PortColor.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: PortColor.button),
-                            ),
+                          ),
+                        ),
+                      ],
+
+                    // Confirm Button
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.05,
+                        vertical: screenHeight * 0.02,
+                      ),
+                      decoration: BoxDecoration(
+                        color: PortColor.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, -2),
+                          ),
+                        ],
+                      ),
+                      child: GestureDetector(
+                        onTap: _selectedTimeSlot != null
+                            ? () {
+                          Navigator.pop(context);
+                          setState(() {
+                            _slotConfirmed = true;
+                          });
+                        }
+                            : null,
+                        child: Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            vertical: screenHeight * 0.018,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _selectedTimeSlot != null
+                                ? PortColor.button
+                                : Colors.grey,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Center(
                             child: TextConst(
-                              title: '03 OCT 2025',
-                              fontFamily: AppFonts.poppinsReg,
-                              color: PortColor.button,
+                              title: "Confirm Slot",
+                              fontFamily: AppFonts.kanitReg,
+                              color: _selectedTimeSlot != null
+                                  ? PortColor.black
+                                  : Colors.grey.shade700,
                               fontWeight: FontWeight.w600,
                               size: 14,
                             ),
                           ),
                         ),
-                        SizedBox(height: screenHeight * 0.03),
-
-                        // Time Slot Sections in Row
-                        Row(
-                          children: [
-                            // Morning Section
-                            Expanded(
-                              child: _buildTimeSlotCard(
-                                "Morning",
-                                "8AM - 12PM",
-                                Icons.wb_sunny_outlined,
-                                _selectedSession == "Morning",
-                                    () {
-                                  setModalState(() {
-                                    _selectedSession = "Morning";
-                                    _selectedTimeSlot = null;
-                                  });
-                                },
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.02),
-
-                            // Afternoon Section
-                            Expanded(
-                              child: _buildTimeSlotCard(
-                                "Afternoon",
-                                "12PM - 4PM",
-                                Icons.light_mode_outlined,
-                                _selectedSession == "Afternoon",
-                                    () {
-                                  setModalState(() {
-                                    _selectedSession = "Afternoon";
-                                    _selectedTimeSlot = null;
-                                  });
-                                },
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.02),
-
-                            // Evening Section
-                            Expanded(
-                              child: _buildTimeSlotCard(
-                                "Evening",
-                                "4PM - 7PM",
-                                Icons.nights_stay_outlined,
-                                _selectedSession == "Evening",
-                                    () {
-                                  setModalState(() {
-                                    _selectedSession = "Evening";
-                                    _selectedTimeSlot = null;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: screenHeight * 0.03),
-
-                        // Individual Time Slots based on selected session
-                        if (_selectedSession != null) ...[
-                          TextConst(
-                            title: "Available Time Slots",
-                            fontFamily: AppFonts.kanitReg,
-                            fontWeight: FontWeight.w600,
-                            size: 16,
-                            color: PortColor.black,
-                          ),
-                          SizedBox(height: screenHeight * 0.02),
-
-                          Column(
-                            children: _getTimeSlotsForSession().map((slot) => _buildTimeSlotItem(slot, setModalState)).toList(),
-                          ),
-                        ],
-
-                        SizedBox(height: screenHeight * 0.05),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Confirm Button
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: screenWidth * 0.05,
-                    vertical: screenHeight * 0.02,
-                  ),
-                  decoration: BoxDecoration(
-                    color: PortColor.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: GestureDetector(
-                    onTap: _selectedTimeSlot != null ? () {
-                      Navigator.pop(context);
-                      setState(() {
-                        _slotConfirmed = true;
-                      });
-                    } : null,
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.018),
-                      decoration: BoxDecoration(
-                        color: _selectedTimeSlot != null ? PortColor.button : Colors.grey,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 6,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: TextConst(
-                          title: "Confirm Slot",
-                          fontFamily: AppFonts.kanitReg,
-                          color: _selectedTimeSlot != null ? PortColor.black : Colors.grey.shade700,
-                          fontWeight: FontWeight.w600,
-                          size: 14,
-                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
+      ),
+    );
+  }
+// Helper function to get month name
+  String _getMonthName(int month) {
+    switch (month) {
+      case 1: return 'JAN';
+      case 2: return 'FEB';
+      case 3: return 'MAR';
+      case 4: return 'APR';
+      case 5: return 'MAY';
+      case 6: return 'JUN';
+      case 7: return 'JUL';
+      case 8: return 'AUG';
+      case 9: return 'SEP';
+      case 10: return 'OCT';
+      case 11: return 'NOV';
+      case 12: return 'DEC';
+      default: return '';
+    }
+  }
+
+  Morning? _getSelectedSessionSlots() {
+    final dailySlots = Provider.of<DailySlotViewModel>(context, listen: false).dailySlotModel;
+
+    switch (_selectedSession) {
+      case "Morning":
+        return dailySlots?.slots?.morning;
+      case "Afternoon":
+        return dailySlots?.slots?.afternoon;
+      case "Evening":
+        return dailySlots?.slots?.evening;
+      default:
+        return null;
+    }
+  }
+
+
+// Updated time slot card that uses API data
+  Widget _buildTimeSlotCardFromApi(
+      String title,
+      Morning sessionData,
+      IconData icon,
+      bool isSelected,
+      VoidCallback onTap,
+      ) {
+    final isAvailable = sessionData.availableTimeStatus == 1;
+    final slotCount = sessionData.availableSlots?.length ?? 0;
+
+    // अगर available नहीं है, तो selected भी नहीं हो सकता
+    final effectiveIsSelected = isAvailable && isSelected;
+
+    return GestureDetector(
+      onTap: isAvailable ? onTap : null,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.03,
+          vertical: screenHeight * 0.02,
+        ),
+        decoration: BoxDecoration(
+          color: effectiveIsSelected
+              ? PortColor.gold.withOpacity(0.2)
+              : (isAvailable ? PortColor.white : Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: effectiveIsSelected
+                ? PortColor.gold
+                : (isAvailable ? PortColor.gray.withOpacity(0.3) : Colors.grey.shade400),
+            width: effectiveIsSelected ? 2 : 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Icon
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.02),
+              decoration: BoxDecoration(
+                color: effectiveIsSelected
+                    ? PortColor.gold
+                    : (isAvailable ? PortColor.gold.withOpacity(0.1) : Colors.grey.shade400),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: effectiveIsSelected ? PortColor.white : (isAvailable ? PortColor.gold : Colors.grey.shade600),
+                size: screenHeight * 0.025,
+              ),
+            ),
+
+            SizedBox(height: screenHeight * 0.01),
+
+            // Title
+            TextConst(
+              title: title,
+              fontFamily: AppFonts.kanitReg,
+              fontWeight: FontWeight.w600,
+              size: 14,
+              color: effectiveIsSelected
+                  ? PortColor.black
+                  : (isAvailable ? Colors.grey.shade700 : Colors.grey.shade500),
+            ),
+
+            SizedBox(height: screenHeight * 0.005),
+
+            // Time Range
+            TextConst(
+              title: sessionData.amToPm ?? "$slotCount slots",
+              fontFamily: AppFonts.poppinsReg,
+              color: effectiveIsSelected
+                  ? PortColor.black
+                  : (isAvailable ? Colors.grey.shade600 : Colors.grey.shade500),
+              size: 12,
+              fontWeight: FontWeight.w500,
+            ),
+
+            // Availability Status
+            if (!isAvailable) ...[
+              SizedBox(height: screenHeight * 0.005),
+              TextConst(
+                title: "Not Available",
+                fontFamily: AppFonts.poppinsReg,
+                color: Colors.red,
+                size: 10,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+// Build available slots list from API data
+  Widget _buildAvailableSlotsList(StateSetter setModalState) {
+    final sessionSlots = _getSelectedSessionSlots();
+
+    if (sessionSlots == null || sessionSlots.availableSlots == null) {
+      return Center(
+        child: TextConst(
+          title: "No slots available",
+          color: Colors.grey,
+          fontFamily: AppFonts.kanitReg,
+        ),
+      );
+    }
+
+    return Column(
+      children: sessionSlots.availableSlots!.map((slot) {
+        final isSlotAvailable = slot.remaining != null && slot.remaining! > 0;
+
+        return _buildTimeSlotItemFromApi(slot, isSlotAvailable, setModalState);
+      }).toList(),
+    );
+  }
+
+// Updated time slot item that uses API data
+  Widget _buildTimeSlotItemFromApi(
+      AvailableSlots slot,
+      bool isAvailable,
+      StateSetter setModalState,
+      ) {
+    bool isSelected = _selectedTimeSlot == slot.slotName;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: screenHeight * 0.015),
+      child: GestureDetector(
+        onTap: isAvailable ? () {
+          setModalState(() {
+            _selectedTimeSlot = slot.slotName;
+          });
+        } : null,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.04,
+            vertical: screenHeight * 0.02,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? PortColor.gold.withOpacity(0.2)
+                : (isAvailable ? PortColor.white : Colors.grey.shade100),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelected
+                  ? PortColor.gold
+                  : (isAvailable ? PortColor.gray.withOpacity(0.3) : Colors.grey.shade300),
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: isSelected
+                ? [
+              BoxShadow(
+                color: PortColor.gold.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ]
+                : [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Selection indicator
+              Container(
+                width: screenWidth * 0.04,
+                height: screenWidth * 0.04,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected
+                        ? PortColor.gold
+                        : (isAvailable ? Colors.grey.shade400 : Colors.grey.shade300),
+                    width: 2,
+                  ),
+                  color: isSelected ? PortColor.gold : Colors.transparent,
+                ),
+                child: isSelected
+                    ? Icon(
+                  Icons.check,
+                  color: PortColor.white,
+                  size: screenWidth * 0.03,
+                )
+                    : null,
+              ),
+
+              SizedBox(width: screenWidth * 0.03),
+
+              // Time slot text and details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextConst(
+                      title: slot.slotName ?? "Unknown Slot",
+                      fontFamily: AppFonts.kanitReg,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                      color: isSelected
+                          ? PortColor.black
+                          : (isAvailable ? Colors.grey.shade700 : Colors.grey.shade500),
+                      size: 14,
+                    ),
+
+                  ],
+                ),
+              ),
+
+              // Availability badge
+              if (!isAvailable)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.02,
+                    vertical: screenHeight * 0.005,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: TextConst(
+                    title: "Full",
+                    color: Colors.red,
+                    size: 10,
+                    fontFamily: AppFonts.poppinsReg,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -352,7 +795,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       decoration: BoxDecoration(
                         color: PortColor.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: PortColor.gray.withOpacity(0.3)),
+                        border: Border.all(
+                          color: PortColor.gray.withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -410,7 +855,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             decoration: BoxDecoration(
                               color: PortColor.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: PortColor.gray.withOpacity(0.3)),
+                              border: Border.all(
+                                color: PortColor.gray.withOpacity(0.3),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +893,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             decoration: BoxDecoration(
                               color: PortColor.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: PortColor.gray.withOpacity(0.3)),
+                              border: Border.all(
+                                color: PortColor.gray.withOpacity(0.3),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +925,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
                     // Terms & Conditions
                     TextConst(
-                      title: "By proceeding, you agree to our Terms & Conditions",
+                      title:
+                          "By proceeding, you agree to our Terms & Conditions",
                       fontFamily: AppFonts.kanitReg,
                       color: Colors.grey.shade600,
                       size: 12,
@@ -548,7 +998,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildTimeSlotCard(String title, String timeRange, IconData icon, bool isSelected, VoidCallback onTap) {
+  Widget _buildTimeSlotCard(
+    String title,
+    String timeRange,
+    IconData icon,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -560,7 +1016,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           color: isSelected ? PortColor.gold.withOpacity(0.2) : PortColor.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? PortColor.gold : PortColor.gray.withOpacity(0.3),
+            color: isSelected
+                ? PortColor.gold
+                : PortColor.gray.withOpacity(0.3),
             width: isSelected ? 2 : 1.5,
           ),
           boxShadow: [
@@ -578,7 +1036,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             Container(
               padding: EdgeInsets.all(screenWidth * 0.02),
               decoration: BoxDecoration(
-                color: isSelected ? PortColor.gold : PortColor.gold.withOpacity(0.1),
+                color: isSelected
+                    ? PortColor.gold
+                    : PortColor.gold.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -633,25 +1093,31 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             vertical: screenHeight * 0.02,
           ),
           decoration: BoxDecoration(
-            color: isSelected ? PortColor.gold.withOpacity(0.2) : PortColor.white,
+            color: isSelected
+                ? PortColor.gold.withOpacity(0.2)
+                : PortColor.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: isSelected ? PortColor.gold : PortColor.gray.withOpacity(0.3),
+              color: isSelected
+                  ? PortColor.gold
+                  : PortColor.gray.withOpacity(0.3),
               width: isSelected ? 2 : 1,
             ),
-            boxShadow: isSelected ? [
-              BoxShadow(
-                color: PortColor.gold.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ] : [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: PortColor.gold.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 2,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
           ),
           child: Row(
             children: [
@@ -669,10 +1135,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ),
                 child: isSelected
                     ? Icon(
-                  Icons.check,
-                  color: PortColor.white,
-                  size: screenWidth * 0.03,
-                )
+                        Icons.check,
+                        color: PortColor.white,
+                        size: screenWidth * 0.03,
+                      )
                     : null,
               ),
 
@@ -695,188 +1161,318 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Scaffold(
-        backgroundColor: PortColor.bg,
-        body: Column(
-          children: [
-            SizedBox(height: topPadding,),
-            Container(
-              padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.03,
-                  vertical: screenHeight * 0.02),
-              height: screenHeight * 0.17,
-              decoration: BoxDecoration(
-                color: PortColor.white,
-                border: Border(
-                  bottom: BorderSide(
-                      color: PortColor.gray, width: screenWidth * 0.002),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: PortColor.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, -1),
+    final summary = Provider.of<FinalSummaryViewModel>(context);
+    final charges = summary.finalSummaryModel?.charges;
+    if (charges == null) {
+      return const Center(child: CupertinoActivityIndicator());
+    }    return Stack(
+      children: [
+        SafeArea(
+          top: false,
+          child: Scaffold(
+            backgroundColor: PortColor.bg,
+            body: Column(
+              children: [
+                SizedBox(height: topPadding),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.03,
+                    vertical: screenHeight * 0.02,
                   ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
+                  height: screenHeight * 0.17,
+                  decoration: BoxDecoration(
+                    color: PortColor.white,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: PortColor.gray,
+                        width: screenWidth * 0.002,
+                      ),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: PortColor.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, -1),
+                      ),
+                    ],
+                  ),
+                  child: Column(
                     children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: PortColor.black,
-                          size: screenHeight * 0.02,
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.pop(context),
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: PortColor.black,
+                              size: screenHeight * 0.02,
+                            ),
+                          ),
+                          SizedBox(width: screenWidth * 0.02),
+                          TextConst(
+                            title: "Packer and Mover",
+                            color: PortColor.black,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          StepWidget(
+                            icon: Icons.check,
+                            text: 'Moving details',
+                            isActive: true,
+                            isCompleted: true,
+                          ),
+                          DottedLine(),
+                          StepWidget(
+                            icon: Icons.inventory,
+                            text: 'Add items',
+                            isActive: true,
+                            isCompleted: true,
+                          ),
+                          DottedLine(),
+                          StepWidget(
+                            icon: Icons.receipt,
+                            text: 'Schedule',
+                            isActive: true,
+                            isCompleted: false,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextConst(
+                          title: "Select shifting date",
+                          fontFamily: AppFonts.kanitReg,
+                          size: 15,
+                          fontWeight: FontWeight.w400,
                         ),
-                      ),
-                      SizedBox(width: screenWidth * 0.02),
-                      TextConst(
-                          title: "Packer and Mover",
-                          color: PortColor.black),
-                    ],
+                        const SizedBox(height: 8),
+
+                        TextConst(
+                          title: 'SEP 2025',
+                          fontFamily: AppFonts.poppinsReg,
+                          color: PortColor.button,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 80, // 👈 compact height
+                          child: GridView.builder(
+                            scrollDirection: Axis.horizontal,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 1,
+                                  childAspectRatio: 1,
+                                  mainAxisSpacing: 10,
+                                ),
+                            itemCount: summary
+                                .finalSummaryModel!
+                                .dateBaseAddAmount!
+                                .length,
+                            itemBuilder: (context, index) {
+                              final item = summary
+                                  .finalSummaryModel!
+                                  .dateBaseAddAmount![index];
+
+                              bool isSelected = (index == selectedDateIndex);
+
+                              return _buildDateItem(
+                                item.label.toString(),
+                                item.date.toString(),
+                                "₹${item.amount}",
+                                isSelected,
+                                index,
+                                item,
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        TextConst(
+                          title: 'Recommended add-ons',
+                          fontFamily: AppFonts.kanitReg,
+                          size: 15,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Single-layer packing
+                        _buildAddonItem(
+                          charges.singleLayerCharges!.heading!,
+                          "₹${charges.singleLayerCharges!.amount}\n${charges.singleLayerCharges!.subHeading}",
+                          _singleLayer,
+                          (value) {
+                            setState(() {
+                              _singleLayer = value!;
+                              _multiLayer = false;
+
+                              selectedSingle = value ? 1 : 0; // ✅ always 1 or 0
+                              selectedMulti = 0; // disable other layer
+                            });
+
+                            final summaryVm =
+                                Provider.of<FinalSummaryViewModel>(
+                                  context,
+                                  listen: false,
+                                );
+                            summaryVm.finalSummaryApi(
+                              selectedDate,
+                              summary.finalSummaryModel!.distance,
+                              summary.finalSummaryModel!.pickupPoint,
+                              summary.finalSummaryModel!.dropPoint,
+                              selectedSingle,
+                              selectedMulti,
+                              selectedUnpack,
+                              selectedDismantle,
+                              context,
+                            );
+                          },
+                          context,
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _buildAddonItem(
+                          charges.multiLayerCharges!.heading!,
+                          "₹${charges.multiLayerCharges!.amount}\n${charges.multiLayerCharges!.subHeading}",
+                          _multiLayer,
+                          (value) {
+                            setState(() {
+                              _multiLayer = value!;
+                              _singleLayer = false;
+
+                              selectedMulti = value ? 1 : 0;
+                              selectedSingle = 0;
+                            });
+
+                            final summaryVm =
+                                Provider.of<FinalSummaryViewModel>(
+                                  context,
+                                  listen: false,
+                                );
+                            summaryVm.finalSummaryApi(
+                              selectedDate,
+                              summary.finalSummaryModel!.distance,
+                              summary.finalSummaryModel!.pickupPoint,
+                              summary.finalSummaryModel!.dropPoint,
+                              selectedSingle,
+                              selectedMulti,
+                              selectedUnpack,
+                              selectedDismantle,
+                              context,
+                            );
+                          },
+                          context,
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _buildAddonItem(
+                          charges.unpackingCharges!.heading!,
+                          "₹${charges.unpackingCharges!.amount}\n${charges.unpackingCharges!.subHeading}",
+                          _unpacking,
+                          (value) {
+                            setState(() {
+                              _unpacking = value!;
+                              selectedUnpack = value ? 1 : 0;
+                            });
+
+                            final summaryVm =
+                                Provider.of<FinalSummaryViewModel>(
+                                  context,
+                                  listen: false,
+                                );
+                            summaryVm.finalSummaryApi(
+                              selectedDate,
+                              summary.finalSummaryModel!.distance,
+                              summary.finalSummaryModel!.pickupPoint,
+                              summary.finalSummaryModel!.dropPoint,
+                              selectedSingle,
+                              selectedMulti,
+                              selectedUnpack,
+                              selectedDismantle,
+                              context,
+                            );
+                          },
+                          context,
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _buildAddonItem(
+                          charges.dismantleReassemblyCharges!.heading!,
+                          "₹${charges.dismantleReassemblyCharges!.amount}\n${charges.dismantleReassemblyCharges!.subHeading}",
+                          _dismantle,
+                          (value) {
+                            setState(() {
+                              _dismantle = value!;
+                              selectedDismantle = value ? 1 : 0;
+                            });
+
+                            final summaryVm =
+                                Provider.of<FinalSummaryViewModel>(
+                                  context,
+                                  listen: false,
+                                );
+                            summaryVm.finalSummaryApi(
+                              selectedDate,
+                              summary.finalSummaryModel!.distance,
+                              summary.finalSummaryModel!.pickupPoint,
+                              summary.finalSummaryModel!.dropPoint,
+                              selectedSingle,
+                              selectedMulti,
+                              selectedUnpack,
+                              selectedDismantle,
+                              context,
+                            );
+                          },
+                          context,
+                        ),
+
+                        const SizedBox(height: 80),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: screenHeight * 0.03),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      StepWidget(
-                        icon: Icons.check,
-                        text: 'Moving details',
-                        isActive: true,
-                        isCompleted: true,
-                      ),
-                      DottedLine(),
-                      StepWidget(
-                        icon: Icons.inventory,
-                        text: 'Add items',
-                        isActive: true,
-                        isCompleted: true,
-                      ),
-                      DottedLine(),
-                      StepWidget(
-                        icon: Icons.receipt,
-                        text: 'Schedule',
-                        isActive: true,
-                        isCompleted: false,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextConst(title: "Select shifting date",fontFamily: AppFonts.kanitReg,size: 15,fontWeight: FontWeight.w400,),
-                    const SizedBox(height: 10),
-
-                    Center(
-                        child: TextConst(title: 'SEP 2025',fontFamily: AppFonts.poppinsReg,color: PortColor.button,fontWeight: FontWeight.w600,)
-                    ),
-
-                    GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        childAspectRatio: 0.7,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                      ),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _dateItems.length,
-                      itemBuilder: (context, index) {
-                        return _buildDateItem(
-                          _dateItems[index]['day'],
-                          _dateItems[index]['weekDay'],
-                          _dateItems[index]['price'],
-                          _dateItems[index]['selected'],
-                          index,
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Recommended add-ons
-                    TextConst(title: 'Recommended add-ons',fontFamily: AppFonts.kanitReg,size: 15,),
-                    const SizedBox(height: 16),
-
-                    // Installation/Un-installation
-                    _buildAddonItem(
-                      'Installation / Un-installation',
-                      'Starts @₹300\nFor electronic appliances',
-                      _installationSelected,
-                          (value) {
-                        setState(() {
-                          _installationSelected = value!;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Single-layer packing
-                    _buildAddonItem(
-                      'Single-layer packing',
-                      '₹199\nIncl. single layer of protective material like foam or corrugated sheets for essential protection',
-                      _singleLayerPacking,
-                          (value) {
-                        setState(() {
-                          _singleLayerPacking = value!;
-                          if (value) _multiLayerPacking = false;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Multi-layer packing
-                    _buildAddonItem(
-                      'Multi-layer packing',
-                      '₹399\nIncl. extra layer of bubble wrap + (foam sheets or film rolls) for superior protection',
-                      _multiLayerPacking,
-                          (value) {
-                        setState(() {
-                          _multiLayerPacking = value!;
-                          if (value) _singleLayerPacking = false;
-                        });
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // COVER
-                    _buildAddonItem(
-                      'COVER',
-                      'With COVER claim up to ₹50,000 in case of damage / loss',
-                      _coverSelected,
-                          (value) {
-                        setState(() {
-                          _coverSelected = value!;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 80),
-                  ],
                 ),
-              ),
+              ],
             ),
-          ],
+            bottomSheet: _slotConfirmed
+                ? _buildPaymentBottomSheet()
+                : _buildSelectSlotBottomSheet(),
+          ),
         ),
-        bottomSheet: _slotConfirmed ? _buildPaymentBottomSheet() : _buildSelectSlotBottomSheet(),
-      ),
+        if (summary.loading)
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.black54,
+            alignment: Alignment.center,
+            child: CupertinoActivityIndicator(
+              radius: 18,
+              color: PortColor.white,
+            ),
+          ),
+      ],
     );
   }
 
   Widget _buildSelectSlotBottomSheet() {
+    final summary = Provider.of<FinalSummaryViewModel>(context);
+    print(
+      "Total Amount:${summary.finalSummaryModel!.totalAmount.toString()}",
+    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -902,13 +1498,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const TextConst(title:
-                  "Total Amount",
+                  const TextConst(
+                    title: "Total Amount",
                     fontFamily: AppFonts.kanitReg,
                   ),
                   SizedBox(height: screenHeight * 0.005),
-                  TextConst(title:
-                  "₹ 2500",
+                  TextConst(
+                    title:
+                        '₹${summary.finalSummaryModel!.totalAmount.toString()}',
                     fontFamily: AppFonts.kanitReg,
                     size: 13,
                     color: PortColor.blackLight,
@@ -1031,47 +1628,59 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildDateItem(String day, String weekDay, String price, bool isSelected, int index) {
+  Widget _buildDateItem(
+    String day,
+    String weekDate,
+    String price,
+    bool isSelected,
+    int index,
+    DateBaseAddAmount item,
+  ) {
+    final summary = Provider.of<FinalSummaryViewModel>(context, listen: false);
+
     return GestureDetector(
       onTap: () {
         setState(() {
-          for (var i = 0; i < _dateItems.length; i++) {
-            _dateItems[i]['selected'] = (i == index);
-          }
+          selectedDateIndex = index;
+          selectedDate = item.date;
         });
+
+        final summaryVm = Provider.of<FinalSummaryViewModel>(
+          context,
+          listen: false,
+        );
+
+        summaryVm.finalSummaryApi(
+          selectedDate,
+          summary.finalSummaryModel!.distance,
+          summary.finalSummaryModel!.pickupPoint,
+          summary.finalSummaryModel!.dropPoint,
+          selectedSingle,
+          selectedMulti,
+          selectedUnpack,
+          selectedDismantle,
+          context,
+        );
       },
+
       child: Container(
         decoration: BoxDecoration(
           color: isSelected ? PortColor.gold.withOpacity(0.2) : Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? PortColor.gold: Colors.grey.shade300,
+            color: isSelected ? PortColor.gold : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  day,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  weekDay,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isSelected ? Colors.black : Colors.grey,
-                  ),
-                ),
-              ],
+            TextConst(title: day, fontWeight: FontWeight.bold, size: 12),
+            const SizedBox(height: 2),
+            TextConst(
+              title: weekDate,
+              color: isSelected ? Colors.black : Colors.grey,
+              size: 10,
             ),
             const SizedBox(height: 4),
             Text(
@@ -1088,45 +1697,56 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildAddonItem(String title, String description, bool isSelected, ValueChanged<bool?> onChanged) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? PortColor.button : Colors.grey[300]!,
-          width: isSelected ? 2 : 1,
+  Widget _buildAddonItem(
+    String title,
+    String description,
+    bool isSelected,
+    ValueChanged<bool?> onChanged,
+    BuildContext context,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        onChanged(!isSelected);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? PortColor.button : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Checkbox(
-            value: isSelected,
-            onChanged: onChanged,
-            activeColor: PortColor.button,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextConst(title:
-                title,
-                  color: isSelected ? PortColor.button : Colors.black,
-                  fontFamily: AppFonts.kanitReg,
-                  fontWeight: FontWeight.w500,
-                ),
-                TextConst(title:
-                description,
-                  color: Colors.grey,
-                  fontFamily: AppFonts.poppinsReg,
-                  size: 12,
-                ),
-              ],
+        child: Row(
+          children: [
+            Checkbox(
+              value: isSelected,
+              onChanged: onChanged,
+              activeColor: PortColor.button,
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextConst(
+                    title: title,
+                    color: isSelected ? PortColor.button : Colors.black,
+                    fontFamily: AppFonts.kanitReg,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  TextConst(
+                    title: description,
+                    color: Colors.grey,
+                    fontFamily: AppFonts.poppinsReg,
+                    size: 12,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1167,10 +1787,10 @@ class StepWidget extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-              color: isActive ? Colors.black : Colors.grey,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              fontSize: 10,
-              fontFamily: AppFonts.kanitReg
+            color: isActive ? Colors.black : Colors.grey,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            fontSize: 10,
+            fontFamily: AppFonts.kanitReg,
           ),
         ),
       ],

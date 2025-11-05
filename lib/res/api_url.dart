@@ -28,6 +28,10 @@ class ApiUrl{
   static const String paymentUrl="${baseUrl}payment";
   static const String callBackUrl="${baseUrl}cashfree/callback";
   static const String driverRatingUrl="${baseUrl}driver_rating";
+  static const String calculateVolumeUrl ="${baseUrl}calculateVolume";
+  static const String saveSelectedItemsUrl ="${baseUrl}saveSelectedItems";
+  static const String finalSummaryUrl ="${baseUrl}final_Summary";
+  static const String getDailySlotUrl ="${baseUrl}getDailySlots?";
 
   static const String sendOtpUrl ="https://otp.fctechteam.org/send_otp.php?mode=test&digit=4&mobile=";
   static const String verifyOtpUrl ="https://otp.fctechteam.org/verifyotp.php?mobile=";

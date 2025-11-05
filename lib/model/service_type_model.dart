@@ -1,49 +1,81 @@
 class ServiceTypeModel {
-  List<Data>? data;
+  bool? success;
   int? status;
   String? message;
+  List<ServiceCategory>? data;
 
-  ServiceTypeModel({this.data, this.status, this.message});
+  ServiceTypeModel({this.success, this.status, this.message, this.data});
 
   ServiceTypeModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
-      });
-    }
+    success = json['success'];
     status = json['status'];
     message = json['message'];
+    if (json['data'] != null) {
+      data = <ServiceCategory>[];
+      json['data'].forEach((v) {
+        data!.add(ServiceCategory.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['status'] = status;
-    data['message'] = message;
     return data;
   }
 }
 
-class Data {
+class ServiceCategory {
+  String? comment;
+  List<VehicleData>? data;
+
+  ServiceCategory({this.comment, this.data});
+
+  ServiceCategory.fromJson(Map<String, dynamic> json) {
+    comment = json['comment'];
+    if (json['data'] != null) {
+      data = <VehicleData>[];
+      json['data'].forEach((v) {
+        data!.add(VehicleData.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['comment'] = comment;
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class VehicleData {
   int? id;
   String? name;
+  int? status;
   String? images;
 
-  Data({this.id, this.name, this.images});
+  VehicleData({this.id, this.name, this.status, this.images});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  VehicleData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    status = json['status'];
     images = json['images'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['name'] = name;
+    data['status'] = status;
     data['images'] = images;
     return data;
   }

@@ -112,7 +112,7 @@ class _SavePickUpAddressState extends State<SavePickUpAddress> {
             ),
             if (searchResults.isNotEmpty)
               SizedBox(
-                height: screenHeight * 0.4,
+                height: screenHeight * 0.3,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,

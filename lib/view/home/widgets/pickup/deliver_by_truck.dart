@@ -409,7 +409,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                     ),
                   ],
                 ),
-                child: ListView.separated(
+                child:ListView.separated(
                   itemCount: searchResults.length,
                   itemBuilder: (context, index) {
                     final place = searchResults[index];
@@ -417,10 +417,22 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.04,
                       ),
-                      title: TextConst(
-                        title: place['description'],
-                        color: PortColor.black.withOpacity(0.5),
-                        fontFamily: AppFonts.kanitReg,
+                      title: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.redAccent, // 🔴 You can use PortColor.blue if needed
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: TextConst(
+                              title: place['description'],
+                              color: PortColor.black.withOpacity(0.5),
+                              fontFamily: AppFonts.kanitReg,
+                            ),
+                          ),
+                        ],
                       ),
                       onTap: () async {
                         String placeId = place['place_id'];
@@ -429,7 +441,7 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                           context,
                           PageRouteBuilder(
                             transitionDuration: const Duration(milliseconds: 400),
-                            pageBuilder: (_, __, ___) =>   EnterContactDetail(
+                            pageBuilder: (_, __, ___) => EnterContactDetail(
                               selectedLocation: place['description'],
                               selectedLatLng: latLng,
                             ),
@@ -459,7 +471,9 @@ class _DeliverByTruckState extends State<DeliverByTruck> {
                       thickness: 0.5,
                     ),
                   ),
-                ),
+                )
+
+
               ),
 
             if (searchResults.isEmpty)

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:port_karo/main.dart';
-import 'package:port_karo/res/app_fonts.dart';
-import 'package:port_karo/res/constant_color.dart';
+import 'package:port_karo/res/constant_text.dart';
 import 'package:port_karo/res/shimmer_loader.dart';
 import 'package:port_karo/view/home/widgets/pickup/deliver_by_packer_mover.dart';
 import 'package:port_karo/view/home/widgets/pickup/deliver_by_truck.dart';
 import 'package:port_karo/view_model/service_type_view_model.dart';
 import 'package:provider/provider.dart';
+
+import '../../../model/service_type_model.dart';
 
 class CategoryGrid extends StatefulWidget {
   const CategoryGrid({super.key});
@@ -17,73 +18,366 @@ class CategoryGrid extends StatefulWidget {
 
 class _CategoryGridState extends State<CategoryGrid> {
   String? _selectedVehicleId;
-  String? _selectedAnotherId;
+  String? _selectedVehicleName;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final serviceTypeViewModel =
-      Provider.of<ServiceTypeViewModel>(context, listen: false);
+      final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(
+        context,
+        listen: false,
+      );
       serviceTypeViewModel.serviceTypeApi();
     });
   }
 
-  void showComingSoonDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+  void _handleVehicleSelection(
+      VehicleData vehicle,
+      String section,
+      int categoryIndex,
+      int vehicleIndex,
+      ) {
+    final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(
+      context,
+      listen: false,
+    );
+
+    setState(() {
+      _selectedVehicleId = vehicle.id?.toString();
+      _selectedVehicleName = vehicle.name;
+    });
+
+    serviceTypeViewModel.setSelectedVehicleId(_selectedVehicleId!);
+
+    print("Selected Vehicle ID: $_selectedVehicleId");
+    print("Selected Vehicle Name: $_selectedVehicleName");
+    print("Section: $section");
+    print("Category Index: $categoryIndex");
+    print("Vehicle Index: $vehicleIndex");
+
+    // Navigation logic based on section and vehicle type
+    if (section == "Logistic Parcel Delivery") {
+      if (vehicleIndex == 0 || vehicleIndex == 1 || vehicleIndex == 2) {
+        // Bike or 3 Wheeler
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 400),
+            pageBuilder: (_, __, ___) => const DeliverByTruck(),
+            transitionsBuilder: (_, animation, __, child) {
+              final offsetAnimation =
+              Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutCubic,
+                ),
+              );
+
+              return SlideTransition(position: offsetAnimation, child: child);
+            },
+          ),
+        );
+      }
+    } else if (section == "Packers and Movers") {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const DeliverByPackerMover(),
+          transitionsBuilder: (_, animation, __, child) {
+            final offsetAnimation =
+            Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              ),
+            );
+
+            return SlideTransition(position: offsetAnimation, child: child);
+          },
         ),
-        backgroundColor: Colors.white,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.hourglass_empty_rounded,
-                size: 40, color: Colors.deepOrangeAccent),
-            const SizedBox(height: 12),
-            const Text(
-              "Coming Soon",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+      );
+    } else {
+      // For Passenger Booking and other sections, show coming soon
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const DeliverByTruck(),
+          transitionsBuilder: (_, animation, __, child) {
+            final offsetAnimation =
+            Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              "This feature is under development.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 18),
-            SizedBox(
-              width: double.infinity,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: PortColor.buttonBlue,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    "Got it",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+            );
+
+            return SlideTransition(position: offsetAnimation, child: child);
+          },
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context);
+
+    return serviceTypeViewModel.loading
+        ? _buildShimmerLoader()
+        : serviceTypeViewModel.serviceTypeModel?.data?.isNotEmpty == true
+        ? _buildCategoryGrid(serviceTypeViewModel)
+        : const Center(child: Text("No vehicles Available"));
+  }
+
+  Widget _buildShimmerLoader() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Logistics Section Shimmer
+          _buildSectionHeader("Logistic Parcel Delivery"),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            height: 120,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: 16,
                   ),
                 ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: 16,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Passenger Booking Shimmer
+          _buildSectionHeader("Passenger Booking"),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            height: 120,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: 16,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Packer & Mover Shimmer - Only one item
+          _buildSectionHeader("Packers and Movers"),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            height: 120,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ShimmerLoader(
+                    width: double.infinity,
+                    height: 120,
+                    borderRadius: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryGrid(ServiceTypeViewModel serviceTypeViewModel) {
+    final categories = serviceTypeViewModel.serviceTypeModel!.data!;
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section 1: Logistic Parcel Delivery
+          if (categories.isNotEmpty &&
+              categories[0].data != null &&
+              categories[0].data!.isNotEmpty)
+            _buildServiceSection(categories[0], isPackersAndMovers: false),
+
+          const SizedBox(height: 20),
+
+          // Section 2: Passenger Booking
+          if (categories.length > 1 &&
+              categories[1].data != null &&
+              categories[1].data!.isNotEmpty)
+            _buildServiceSection(categories[1], isPackersAndMovers: false),
+
+          const SizedBox(height: 20),
+
+          // Section 3: Packers and Movers - Only one vehicle
+          if (categories.length > 2 &&
+              categories[2].data != null &&
+              categories[2].data!.isNotEmpty)
+            _buildServiceSection(categories[2], isPackersAndMovers: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceSection(ServiceCategory category, {bool isPackersAndMovers = false}) {
+    List<VehicleData> vehicles = category.data!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader(category.comment ?? "Services"),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          height: isPackersAndMovers ? 140 : 120, // Increased height for Packers and Movers
+          child: Row(
+            children: List.generate(
+              isPackersAndMovers ? 1 : vehicles.length,
+                  (index) {
+                if (index < 3) {
+                  // Maximum 3 items per row for other sections, only 1 for Packers and Movers
+                  return Expanded(
+                    child: Padding(
+                      padding: index < (isPackersAndMovers ? 0 : vehicles.length - 1)
+                          ? const EdgeInsets.only(right: 10)
+                          : EdgeInsets.zero,
+                      child: _buildVehicleCard(
+                        vehicles[isPackersAndMovers ? 0 : index], // Always take first vehicle for Packers and Movers
+                        category.comment!,
+                        vehicles.indexOf(vehicles[isPackersAndMovers ? 0 : index]),
+                        isPackersAndMovers: isPackersAndMovers, // Pass the flag to vehicle card
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: TextConst(title: title, size: 15, fontWeight: FontWeight.w800),
+    );
+  }
+
+  Widget _buildVehicleCard(
+      VehicleData vehicle,
+      String section,
+      int vehicleIndex, {
+        bool isPackersAndMovers = false,
+      }) {
+    return GestureDetector(
+      onTap: () {
+        _handleVehicleSelection(vehicle, section, 0, vehicleIndex);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 12,
+              spreadRadius: 2,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: screenHeight * 0.01,
+                horizontal: screenWidth * 0.03,
+              ),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextConst(
+                        title: vehicle.name ?? "Vehicle",
+                        size: 13,
+                        fontWeight: FontWeight.w400,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.006),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: vehicle.images != null && vehicle.images!.isNotEmpty
+                    ? Image.network(
+                  vehicle.images!,
+                  height: isPackersAndMovers ? 93 : 70,
+                  width: isPackersAndMovers ? 340 : 90,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildPlaceholderImage(isPackersAndMovers: isPackersAndMovers);
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return _buildPlaceholderImage(isPackersAndMovers: isPackersAndMovers);
+                  },
+                )
+                    : _buildPlaceholderImage(isPackersAndMovers: isPackersAndMovers),
               ),
             ),
           ],
@@ -92,181 +386,12 @@ class _CategoryGridState extends State<CategoryGrid> {
     );
   }
 
-  // Method to set vehicle IDs when grid is tapped
-// Method to set vehicle IDs when grid is tapped
-  void _setVehicleIds(int index) {
-    final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context, listen: false);
-    final services = serviceTypeViewModel.serviceTypeModel!.data![index];
-
-    setState(() {
-      // API data se actual ID le rahe hain
-      _selectedVehicleId = services.id?.toString() ?? "vehicle_${index + 1}";
-      _selectedAnotherId = "another_id_${index + 1}";
-    });
-
-    // ✅ServiceTypeViewModel mein ID store karo
-    serviceTypeViewModel.setSelectedVehicleId(_selectedVehicleId!);
-
-    print("Vehicle ID Set: $_selectedVehicleId");
-    print("Another ID Set: $_selectedAnotherId");
-
-    // Your existing navigation logic
-    if (index == 0 || index == 1 || index == 3) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 400),
-          pageBuilder: (_, __, ___) => const DeliverByTruck(),
-          transitionsBuilder: (_, animation, __, child) {
-            final offsetAnimation = Tween<Offset>(
-              begin: const Offset(0, 1), // start from bottom
-              end: Offset.zero,          // end at normal position
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ));
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-        ),
-      );
-    } else if (index == 2) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 400),
-          pageBuilder: (_, __, ___) => const DeliverByPackerMover(),
-          transitionsBuilder: (_, animation, __, child) {
-            final offsetAnimation = Tween<Offset>(
-              begin: const Offset(0, 1),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ));
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-        ),
-      );
-    }
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final serviceTypeViewModel = Provider.of<ServiceTypeViewModel>(context);
-
-    return serviceTypeViewModel.loading
-        ? GridView.builder(
-      padding: const EdgeInsets.all(10),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 7,
-      ),
-      itemCount: 4,
-      itemBuilder: (context, index) {
-        return const ShimmerLoader(
-          width: double.infinity,
-          height: 140,
-          borderRadius: 16,
-        );
-      },
-    )
-        : serviceTypeViewModel.serviceTypeModel?.data?.isNotEmpty == true
-        ? Column(
-      children: [
-        GridView.builder(
-          padding: const EdgeInsets.all(12),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 7,
-              childAspectRatio: 1.1
-          ),
-          itemCount: serviceTypeViewModel.serviceTypeModel!.data!.length,
-          itemBuilder: (context, index) {
-            final services = serviceTypeViewModel.serviceTypeModel!.data![index];
-            return GestureDetector(
-              onTap: () {
-                _setVehicleIds(index);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(19),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.01,
-                        horizontal: screenWidth * 0.03,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Row(
-                          children: [
-                            Text(
-                              services.name ?? "",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: AppFonts.kanitReg,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 10,
-                              color: PortColor.grayLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: screenHeight * 0.006,
-                      ),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Image.network(
-                          services.images ?? "",
-                          height: 100,
-                          width: 130,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    )
-        : const Center(child: Text("No vehicles Available"));
+  Widget _buildPlaceholderImage({bool isPackersAndMovers = false}) {
+    return Container(
+      height: isPackersAndMovers ? 90 : 70, // Increased height for Packers and Movers
+      width: isPackersAndMovers ? 110 : 90, // Increased width for Packers and Movers
+      color: Colors.grey[200],
+      child: Icon(Icons.directions_car, color: Colors.grey[400], size: isPackersAndMovers ? 40 : 30), // Increased icon size for Packers and Movers
+    );
   }
 }

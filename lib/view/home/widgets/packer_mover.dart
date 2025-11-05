@@ -184,7 +184,10 @@ class _PackerMoverState extends State<PackerMover> {
 
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                  child: CityToggle(),
+                  child: CityToggle(
+                    pickupLocation: pickupController.text,
+                    dropLocation: dropController.text,
+                  ),
                 ),
 
                 SizedBox(height: screenHeight * 0.02),

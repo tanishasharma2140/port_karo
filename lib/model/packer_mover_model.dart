@@ -54,21 +54,21 @@ class Data {
 }
 
 class Packers {
-  int? packerId;
+  int? packerMoverId;
   String? packerName;
   String? comment;
   String? imageIcon;
   List<SubItems>? subItems;
 
   Packers(
-      {this.packerId,
+      {this.packerMoverId,
         this.packerName,
         this.comment,
         this.imageIcon,
         this.subItems});
 
   Packers.fromJson(Map<String, dynamic> json) {
-    packerId = json['packer_id'];
+    packerMoverId = json['packer_and_mover_id'];
     packerName = json['packer_name'];
     comment = json['comment'];
     imageIcon = json['image_icon'];
@@ -82,7 +82,7 @@ class Packers {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['packer_id'] = packerId;
+    data['packer_and_mover_id'] = packerMoverId;
     data['packer_name'] = packerName;
     data['comment'] = comment;
     data['image_icon'] = imageIcon;

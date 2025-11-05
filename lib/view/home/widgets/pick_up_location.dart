@@ -136,11 +136,23 @@ class _PickUpLocationState extends State<PickUpLocation> {
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.04,
                       ),
-                      title: TextConst(
-                        title: place['description'],
-                        color: PortColor.black.withOpacity(0.5),
-                        fontFamily: AppFonts.kanitReg,
-                        size: 12,
+                      title: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.green,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: TextConst(
+                              title: place['description'],
+                              color: PortColor.black.withOpacity(0.5),
+                              fontFamily: AppFonts.kanitReg,
+                              size: 12,
+                            ),
+                          ),
+                        ],
                       ),
                       onTap: () async {
                         String placeId = place['place_id'];
@@ -149,14 +161,14 @@ class _PickUpLocationState extends State<PickUpLocation> {
                           context,
                           PageRouteBuilder(
                             transitionDuration: const Duration(milliseconds: 400),
-                            pageBuilder: (_, __, ___) =>   SenderAddress(
+                            pageBuilder: (_, __, ___) => SenderAddress(
                               selectedLocation: place['description'],
                               selectedLatLng: latLng,
                             ),
                             transitionsBuilder: (_, animation, __, child) {
                               final offsetAnimation = Tween<Offset>(
-                                begin: const Offset(0, 1), // start from bottom
-                                end: Offset.zero,          // end at normal position
+                                begin: const Offset(0, 1),
+                                end: Offset.zero,
                               ).animate(CurvedAnimation(
                                 parent: animation,
                                 curve: Curves.easeOutCubic,
@@ -173,12 +185,11 @@ class _PickUpLocationState extends State<PickUpLocation> {
                     );
                   },
                   separatorBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.04,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
                     child: Divider(color: Colors.grey.shade300, thickness: 0.5),
                   ),
-                ),
+                )
+
               ),
             if (searchResults.isEmpty)
               Container(

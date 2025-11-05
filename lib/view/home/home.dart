@@ -318,8 +318,9 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 // Rest of your code remains same
-                SizedBox(height: screenHeight * 0.04),
+                SizedBox(height: screenHeight * 0.05),
                 const CategoryGrid(),
+                SizedBox(height: screenHeight * 0.03),
                 Container(
                   width: screenWidth,
                   decoration: const BoxDecoration(
