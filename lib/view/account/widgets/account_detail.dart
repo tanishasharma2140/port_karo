@@ -10,6 +10,7 @@ import 'package:port_karo/view/account/widgets/help_support.dart';
 import 'package:port_karo/view/account/widgets/save_address_detail.dart';
 import 'package:port_karo/view/account/widgets/terms_condition.dart';
 import 'package:port_karo/view/coins/coins.dart';
+import 'package:port_karo/view/order/packer_mover_order_history.dart';
 import 'package:port_karo/view/splash_screen.dart';
 import 'package:port_karo/view_model/user_view_model.dart';
 
@@ -34,6 +35,21 @@ class AccountDetail extends StatelessWidget {
                 color: PortColor.rapidBlue,
                 "Saved Address",
                 page: const SaveAddressDetail(),
+              )),
+          SizedBox(height: screenHeight * 0.02),
+          TextConst(title: "Order History", color: PortColor.gray),
+          SizedBox(height: screenHeight * 0.02),
+          Material(
+              elevation: 3.0,
+              borderRadius: BorderRadius.circular(10.0),
+              shadowColor: PortColor.grey.withOpacity(0.5),
+              color: PortColor.white,
+              child: buttonLayoutUi(
+                context,
+                Icons.history,
+                color: PortColor.gold,
+                "Packer Mover Order History",
+                page: const PackerMoverOrderHistory(),
               )),
           SizedBox(height: screenHeight * 0.02),
           TextConst(title: "Benefits", color: PortColor.gray),

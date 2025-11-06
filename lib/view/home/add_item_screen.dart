@@ -5,7 +5,6 @@ import 'package:port_karo/model/packer_mover_model.dart';
 import 'package:port_karo/res/app_fonts.dart';
 import 'package:port_karo/res/constant_color.dart';
 import 'package:port_karo/res/constant_text.dart';
-import 'package:port_karo/view_model/calculate_volume_view_model.dart';
 import 'package:port_karo/view_model/packer_mover_view_model.dart';
 import 'package:port_karo/view_model/save_selected_item_view_model.dart';
 import 'package:provider/provider.dart';
@@ -65,18 +64,15 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     });
   }
 
+  // void _storeMovingDetailsGlobally() {
+  //   final movingDetailsVm = Provider.of<MovingDetailsViewModel>(context, listen: false);
+  //   movingDetailsVm.setMovingDetails(widget.movingDetailsData);
+  // }
+
   void _printReceivedMovingDetails() {
     print("═══════════════════════════════════════");
     print("RECEIVED MOVING DETAILS IN ADD ITEMS SCREEN:");
-    print(
-      "Vehicle Type ID: ${widget.movingDetailsData['vehicle_type_id'] ?? 'N/A'}",
-    );
-    print(
-      "Vehicle Body Types: ${widget.movingDetailsData['vehicle_body_types'] ?? 'N/A'}",
-    );
-    print(
-      "Vehicle Body Detail ID: ${widget.movingDetailsData['vehicle_body_detail_id'] ?? 'N/A'}",
-    );
+
     print("Distance: ${widget.movingDetailsData['distance'] ?? 'N/A'} km");
 
     // Safe access for nested maps
@@ -91,22 +87,33 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
     print(
       "Drop Point - Lift: ${dropPoint['has_lift'] ?? 'N/A'}, Floors: ${dropPoint['floors'] ?? 'N/A'}",
     );
+
     print(
       "Pickup Location: ${widget.movingDetailsData['pickup_address'] ?? 'N/A'}",
     );
     print(
       "Drop Location: ${widget.movingDetailsData['drop_address'] ?? 'N/A'}",
     );
+
+    // ✅ Newly added: print coordinates
+    print(
+      "Pickup Latitude: ${widget.movingDetailsData['pickup_lat'] ?? 'N/A'}",
+    );
+    print(
+      "Pickup Longitude: ${widget.movingDetailsData['pickup_lng'] ?? 'N/A'}",
+    );
+    print(
+      "Drop Latitude: ${widget.movingDetailsData['drop_lat'] ?? 'N/A'}",
+    );
+    print(
+      "Drop Longitude: ${widget.movingDetailsData['drop_lng'] ?? 'N/A'}",
+    );
+
     print("Service Type: ${widget.movingDetailsData['service_type'] ?? 'N/A'}");
-    print(
-      "Shifting Date: ${widget.movingDetailsData['shifting_date'] ?? 'N/A'}",
-    );
-    print("Vehicle Name: ${widget.movingDetailsData['vehicle_name'] ?? 'N/A'}");
-    print(
-      "Starting Amount: ₹${widget.movingDetailsData['starting_amount'] ?? 'N/A'}",
-    );
+    print("Shifting Date: ${widget.movingDetailsData['shifting_date'] ?? 'N/A'}");
     print("═══════════════════════════════════════");
   }
+
 
   void _initializeEmptyData() {
     for (var category in _categories) {
@@ -322,12 +329,14 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
         listen: false,
       );
       selectedItemVm.saveSelectedItemsApi(
-        1, // cityType static hai dynamic krna hai
+        widget.movingDetailsData['service_type'], // cityType static hai dynamic krna hai
         distance,
         pickupPoint,
         dropPoint,
         selectedItemsForApi,
         context,
+        widget.movingDetailsData
+
       );
     } catch (e, stackTrace) {
       print("Error in _checkPrice: $e");
@@ -426,7 +435,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                           child: Icon(
                             Icons.arrow_back,
                             color: PortColor.black,
-                            size: screenHeight * 0.025,
+                            size: screenHeight * 0.026,
                           ),
                         ),
                       ),
@@ -435,6 +444,7 @@ class _AddItemsScreenState extends State<AddItemsScreen> {
                         title: "Packer and Mover",
                         color: PortColor.black,
                         fontWeight: FontWeight.w600,
+                        size: 16,
                       ),
                     ],
                   ),

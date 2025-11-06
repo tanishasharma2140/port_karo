@@ -32,6 +32,9 @@ class ApiUrl{
   static const String saveSelectedItemsUrl ="${baseUrl}saveSelectedItems";
   static const String finalSummaryUrl ="${baseUrl}final_Summary";
   static const String getDailySlotUrl ="${baseUrl}getDailySlots?";
+  static const String proceedOrderUrl ="${baseUrl}proceed_Order";
+  static const String moverHistoryUrl ="${baseUrl}mover_history/";
+  static const String packerMoversTermsUrl ="${baseUrl}packer-and-mover/terms";
 
   static const String sendOtpUrl ="https://otp.fctechteam.org/send_otp.php?mode=test&digit=4&mobile=";
   static const String verifyOtpUrl ="https://otp.fctechteam.org/verifyotp.php?mobile=";

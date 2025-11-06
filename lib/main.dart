@@ -14,7 +14,6 @@ import 'package:port_karo/view_model/add_wallet_view_model.dart';
 import 'package:port_karo/view_model/address_delete_view_model.dart';
 import 'package:port_karo/view_model/address_show_view_model.dart';
 import 'package:port_karo/view_model/apply_coupon_view_model.dart';
-import 'package:port_karo/view_model/calculate_volume_view_model.dart';
 import 'package:port_karo/view_model/call_back_view_model.dart';
 import 'package:port_karo/view_model/coupon_list_view_model.dart';
 import 'package:port_karo/view_model/daily_slot_view_model.dart';
@@ -23,12 +22,18 @@ import 'package:port_karo/view_model/final_summary_view_model.dart';
 import 'package:port_karo/view_model/goods_type_view_model.dart';
 import 'package:port_karo/view_model/help_and_support_view_model.dart';
 import 'package:port_karo/view_model/login_view_model.dart';
+import 'package:port_karo/view_model/moving_detail_view_model.dart';
 import 'package:port_karo/view_model/on_boarding_view_model.dart';
 import 'package:port_karo/view_model/order_view_model.dart';
+import 'package:port_karo/view_model/packer_mover_call_back_viewmodel.dart';
+import 'package:port_karo/view_model/packer_mover_order_history_view_model.dart';
+import 'package:port_karo/view_model/packer_mover_payment_view_model.dart';
+import 'package:port_karo/view_model/packer_mover_terms_view_model.dart';
 import 'package:port_karo/view_model/packer_mover_view_model.dart';
 import 'package:port_karo/view_model/payment_view_model.dart';
 import 'package:port_karo/view_model/policy_view_model.dart';
 import 'package:port_karo/view_model/port_banner_view_model.dart';
+import 'package:port_karo/view_model/proceed_order_view_model.dart';
 import 'package:port_karo/view_model/profile_update_view_model.dart';
 import 'package:port_karo/view_model/profile_view_model.dart';
 import 'package:port_karo/view_model/reason_cancel_ride_view_model.dart';
@@ -133,11 +138,16 @@ class _MyAppState extends State<MyApp> {
           ChangeNotifierProvider(create: (context)=> PaymentViewModel()),
           ChangeNotifierProvider(create: (context)=> CallBackViewModel()),
           ChangeNotifierProvider(create: (context)=> DriverRatingViewModel()),
-          ChangeNotifierProvider(create: (context)=> CalculateVolumeViewModel()),
           ChangeNotifierProvider(create: (context)=> SaveSelectedItemViewModel()),
           ChangeNotifierProvider(create: (context)=> ReasonCancelRideViewModel()),
           ChangeNotifierProvider(create: (context)=> FinalSummaryViewModel()),
           ChangeNotifierProvider(create: (context)=> DailySlotViewModel()),
+          ChangeNotifierProvider(create: (context)=> MovingDetailsViewModel()),
+          ChangeNotifierProvider(create: (context)=> ProceedOrderViewModel()),
+          ChangeNotifierProvider(create: (context)=> PackerMoverCallBackViewmodel()),
+          ChangeNotifierProvider(create: (context)=> PackerMoverPaymentViewModel()),
+          ChangeNotifierProvider(create: (context)=> PackerMoverOrderHistoryViewModel()),
+          ChangeNotifierProvider(create: (context)=> PackerMoverTermsViewModel()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

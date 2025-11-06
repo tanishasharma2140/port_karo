@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:port_karo/main.dart';
@@ -365,7 +366,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
         'pickup_lng': pickupLatLng.longitude,
         'drop_lat': dropLatLng.latitude,
         'drop_lng': dropLatLng.longitude,
-        'service_type': isWithinCitySelected ? 'within_city' : 'between_cities',
+        'service_type': isWithinCitySelected ? 1 : 2,
         'shifting_date': dateController.text,
       };
 
@@ -410,7 +411,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
     print("Drop Location: ${data['drop_address'] ?? 'N/A'}");
     print("Pickup LatLng: ${data['pickup_lat'] ?? 'N/A'}, ${data['pickup_lng'] ?? 'N/A'}");
     print("Drop LatLng: ${data['drop_lat'] ?? 'N/A'}, ${data['drop_lng'] ?? 'N/A'}");
-    print("Service Type: ${data['service_type'] ?? 'N/A'}");
+    print("Service Type Sent: ${isWithinCitySelected ? 1 : 2}");
     print("Shifting Date: ${data['shifting_date'] ?? 'N/A'}");
     print("═══════════════════════════════════════");
   }
@@ -468,7 +469,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                               child: Icon(
                                 Icons.arrow_back,
                                 color: PortColor.black,
-                                size: screenHeight * 0.025,
+                                size: screenHeight * 0.026,
                               ),
                             ),
                           ),
@@ -477,6 +478,7 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                             title: "Packer and Mover",
                             color: PortColor.black,
                             fontWeight: FontWeight.w600,
+                            size: 16,
                           ),
                           Spacer(),
                           GestureDetector(
@@ -605,7 +607,6 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                             ),
                           ],
                         ),
-                      // 🔹 Floor Number Field for Pickup (shown when lift is OFF)
                       if (pickupController.text.isNotEmpty && !pickupLiftAvailable)
                         Padding(
                           padding: EdgeInsets.only(top: screenHeight * 0.01),
@@ -627,6 +628,26 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                               fontSize: 13,
                             ),
                             keyboardType: TextInputType.number,
+                            onChanged: (val) {
+                              if (val.isNotEmpty) {
+                                int number = int.tryParse(val) ?? 0;
+
+                                if (number < 1) {
+                                  pickupFloorController.text = "1";
+                                  pickupFloorController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: pickupFloorController.text.length),
+                                  );
+                                } else if (number > 15) {
+                                  pickupFloorController.text = "15";
+                                  pickupFloorController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: pickupFloorController.text.length),
+                                  );
+                                }
+                              }
+                            },
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                           ),
                         ),
                     ],
@@ -719,6 +740,25 @@ class _DeliverByPackerMoverState extends State<DeliverByPackerMover> {
                               fontSize: 13,
                             ),
                             keyboardType: TextInputType.number,
+                            onChanged: (val) {
+                              if (val.isNotEmpty) {
+                                int number = int.tryParse(val) ?? 0;
+                                if (number < 1) {
+                                  dropFloorController.text = "1";
+                                  dropFloorController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: dropFloorController.text.length),
+                                  );
+                                } else if (number > 15) {
+                                  dropFloorController.text = "15";
+                                  dropFloorController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: dropFloorController.text.length),
+                                  );
+                                }
+                              }
+                            },
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
                           ),
                         ),
                     ],

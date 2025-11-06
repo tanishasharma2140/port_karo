@@ -3,36 +3,38 @@ import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart'
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfsession/cfsession.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
-import 'package:port_karo/model/cash_free_gateway_model.dart';
-import 'package:port_karo/res/constant_color.dart';
-import 'package:port_karo/view_model/call_back_view_model.dart';
+import 'package:port_karo/view_model/packer_mover_call_back_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-class CashfreePaymentScreen extends StatefulWidget {
+import '../model/cash_free_gateway_model.dart';
+import '../res/constant_color.dart' show PortColor;
+
+class PackerMoverCashfreeScreen extends StatefulWidget {
   final String amount;
   final CashFreeGatewayModel data;
 
-  const CashfreePaymentScreen({
+  const PackerMoverCashfreeScreen({
     super.key,
     required this.amount,
     required this.data,
   });
 
   @override
-  State<CashfreePaymentScreen> createState() => _CashfreePaymentScreenState();
+  State<PackerMoverCashfreeScreen> createState() => _PackerMoverCashfreeScreenState();
 }
 
-class _CashfreePaymentScreenState extends State<CashfreePaymentScreen> {
+class _PackerMoverCashfreeScreenState extends State<PackerMoverCashfreeScreen> {
   final CFPaymentGatewayService cfPaymentGatewayService =
-      CFPaymentGatewayService();
+  CFPaymentGatewayService();
 
   @override
   void initState() {
     super.initState();
     // Setup callbacks
     cfPaymentGatewayService.setCallback(
-      (orderId) async {
-        final callBackVm = Provider.of<CallBackViewModel>(
+          (orderId) async {
+        _showMessage("Payment Success for Order ID: $orderId");
+        final callBackVm = Provider.of<PackerMoverCallBackViewmodel>(
           context,
           listen: false,
         );
@@ -42,7 +44,7 @@ class _CashfreePaymentScreenState extends State<CashfreePaymentScreen> {
           context: context,
         );
       },
-      (error, orderId) {
+          (error, orderId) {
         _showMessage(
           "Payment Failed: ${error.getMessage()} (Order ID: $orderId)",
         );
@@ -65,8 +67,8 @@ class _CashfreePaymentScreenState extends State<CashfreePaymentScreen> {
       /// STEP 2: Build session
       var session = CFSessionBuilder()
           .setEnvironment(
-            CFEnvironment.SANDBOX,
-          ) // Change to PRODUCTION in live mode
+        CFEnvironment.SANDBOX,
+      ) // Change to PRODUCTION in live mode
           .setOrderId(orderId)
           .setPaymentSessionId(paymentSessionId)
           .build();

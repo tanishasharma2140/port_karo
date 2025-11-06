@@ -33,17 +33,6 @@ class AddAddressViewModel with ChangeNotifier {
     UserViewModel userViewModel = UserViewModel();
     String? userId = await userViewModel.getUser();
     Map<String, dynamic> data =
-    // {
-    //   "userid": userId,
-    //   "latitude": latitude,
-    //   "longitude": longitude,
-    //   "address": address,
-    //   "contact_no": phone,
-    //   "address_type": addressType,
-    //   "name": name,
-    //   "pincode": pinCode,
-    //   "house": house,
-    // }
     {
       "userid": userId,
       "name": name,

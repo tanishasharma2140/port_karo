@@ -34,6 +34,8 @@ class SaveSelectedItemViewModel with ChangeNotifier {
     dynamic dropPoint,
       dynamic selectedItems,
     context,
+      Map<String, dynamic> movingDetailsData,
+
   ) async {
     UserViewModel userViewModel = UserViewModel();
     String? userId = await userViewModel.getUser();
@@ -49,6 +51,7 @@ class SaveSelectedItemViewModel with ChangeNotifier {
     };
 
     print("saveSelectedItem${data}");
+    print("movingDetailsData${movingDetailsData}");
 
     _saveSelectedItemRepo
         .saveSelectedItemsApi(data)
@@ -58,11 +61,14 @@ class SaveSelectedItemViewModel with ChangeNotifier {
             setSelectedItemData(value);
             final summaryVm = Provider.of<FinalSummaryViewModel>(context,listen: false);
             summaryVm.finalSummaryApi(null,distance, pickupPoint, dropPoint, 0, 0, 0, 0, context);
+
             Navigator.push(
               context,
               PageRouteBuilder(
                 transitionDuration: const Duration(milliseconds: 400),
-                pageBuilder: (_, __, ___) => const ScheduleScreen(),
+                pageBuilder: (_, __, ___) => ScheduleScreen(
+                  data : movingDetailsData,
+                ),
                 transitionsBuilder: (_, animation, __, child) {
                   final offsetAnimation = Tween<Offset>(
                     begin: const Offset(0, 1),
